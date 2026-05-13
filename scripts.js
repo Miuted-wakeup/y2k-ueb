@@ -32,10 +32,10 @@ const diaryEntries = [
 ];
 
 const obsessions = [
-  "city pop 🎵", "japanese street fashion", "Y2K aesthetics ✦",
-  "old web archives", "anime openings de 2005", "synth music",
-  "aprender japonés 日本語", "fotografía analógica", "web design retro",
-  "videojuegos viejos", "lo-fi beats", "fashion history"
+  "city pop 🎵", "moda callejera japonesa", "estética Y2K ✦",
+  "archivos de la web antigua", "openings de anime de 2005", "música synth",
+  "aprender japonés 日本語", "fotografía analógica", "diseño web retro",
+  "videojuegos viejos", "beats lo-fi", "historia de la moda"
 ];
 
 function updateDaily() {
@@ -201,7 +201,7 @@ function updateNP() {
       audio.play().then(() => {
         if (playBtn) playBtn.textContent = '⏸';
       }).catch(e => {
-        console.log("Autoplay blocked");
+        console.log("Autoplay bloqueado");
         isPlaying = false;
         localStorage.setItem('isPlaying', 'false');
         if (playBtn) playBtn.textContent = '▶';
