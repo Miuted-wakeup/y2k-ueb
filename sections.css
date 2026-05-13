@@ -133,6 +133,15 @@
   color: #E8E8FF;
 }
 
+#section-japan #sidebar-left {
+  width: 160px;
+}
+
+#section-japan #sidebar-right {
+  width: 210px;
+}
+
+
 #section-japan {
   background-image: 
     repeating-radial-gradient(

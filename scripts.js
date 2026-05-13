@@ -170,6 +170,7 @@ const playlist = [
 let npIndex = parseInt(localStorage.getItem('npIndex') || Math.floor(Math.random() * playlist.length));
 let isPlaying = localStorage.getItem('isPlaying') === 'true';
 let startFrom = parseFloat(localStorage.getItem('npTime') || 0);
+let npVolume = parseFloat(localStorage.getItem('npVolume') || 0.5);
 
 function updateNP() {
   const titleEl = document.getElementById('np-title');
@@ -249,9 +250,11 @@ function initNowPlaying() {
     // Volume control
     const volSlider = document.getElementById('np-volume');
     if (volSlider) {
-      audio.volume = volSlider.value;
+      volSlider.value = npVolume;
+      audio.volume = npVolume;
       volSlider.addEventListener('input', () => {
         audio.volume = volSlider.value;
+        localStorage.setItem('npVolume', volSlider.value);
       });
     }
 
@@ -262,4 +265,69 @@ function initNowPlaying() {
 
   updateNP();
 }
+
+/* Favorite Song Logic (Japan Section) */
+const favAudio = new Audio('assets/music/vivarium.mp3');
+const favBtn = document.getElementById('fav-play-btn');
+const favEq = document.getElementById('fav-eq');
+
+if (favBtn) {
+  const favVol = document.getElementById('fav-volume');
+  if (favVol) {
+    favAudio.volume = favVol.value;
+    favVol.addEventListener('input', () => {
+      favAudio.volume = favVol.value;
+    });
+  }
+
+  const favProgress = document.getElementById('fav-progress');
+  const favRewind = document.getElementById('fav-rewind');
+  const favForward = document.getElementById('fav-forward');
+
+  if (favProgress) {
+    favAudio.addEventListener('timeupdate', () => {
+      const pct = (favAudio.currentTime / favAudio.duration) * 100;
+      favProgress.value = pct || 0;
+    });
+    favProgress.addEventListener('input', () => {
+      const time = (favProgress.value / 100) * favAudio.duration;
+      favAudio.currentTime = time;
+    });
+  }
+
+  if (favRewind) {
+    favRewind.addEventListener('click', () => {
+      favAudio.currentTime = Math.max(0, favAudio.currentTime - 5);
+    });
+  }
+  if (favForward) {
+    favForward.addEventListener('click', () => {
+      favAudio.currentTime = Math.min(favAudio.duration, favAudio.currentTime + 5);
+    });
+  }
+
+  favBtn.addEventListener('click', () => {
+    const audio = document.getElementById('audio-player');
+    if (favAudio.paused) {
+      if (audio) audio.pause();
+      favAudio.play();
+      favBtn.textContent = '■ STOP';
+      favEq.style.display = 'flex';
+    } else {
+      favAudio.pause();
+      favAudio.currentTime = 0;
+      if (audio) audio.play();
+      favBtn.textContent = '▶ PLAY';
+      favEq.style.display = 'none';
+    }
+  });
+
+  favAudio.addEventListener('ended', () => {
+    const audio = document.getElementById('audio-player');
+    favBtn.textContent = '▶ PLAY';
+    favEq.style.display = 'none';
+    if (audio) audio.play();
+  });
+}
+
 

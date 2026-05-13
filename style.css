@@ -1043,3 +1043,173 @@ body {
     opacity: 0;
   }
 }
+
+/* Mini Profile (Japan) */
+#profile-mini-body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+}
+
+#mini-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 8px rgba(0, 71, 171, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+#mini-name {
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  color: var(--accent);
+  margin-bottom: 3px;
+}
+
+#mini-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #00FF41;
+}
+
+#mini-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00FF41;
+  box-shadow: 0 0 4px #00FF41;
+  animation: blink-dot 1.5s infinite;
+}
+
+#mini-mood {
+  font-family: var(--font-jp);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Anime Panel */
+#anime-title {
+  font-family: var(--font-chrome);
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 4px;
+  text-shadow: 0 0 8px rgba(0, 71, 171, 0.4);
+}
+
+#anime-sub {
+  font-family: var(--font-jp);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.status-badge {
+  background: var(--primary);
+  color: #fff;
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  padding: 3px 8px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+#anime-note {
+  font-family: var(--font-jp);
+  font-size: 11px;
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+/* Favorite Song Panel */
+#fav-title {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+#fav-artist {
+  font-family: var(--font-jp);
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+#fav-play-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 6px 12px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--primary-dark);
+  transition: all 0.1s;
+  margin-bottom: 8px;
+}
+
+#fav-play-btn:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+#fav-eq {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  height: 16px;
+  align-items: flex-end;
+  margin-top: 6px;
+}
+
+#fav-volume {
+  -webkit-appearance: none;
+  width: 60px;
+  height: 4px;
+  background: #330000;
+  border: 1px solid var(--primary);
+  outline: none;
+}
+
+#fav-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  cursor: pointer;
+  border: 1px solid var(--accent);
+}
+
+#fav-progress {
+  -webkit-appearance: none;
+  width: 120px;
+  height: 6px;
+  background: #111;
+  border: 1px solid var(--primary-dark);
+  outline: none;
+}
+
+#fav-progress::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 8px;
+  height: 12px;
+  background: var(--accent);
+  cursor: pointer;
+  border: 1px solid #fff;
+}
+
+.fav-seek-btn:hover {
+  filter: brightness(1.5);
+  text-decoration: underline;
+}

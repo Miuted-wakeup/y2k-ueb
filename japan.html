@@ -51,6 +51,26 @@
   <div id="main-wrapper">
     <div id="layout">
       <aside id="sidebar-left">
+        <div class="panel" id="profile-mini">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ PROFILE</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" id="profile-mini-body">
+            <div id="mini-avatar">✿</div>
+            <div id="mini-info">
+              <div id="mini-name">☆ tu_nombre ☆</div>
+              <div id="mini-status">
+                <span id="mini-dot"></span> ONLINE
+              </div>
+              <div id="mini-mood">気分: nostálgico ✦</div>
+            </div>
+          </div>
+        </div>
+
         <div class="panel">
           <div class="panel-titlebar">
             <span class="panel-title">✦ にゃん</span>
@@ -229,6 +249,62 @@
               <span class="guest-msg">visiting from the webring~ ✦</span>
             </div>
             <div id="coming-soon-stamp">COMING<br>SOON</div>
+          </div>
+        </div>
+
+        <!-- ANIME PANEL -->
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ WATCHING NOW</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="text-align:center">
+            <div id="anime-title">BLACK CLOVER</div>
+            <div id="anime-sub">ブラッククローバー</div>
+            <div id="anime-status">
+              <span class="status-badge">● WATCHING</span>
+            </div>
+            <div id="anime-note">
+              asta me recuerda que la determinación 
+              es más fuerte que la magia ✦
+            </div>
+          </div>
+        </div>
+
+        <!-- FAVORITE SONG PANEL -->
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ 好きな曲</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="text-align:center">
+            <div id="fav-title">Vivarium</div>
+            <div id="fav-artist">Ado</div>
+            <button id="fav-play-btn">▶ PLAY</button>
+            <div id="fav-vol-wrap" style="margin-top:8px; display:flex; align-items:center; justify-content:center; gap:8px">
+              <span style="font-family:var(--font-pixel); font-size:6px; color:var(--primary)">VOL</span>
+              <input type="range" id="fav-volume" min="0" max="1" step="0.1" value="0.5">
+            </div>
+            <div id="fav-seek-wrap" style="margin-top:10px">
+              <input type="range" id="fav-progress" min="0" max="100" value="0" style="width:120px">
+              <div style="margin-top:6px; display:flex; justify-content:center; gap:12px">
+                <span class="fav-seek-btn" id="fav-rewind" style="cursor:pointer; font-family:var(--font-pixel); font-size:6px; color:var(--accent)">-5s</span>
+                <span class="fav-seek-btn" id="fav-forward" style="cursor:pointer; font-family:var(--font-pixel); font-size:6px; color:var(--accent)">+5s</span>
+              </div>
+            </div>
+            <div id="fav-eq" style="display:none">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
           </div>
         </div>
         
