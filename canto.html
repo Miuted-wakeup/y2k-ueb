@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1024" />
+  <meta name="description" content="Y2K Japanese internet portal — personal blog" />
+  <title>y2k-blog | CANTO</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans+JP:wght@400;700&family=Caveat:wght@400;700&family=Russo+One&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header id="site-header">
+    <div id="header-inner">
+      <div id="header-logo">
+        <span id="site-title">★ mi espacio ★</span>
+        <span id="site-tagline">わたしのせかい ✦ my little corner of the internet</span>
+      </div>
+      <div id="header-marquee">
+        <marquee behavior="scroll" direction="left" scrollamount="3">
+          ★ようこそ★ WELCOME TO MY BLOG ★ 更新しました ★ new post up!
+          ★ thanks for visiting ★ どうぞよろしく ★
+          leave a message in my guestbook ★ (✿◠‿◠) ★
+        </marquee>
+      </div>
+    </div>
+  </header>
+
+  <nav id="site-nav">
+    <div id="nav-inner">
+      <a href="index.html" class="nav-tab">HOME</a>
+      <a href="japan.html" class="nav-tab">日本 JAPAN</a>
+      <a href="music.html" class="nav-tab">MUSIC</a>
+      <a href="canto.html" class="nav-tab active">CANTO</a>
+      <a href="tech.html" class="nav-tab">TECH</a>
+      <a href="sobre-mi.html" class="nav-tab">SOBRE MÍ</a>
+      <a href="cosas.html" class="nav-tab">COSAS ♥</a>
+    </div>
+  </nav>
+
+  <div id="main-wrapper">
+    <div id="layout">
+      <main id="center-feed" style="flex:1">
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ CANTO</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <h2 class="post-title">Próximamente...</h2>
+            <p>Sección en construcción. ✦</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="now-playing-bar">
+    <img id="np-kirby" src="assets/gifs/kirby-hang.gif" alt="kirby">
+    <div id="np-left">
+      <span id="np-label">♪ NOW PLAYING</span>
+      <div id="np-equalizer">
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+      </div>
+    </div>
+    <div id="np-info">
+      <span id="np-title">loading...</span>
+      <span id="np-artist"></span>
+    </div>
+    <div id="np-controls">
+      <span class="np-btn" id="np-prev">◀◀</span>
+      <span class="np-btn" id="np-play">▶</span>
+      <span class="np-btn" id="np-next">▶▶</span>
+    </div>
+    <div id="np-volume-wrap">
+      <span id="vol-icon">VOL</span>
+      <input type="range" id="np-volume" min="0" max="1" step="0.1" value="0.5">
+    </div>
+    <audio id="audio-player"></audio>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+</html>

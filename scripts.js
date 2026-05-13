@@ -167,7 +167,7 @@ const playlist = [
   { title: "aishite aishite aishite", artist: "kikuo", src: "assets/music/aishite.mp3" }
 ];
 
-let npIndex = Math.floor(Math.random() * playlist.length);
+let npIndex = parseInt(localStorage.getItem('npIndex') || Math.floor(Math.random() * playlist.length));
 let isPlaying = false;
 
 function updateNP() {
@@ -181,6 +181,7 @@ function updateNP() {
   
   if (audio) {
     audio.src = playlist[npIndex].src;
+    localStorage.setItem('npIndex', npIndex);
     if (isPlaying) {
       audio.play().catch(e => console.log("Interaction required to play"));
       if (playBtn) playBtn.textContent = '⏸';

@@ -1,0 +1,144 @@
+/* ============================================================
+   JAPAN SECTION OVERRIDES
+   ============================================================ */
+
+#section-japan {
+  --primary: #0047AB;
+  --primary-dark: #001F5B;
+  --accent: #00BFFF;
+  --silver: #E8E8FF;
+  --text: #FFFFFF;
+}
+
+#section-japan .panel-titlebar {
+  background: linear-gradient(90deg, #0047AB 0%, #001F5B 100%);
+}
+
+#section-japan .nav-tab.active {
+  background: linear-gradient(180deg, #0047AB 0%, #001F5B 100%);
+  border-top: 2px solid #00BFFF;
+}
+
+#section-japan #site-header {
+  border-bottom: 3px solid #0047AB;
+  box-shadow: 0 4px 12px rgba(0, 71, 171, 0.4);
+}
+
+#section-japan #header-marquee {
+  background: #0047AB;
+}
+
+#section-japan .post-tag {
+  background: #0047AB;
+}
+
+#section-japan .read-more-btn {
+  background: #0047AB;
+  box-shadow: 2px 2px 0 #001F5B;
+}
+
+#section-japan #site-footer {
+  border-top: 3px solid #0047AB;
+}
+
+#section-japan .badge {
+  border-color: #0047AB;
+  color: #0047AB;
+}
+
+#section-japan #now-playing-bar {
+  border-top: 2px solid #0047AB;
+  box-shadow: 0 -4px 16px rgba(0, 71, 171, 0.4);
+}
+
+#section-japan .eq-bar {
+  background: #0047AB;
+}
+
+#section-japan #status-dot {
+  background: #00BFFF;
+  box-shadow: 0 0 6px #00BFFF;
+}
+
+#section-japan #clock-time {
+  color: #00BFFF;
+  text-shadow: 0 0 10px #00BFFF, 0 0 20px #00BFFF;
+}
+
+#section-japan .digit {
+  color: #00BFFF;
+  border-color: #001F5B;
+}
+
+#section-japan #site-title {
+  color: #00BFFF;
+  text-shadow: 0 0 10px #0047AB, 0 0 20px #0047AB, 2px 2px 0 #000;
+}
+
+#section-japan #coming-soon-stamp {
+  border-color: #0047AB;
+  color: #0047AB;
+  box-shadow: 0 0 10px rgba(0, 71, 171, 0.4);
+}
+
+#section-japan #daily-date {
+  color: #0047AB;
+}
+
+#section-japan #daily-entry {
+  border-left: 2px solid #0047AB;
+}
+
+#section-japan .label {
+  color: #0047AB;
+}
+
+#section-japan #profile-name {
+  color: #00BFFF;
+  text-shadow: 0 0 8px #0047AB;
+}
+
+#section-japan #avatar-ring {
+  border-color: #0047AB;
+  box-shadow: 0 0 10px rgba(0, 71, 171, 0.6);
+}
+
+#section-japan .post-title {
+  color: #00BFFF;
+}
+
+#section-japan #site-footer span:first-child {
+  color: #0047AB;
+}
+
+#section-japan .gif-slot {
+  border-color: #0047AB;
+  color: #0047AB;
+}
+
+#section-japan #side-menu li a:hover {
+  background: #0047AB;
+}
+
+#section-japan .nav-tab:hover {
+  background: #0047AB;
+  border-top: 2px solid #00BFFF;
+}
+
+#section-japan #footer-divider {
+  background: linear-gradient(90deg, transparent, #0047AB, transparent);
+}
+
+#section-japan #header-logo #site-tagline {
+  color: #E8E8FF;
+}
+
+#section-japan {
+  background-image: 
+    repeating-radial-gradient(
+      circle at 1px 1px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 0
+    ),
+    url('assets/images/japan/bg-japan.jpg');
+}
