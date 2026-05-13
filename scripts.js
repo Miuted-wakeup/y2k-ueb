@@ -155,6 +155,13 @@ function initPanelControls() {
   });
 }
 
+function formatTime(seconds) {
+  if (isNaN(seconds) || seconds === Infinity) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
 /* ============================================================
    NOW PLAYING BAR
    ============================================================ */
@@ -258,9 +265,33 @@ function initNowPlaying() {
       });
     }
 
+    const mainProgress = document.getElementById('np-progress');
+    const curTimeEl = document.getElementById('np-current-time');
+    const durationEl = document.getElementById('np-duration');
+
     audio.addEventListener('timeupdate', () => {
       localStorage.setItem('npTime', audio.currentTime);
+      if (curTimeEl) curTimeEl.textContent = formatTime(audio.currentTime);
+      
+      if (mainProgress && !isNaN(audio.duration)) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        mainProgress.value = pct;
+      }
     });
+
+    audio.addEventListener('loadedmetadata', () => {
+      if (durationEl) durationEl.textContent = formatTime(audio.duration);
+    });
+
+    if (mainProgress) {
+      mainProgress.addEventListener('input', () => {
+        if (!isNaN(audio.duration)) {
+          const time = (mainProgress.value / 100) * audio.duration;
+          audio.currentTime = time;
+        }
+      });
+    }
+
   }
 
   updateNP();
@@ -284,10 +315,15 @@ if (favBtn) {
   const favRewind = document.getElementById('fav-rewind');
   const favForward = document.getElementById('fav-forward');
 
+  const favTimeEl = document.getElementById('fav-time');
+
   if (favProgress) {
     favAudio.addEventListener('timeupdate', () => {
       const pct = (favAudio.currentTime / favAudio.duration) * 100;
       favProgress.value = pct || 0;
+      if (favTimeEl) {
+        favTimeEl.textContent = `${formatTime(favAudio.currentTime)} / ${formatTime(favAudio.duration)}`;
+      }
     });
     favProgress.addEventListener('input', () => {
       const time = (favProgress.value / 100) * favAudio.duration;
