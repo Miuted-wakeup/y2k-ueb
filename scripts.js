@@ -168,7 +168,8 @@ const playlist = [
 ];
 
 let npIndex = parseInt(localStorage.getItem('npIndex') || Math.floor(Math.random() * playlist.length));
-let isPlaying = false;
+let isPlaying = localStorage.getItem('isPlaying') === 'true';
+let startFrom = parseFloat(localStorage.getItem('npTime') || 0);
 
 function updateNP() {
   const titleEl = document.getElementById('np-title');
@@ -180,11 +181,23 @@ function updateNP() {
   if (artistEl) artistEl.textContent = playlist[npIndex].artist;
   
   if (audio) {
-    audio.src = playlist[npIndex].src;
+    // Only set src if it's different or empty
+    if (!audio.src.includes(playlist[npIndex].src)) {
+      audio.src = playlist[npIndex].src;
+      audio.currentTime = startFrom;
+      startFrom = 0; // Reset for next song change
+    }
+    
     localStorage.setItem('npIndex', npIndex);
     if (isPlaying) {
-      audio.play().catch(e => console.log("Interaction required to play"));
-      if (playBtn) playBtn.textContent = '⏸';
+      audio.play().then(() => {
+        if (playBtn) playBtn.textContent = '⏸';
+      }).catch(e => {
+        console.log("Autoplay blocked");
+        isPlaying = false;
+        localStorage.setItem('isPlaying', 'false');
+        if (playBtn) playBtn.textContent = '▶';
+      });
     } else {
       if (playBtn) playBtn.textContent = '▶';
     }
@@ -208,6 +221,7 @@ function initNowPlaying() {
         playBtn.textContent = '▶';
         isPlaying = false;
       }
+      localStorage.setItem('isPlaying', isPlaying);
     });
   }
 
@@ -240,6 +254,10 @@ function initNowPlaying() {
         audio.volume = volSlider.value;
       });
     }
+
+    audio.addEventListener('timeupdate', () => {
+      localStorage.setItem('npTime', audio.currentTime);
+    });
   }
 
   updateNP();
