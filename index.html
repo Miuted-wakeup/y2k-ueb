@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1024" />
+  <meta name="description" content="Y2K Japanese internet portal — personal blog" />
+  <title>y2k-blog</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans+JP:wght@400;700&family=Caveat:wght@400;700&family=Russo+One&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header id="site-header">
+    <div id="header-inner">
+      <div id="header-logo">
+        <span id="site-title">★ mi espacio ★</span>
+        <span id="site-tagline">わたしのせかい ✦ my little corner of the internet</span>
+      </div>
+      <div id="header-marquee">
+        <marquee behavior="scroll" direction="left" scrollamount="3">
+          ★ようこそ★ WELCOME TO MY BLOG ★ 更新しました ★ new post up!
+          ★ thanks for visiting ★ どうぞよろしく ★
+          leave a message in my guestbook ★ (✿◠‿◠) ★
+        </marquee>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav id="site-nav">
+    <div id="nav-inner">
+      <a href="index.html" class="nav-tab active">HOME</a>
+      <a href="japan.html" class="nav-tab">日本 JAPAN</a>
+      <a href="music.html" class="nav-tab">MUSIC</a>
+      <a href="canto.html" class="nav-tab">CANTO</a>
+      <a href="tech.html" class="nav-tab">TECH</a>
+      <a href="sobre-mi.html" class="nav-tab">SOBRE MÍ</a>
+      <a href="cosas.html" class="nav-tab">COSAS ♥</a>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main-wrapper">
+    <div id="layout">
+      <aside id="sidebar-left">
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ PROFILE</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="text-align:center">
+            <div id="avatar-ring">
+              <div id="avatar-img">✿</div>
+            </div>
+            <div id="profile-name">☆ tu_nombre ☆</div>
+            <div id="profile-sub">◇ welcome to my world ◇</div>
+            <div id="profile-status">
+              <span id="status-dot"></span> ONLINE
+            </div>
+            <div id="profile-mood">
+              気分: nostálgico ✦
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ TODAY</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="daily-date"></div>
+            <div id="daily-entry"></div>
+            <div id="daily-obsession">
+              <span class="label">obsessed with:</span>
+              <span id="obsession-text"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ GIFs</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="display:flex;gap:6px;flex-wrap:wrap; justify-content:center">
+            <div class="gif-slot">GIF</div>
+            <div class="gif-slot">GIF</div>
+          </div>
+        </div>
+      </aside>
+      <main id="center-feed">
+        <!-- MICRO POST -->
+        <div class="panel post">
+          <div class="panel-titlebar">
+            <span class="panel-title">★ つぶやき — 2026.05.12</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body post-micro">
+            <span class="post-tag tag-life">LIFE</span>
+            <p>今日はカフェで音楽を聴きながらずっとここにいたかった。
+            some days the internet feels more like home than anywhere else ♥</p>
+            <div class="post-footer">
+              <span class="post-time">18:42 ★</span>
+              <span class="post-reactions">♥ 心 ★ ✦</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LONG ENTRY -->
+        <div class="panel post">
+          <div class="panel-titlebar">
+            <span class="panel-title">
+              ★ 日記 — sobre el internet que perdimos
+            </span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body post-long">
+            <span class="post-tag tag-nostalgia">NOSTALGIA</span>
+            <h2 class="post-title">el internet era más bonito antes.</h2>
+            <p>Había algo en las páginas de 2005 que no existe más.
+            No era la estética solamente — era la intención. Cada sitio
+            era la casa de alguien. Podías sentir a la persona detrás
+            de cada GIF animado, cada contador de visitas, cada
+            entrada de guestbook.</p>
+            <p>今はどこを見ても同じに見える。
+            Everything looks the same now. Figma templates and 
+            React components. Beautiful but hollow.</p>
+            <p>Este sitio es mi intento de recuperar algo de eso.
+            Un lugar que sea mío de verdad. ✦</p>
+            <a href="#" class="read-more-btn">READ MORE ▶</a>
+          </div>
+        </div>
+
+        <!-- PHOTO DUMP -->
+        <div class="panel post">
+          <div class="panel-titlebar">
+            <span class="panel-title">★ photodump ✦ — esta semana</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <span class="post-tag tag-photos">PHOTOS</span>
+            <div class="photo-grid">
+              <div class="polaroid">
+                <div class="polaroid-img">✿</div>
+                <span class="polaroid-caption">café de siempre</span>
+              </div>
+              <div class="polaroid" style="transform:rotate(2deg)">
+                <div class="polaroid-img">♪</div>
+                <span class="polaroid-caption">vibes del día</span>
+              </div>
+              <div class="polaroid" style="transform:rotate(-1.5deg)">
+                <div class="polaroid-img">★</div>
+                <span class="polaroid-caption">空が綺麗だった</span>
+              </div>
+              <div class="polaroid" style="transform:rotate(1deg)">
+                <div class="polaroid-img">✦</div>
+                <span class="polaroid-caption">sin título</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <aside id="sidebar-right">
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ CLOCK</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="text-align:center">
+            <div id="clock-time">00:00:00</div>
+            <div id="clock-date"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ VISITORS</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="text-align:center">
+            <div id="visitor-counter">
+              <span class="digit">0</span>
+              <span class="digit">0</span>
+              <span class="digit">4</span>
+              <span class="digit">8</span>
+              <span class="digit">2</span>
+              <span class="digit">7</span>
+            </div>
+            <div style="font-size:9px;color:var(--text-dim); margin-top:4px">visitors since 2025</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ GUESTBOOK</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="position:relative">
+            <div class="guest-entry">
+              <span class="guest-name">★ yuki_chan</span>
+              <span class="guest-msg">sugoi!! love your site (≧▽≦)</span>
+            </div>
+            <div class="guest-entry">
+              <span class="guest-name">★ neo_shibuya</span>
+              <span class="guest-msg">visiting from the webring~ ✦</span>
+            </div>
+            <div id="coming-soon-stamp">COMING<br>SOON</div>
+          </div>
+        </div>
+        <div id="character-wrap">
+          <img src="assets/images/character.png" id="character-img" alt="">
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <footer id="site-footer">
+    <div id="footer-inner">
+      <div id="kirby-sleep-wrap">
+        <img src="assets/gifs/kirby-sleep.gif" alt="kirby sleeping" id="kirby-sleep">
+        <span>zzzz...</span>
+      </div>
+      <div id="badge-strip">
+        <div class="badge">Y2K ★ VERIFIED</div>
+        <div class="badge">MADE WITH ♥</div>
+        <div class="badge">1024×768</div>
+        <div class="badge">NO COOKIES</div>
+        <div class="badge">IE 6.0 ✦</div>
+      </div>
+      <div id="footer-divider"></div>
+      <div id="footer-text">
+        <span>★ mi espacio ★ わたしのせかい ★</span>
+        <span>© 2025 — best viewed in 1024×768 — 
+          powered by nostalgia & imagination</span>
+        <span style="color:#333">
+          this page has been visited by 
+          <span style="color:#CC0000">4827</span> 
+          beautiful people ♥
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ANIMATION ELEMENTS -->
+  <img id="runner" src="assets/gifs/kirby-walk.gif" alt="kirby" style="height:32px;width:auto">
+  
+  <div class="float-sprite" style="left:5%;animation-delay:0s">✦</div>
+  <div class="float-sprite" style="left:15%;animation-delay:2s">★</div>
+  <div class="float-sprite" style="left:25%;animation-delay:4s">♥</div>
+  <div class="float-sprite" style="left:40%;animation-delay:1s">✿</div>
+  <div class="float-sprite" style="left:55%;animation-delay:3s">⊹</div>
+  <div class="float-sprite" style="left:70%;animation-delay:5s">✦</div>
+  <div class="float-sprite" style="left:82%;animation-delay:2.5s">★</div>
+  <div class="float-sprite" style="left:92%;animation-delay:0.5s">♥</div>
+
+  <div id="now-playing-bar">
+    <img id="np-kirby" src="assets/gifs/kirby-hang.gif" alt="kirby">
+    <div id="np-left">
+      <span id="np-label">♪ NOW PLAYING</span>
+      <div id="np-equalizer">
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+        <span class="eq-bar"></span>
+      </div>
+    </div>
+    <div id="np-info">
+      <span id="np-title">loading...</span>
+      <span id="np-artist"></span>
+    </div>
+    <div id="np-controls">
+      <span class="np-btn" id="np-prev">◀◀</span>
+      <span class="np-btn" id="np-play">▶</span>
+      <span class="np-btn" id="np-next">▶▶</span>
+    </div>
+    <div id="np-volume-wrap">
+      <span id="vol-icon">VOL</span>
+      <input type="range" id="np-volume" min="0" max="1" step="0.1" value="0.5">
+    </div>
+    <audio id="audio-player"></audio>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+</html>
