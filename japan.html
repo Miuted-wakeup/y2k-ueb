@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=1024" />
@@ -11,12 +12,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans+JP:wght@400;700&family=Caveat:wght@400;700&family=Russo+One&display=swap"
-    rel="stylesheet"
-  />
+    rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="sections.css" />
 </head>
+
 <body id="section-japan">
 
   <!-- HEADER -->
@@ -60,9 +61,9 @@
             </div>
           </div>
           <div class="panel-body" id="profile-mini-body">
-            <div id="mini-avatar">✿</div>
+            <img src="assets/images/home/avatar.jpg" id="mini-avatar" alt="avatar">
             <div id="mini-info">
-              <div id="mini-name">☆ tu_nombre ☆</div>
+              <div id="mini-name">☆ GOS ☆</div>
               <div id="mini-status">
                 <span id="mini-dot"></span> EN LÍNEA
               </div>
@@ -130,12 +131,12 @@
           <div class="panel-body post-micro">
             <span class="post-tag">NIHONGO</span>
             <p>今日は「懐かしい」という言葉を覚えた。
-            no tiene traducción exacta al español pero significa 
-            algo como nostalgia de algo que amabas. 
-            この言葉が大好き。♥</p>
+              no tiene traducción exacta al español pero significa
+              algo como nostalgia de algo que amabas.
+              この言葉が大好き。</p>
             <div class="post-footer">
               <span class="post-time">14:23 ★</span>
-              <span class="post-reactions">♥ 心 ★ ✦</span>
+              <span class="post-reactions"> 心 ★ ✦</span>
             </div>
           </div>
         </div>
@@ -156,15 +157,15 @@
             <span class="post-tag">CULTURA</span>
             <h2 class="post-title">japón vive en mi cabeza rentando.</h2>
             <p>No sé exactamente cuándo pasó. Fue gradual —
-            una canción de vocaloid por aquí, un anime por allá,
-            y de repente estaba aprendiendo hiragana a las 2am
-            sin que nadie me lo pidiera.</p>
+              una canción de vocaloid por aquí, un anime por allá,
+              y de repente estaba aprendiendo hiragana a las 2am
+              sin que nadie me lo pidiera.</p>
             <p>日本の文化はとても面白いと思う。
-            Hay algo en la mezcla japonesa de lo antiguo y lo 
-            ultramoderno que no existe en ningún otro lugar del mundo.
-            Templos al lado de pantallas gigantes. 静けさと喧騒。</p>
+              Hay algo en la mezcla japonesa de lo antiguo y lo
+              ultramoderno que no existe en ningún otro lugar del mundo.
+              Templos al lado de pantallas gigantes. 静けさと喧騒。</p>
             <p>Algún día voy a caminar por Shibuya y va a sentirse
-            como volver a casa aunque nunca haya estado. ✦</p>
+              como volver a casa aunque nunca haya estado. ✦</p>
             <a href="#" class="read-more-btn">LEER MÁS ▶</a>
           </div>
         </div>
@@ -268,7 +269,7 @@
               <span class="status-badge">● VIENDO</span>
             </div>
             <div id="anime-note">
-              asta me recuerda que la determinación 
+              asta me recuerda que la determinación
               es más fuerte que la magia ✦
             </div>
           </div>
@@ -287,16 +288,21 @@
             <div id="fav-title">Vivarium</div>
             <div id="fav-artist">Ado</div>
             <button id="fav-play-btn">▶ PLAY</button>
-            <div id="fav-vol-wrap" style="margin-top:8px; display:flex; align-items:center; justify-content:center; gap:8px">
+            <div id="fav-vol-wrap"
+              style="margin-top:8px; display:flex; align-items:center; justify-content:center; gap:8px">
               <span style="font-family:var(--font-pixel); font-size:6px; color:var(--primary)">VOL</span>
               <input type="range" id="fav-volume" min="0" max="1" step="0.1" value="0.5">
             </div>
             <div id="fav-seek-wrap" style="margin-top:10px">
               <input type="range" id="fav-progress" min="0" max="100" value="0" style="width:120px">
-              <div id="fav-time" style="font-family:var(--font-pixel); font-size:6px; color:var(--accent); margin-top:4px">0:00 / 0:00</div>
+              <div id="fav-time"
+                style="font-family:var(--font-pixel); font-size:6px; color:var(--accent); margin-top:4px">0:00 / 0:00
+              </div>
               <div style="margin-top:6px; display:flex; justify-content:center; gap:12px">
-                <span class="fav-seek-btn" id="fav-rewind" style="cursor:pointer; font-family:var(--font-pixel); font-size:6px; color:var(--accent)">-5s</span>
-                <span class="fav-seek-btn" id="fav-forward" style="cursor:pointer; font-family:var(--font-pixel); font-size:6px; color:var(--accent)">+5s</span>
+                <span class="fav-seek-btn" id="fav-rewind"
+                  style="cursor:pointer; font-family:var(--font-pixel); font-size:6px; color:var(--accent)">-5s</span>
+                <span class="fav-seek-btn" id="fav-forward"
+                  style="cursor:pointer; font-family:var(--font-pixel); font-size:6px; color:var(--accent)">+5s</span>
               </div>
             </div>
             <div id="fav-eq" style="display:none">
@@ -308,7 +314,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="panel">
           <div class="panel-titlebar">
             <span class="panel-title">✦ にゃん②</span>
@@ -321,10 +327,8 @@
             <img src="assets/gifs/japan/cat-fan.gif" style="width:100%;display:block">
           </div>
         </div>
-        
-        <div id="character-wrap">
-          <img src="assets/images/japan/character-japan.png" id="character-img" alt="">
-        </div>
+
+
       </aside>
     </div>
   </div>
@@ -346,11 +350,11 @@
       <div id="footer-divider"></div>
       <div id="footer-text">
         <span>★ mi espacio ★ わたしのせかい ★</span>
-        <span>© 2025 — mejor visto en 1024×768 — 
+        <span>© 2025 — mejor visto en 1024×768 —
           impulsado por nostalgia e imaginación</span>
         <span style="color:#333">
-          esta página ha sido visitada por 
-          <span style="color:#CC0000">4827</span> 
+          esta página ha sido visitada por
+          <span style="color:#CC0000">4827</span>
           personas hermosas ♥
         </span>
       </div>
@@ -359,7 +363,7 @@
 
   <!-- ANIMATION ELEMENTS -->
   <img id="runner" src="assets/gifs/japan/kirby-walk.gif" alt="kirby" style="height:32px;width:auto">
-  
+
   <div class="float-sprite" style="left:5%;animation-delay:0s">✦</div>
   <div class="float-sprite" style="left:15%;animation-delay:2s">★</div>
   <div class="float-sprite" style="left:25%;animation-delay:4s">♥</div>
@@ -404,4 +408,5 @@
 
   <script src="scripts.js"></script>
 </body>
+
 </html>
