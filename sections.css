@@ -151,3 +151,135 @@
     ),
     url('assets/images/japan/bg-japan.jpg');
 }
+
+/* ============================================================
+   MUSIC SECTION OVERRIDES
+   ============================================================ */
+
+#section-music {
+  --primary: #4B0082;
+  --primary-dark: #1a0033;
+  --accent: #00FF41;
+  --silver: #9400D3;
+  --text: #E0E0E0;
+}
+
+#section-music .panel-titlebar {
+  background: linear-gradient(90deg, #4B0082 0%, #1a0033 100%);
+}
+
+#section-music .nav-tab.active {
+  background: linear-gradient(180deg, #4B0082 0%, #1a0033 100%);
+  border-top: 2px solid #00FF41;
+}
+
+#section-music #site-header {
+  border-bottom: 3px solid #4B0082;
+  box-shadow: 0 4px 12px rgba(75, 0, 130, 0.4);
+}
+
+#section-music #header-marquee {
+  background: #4B0082;
+}
+
+#section-music .post-tag {
+  background: #4B0082;
+}
+
+#section-music .read-more-btn {
+  background: #4B0082;
+  box-shadow: 2px 2px 0 #1a0033;
+}
+
+#section-music #site-footer {
+  border-top: 3px solid #4B0082;
+}
+
+#section-music .badge {
+  border-color: #4B0082;
+  color: #4B0082;
+}
+
+#section-music #now-playing-bar {
+  border-top: 2px solid #4B0082;
+  box-shadow: 0 -4px 16px rgba(75, 0, 130, 0.4);
+}
+
+#section-music .eq-bar {
+  background: #4B0082;
+}
+
+#section-music #status-dot {
+  background: #00FF41;
+  box-shadow: 0 0 6px #00FF41;
+}
+
+#section-music #clock-time {
+  color: #00FF41;
+  text-shadow: 0 0 10px #00FF41, 0 0 20px #00FF41;
+}
+
+#section-music .digit {
+  color: #00FF41;
+  border-color: #1a0033;
+}
+
+#section-music #site-title {
+  color: #00FF41;
+  text-shadow: 0 0 10px #4B0082, 0 0 20px #4B0082, 2px 2px 0 #000;
+}
+
+#section-music #coming-soon-stamp {
+  border-color: #4B0082;
+  color: #4B0082;
+  box-shadow: 0 0 10px rgba(75, 0, 130, 0.4);
+}
+
+#section-music #daily-date {
+  color: #4B0082;
+}
+
+#section-music #daily-entry {
+  border-left: 2px solid #4B0082;
+}
+
+#section-music .label {
+  color: #4B0082;
+}
+
+#section-music #profile-name {
+  color: #00FF41;
+  text-shadow: 0 0 8px #4B0082;
+}
+
+#section-music #avatar-ring {
+  border-color: #4B0082;
+  box-shadow: 0 0 10px rgba(75, 0, 130, 0.6);
+}
+
+#section-music .post-title {
+  color: #00FF41;
+}
+
+#section-music #site-footer span:first-child {
+  color: #4B0082;
+}
+
+#section-music .gif-slot {
+  border-color: #4B0082;
+  color: #4B0082;
+}
+
+#section-music #side-menu li a:hover {
+  background: #4B0082;
+}
+
+#section-music .nav-tab:hover {
+  background: #4B0082;
+  border-top: 2px solid #00FF41;
+}
+
+#section-music #footer-divider {
+  background: linear-gradient(90deg, transparent, #4B0082, transparent);
+}
+
