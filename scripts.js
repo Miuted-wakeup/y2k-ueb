@@ -1,3 +1,29 @@
+window.addEventListener('load', () => {
+
+  // Layer 1 - Body fade in (Background + immediate elements)
+  document.body.style.transition = 'opacity 0.8s ease';
+  document.body.style.opacity = '1';
+
+  // Also make GIF images inside panels appear early
+  document.querySelectorAll(
+    '.panel img, #avatar-img, #mini-avatar'
+  ).forEach(el => {
+    el.style.transition = 'opacity 0.6s ease';
+    el.style.opacity = '1';
+  });
+
+  // Layer 2 - panels appear 700ms later
+  setTimeout(() => {
+    document.querySelectorAll(
+      '.panel, #site-header, #site-nav, #main-wrapper, #site-footer'
+    ).forEach(el => {
+      el.style.transition = 'opacity 0.5s ease';
+      el.style.opacity = '1';
+    });
+  }, 700);
+
+});
+
 const diaryEntries = [
   "今日は音楽を聴きながら何も考えたくない日。",
   "extraño el internet de antes. todo era más mágico.",
@@ -365,5 +391,62 @@ if (favBtn) {
     if (audio) audio.play();
   });
 }
+
+function createFallingElements() {
+  const bodyId = document.body.id;
+  let symbols = [];
+  let isMusicPage = false;
+
+  if (bodyId === 'section-japan') {
+    symbols = ['桜', '✿', '⌘'];
+  } else if (bodyId === 'section-music') {
+    symbols = ['♪', '♩', '♫', '♬'];
+    isMusicPage = true;
+  } else {
+    // Default (index and others)
+    symbols = ['✦', '★', '♥'];
+  }
+
+  for (let i = 0; i < 15; i++) {
+    const el = document.createElement('div');
+    el.className = 'falling-element';
+    
+    if (isMusicPage && Math.random() < 0.2) {
+      const img = document.createElement('img');
+      img.src = 'assets/images/music/falling-char.png';
+      img.style.height = '32px';
+      img.style.width = 'auto';
+      img.style.display = 'block';
+      el.appendChild(img);
+    } else {
+      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+    }
+
+    const duration = 6 + Math.random() * 10;
+    const delay = -(Math.random() * 10);
+    const size = 20 + Math.random() * 18;
+    const opacity = 0.4 + Math.random() * 0.4;
+    const left = Math.random() * 100;
+
+    el.style.position = 'fixed';
+    el.style.top = '-40px';
+    el.style.left = left + 'vw';
+    el.style.fontSize = size + 'px';
+    el.style.opacity = opacity;
+    el.style.zIndex = '1';
+    el.style.pointerEvents = 'none';
+    el.style.animation = `fall-down ${duration}s linear ${delay}s infinite`;
+    
+    const computedStyle = getComputedStyle(document.body);
+    const accent = computedStyle.getPropertyValue('--accent').trim();
+    const primary = computedStyle.getPropertyValue('--primary').trim();
+    el.style.color = Math.random() > 0.5 ? accent : primary;
+
+    document.body.appendChild(el);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', createFallingElements);
+
 
 

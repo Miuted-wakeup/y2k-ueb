@@ -162,6 +162,17 @@
   --accent: #00FF41;
   --silver: #9400D3;
   --text: #E0E0E0;
+
+  background-image: 
+    repeating-radial-gradient(
+      circle at 1px 1px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 0
+    ),
+    url('assets/images/music/bg-music.jpg');
+  background-size: 3px 3px, cover;
+  background-position: top left, center;
+  background-attachment: scroll, fixed;
 }
 
 #section-music .panel-titlebar {
@@ -193,6 +204,7 @@
 
 #section-music #site-footer {
   border-top: 3px solid #4B0082;
+  position: relative;
 }
 
 #section-music .badge {
@@ -273,6 +285,22 @@
 #section-music #side-menu li a:hover {
   background: #4B0082;
 }
+
+#section-music #miku-stand {
+  position: absolute;
+  bottom: 48px;
+  left: 20px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#section-music #miku-stand img {
+  height: 180px;
+  width: auto;
+  transform: scaleX(-1);
+}
+
+
 
 #section-music .nav-tab:hover {
   background: #4B0082;
