@@ -54,8 +54,38 @@
       <!-- SIDEBAR LEFT -->
       <aside id="sidebar-left" style="width:180px; flex-shrink:0">
 
+        <!-- PERFIL -->
+        <div class="panel" id="panel-perfil">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ PERFIL</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="display: flex; align-items: center; gap: 12px; padding: 12px;">
+            
+            <div class="perfil-avatar" style="flex-shrink: 0;">
+              <img src="assets/images/music/avatar.jpg" alt="Gos" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); box-shadow: 0 0 10px rgba(0, 255, 65, 0.4); display: block;">
+            </div>
+
+            <div class="perfil-info" style="display: flex; flex-direction: column; justify-content: center;">
+              <div style="font-family: var(--font-pixel); font-size: 11px; color: var(--accent); margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">
+                ☆ GOS ☆
+              </div>
+              <div style="font-family: var(--font-pixel); font-size: 9px; color: #00ff41; margin-bottom: 5px; text-shadow: 0 0 6px #00ff41;">
+                ● EN LÍNEA
+              </div>
+              <div style="font-family: var(--font-jp); font-size: 10px; color: var(--text-dim);">
+                気分: nostálgico ✦
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <!-- MOOD MUSICAL -->
-        <div class="panel">
+        <div class="panel" id="panel-mood">
           <div class="panel-titlebar">
             <span class="panel-title">✦ MOOD</span>
             <div class="panel-controls">
@@ -71,7 +101,13 @@
         </div>
 
         <!-- GÉNEROS -->
-        <div class="panel">
+        <div style="text-align:right;margin-bottom:-14px;
+          position:relative;z-index:10;pointer-events:none;
+          padding-right:15px">
+          <img src="assets/gifs/music/cat-listen.gif"
+            style="height:55px;width:auto;transform:scaleX(-1);">
+        </div>
+        <div class="panel" id="panel-generos">
           <div class="panel-titlebar">
             <span class="panel-title">✦ GÉNEROS</span>
             <div class="panel-controls">
@@ -112,7 +148,7 @@
         </div>
 
         <!-- GIF SLOT -->
-        <div class="panel">
+        <div class="panel" id="panel-vibes">
           <div class="panel-titlebar">
             <span class="panel-title">✦ VIBES</span>
             <div class="panel-controls">
@@ -121,7 +157,44 @@
             </div>
           </div>
           <div class="panel-body" style="padding:0">
-            <div class="gif-slot" style="width:100%;height:100px">GIF</div>
+            <img src="assets/gifs/music/ado.gif" alt="Vibes" style="width:100%; display:block; height:auto; min-height:100px; object-fit:cover;">
+          </div>
+        </div>
+
+        <div class="panel neon-flicker" id="panel-synth">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ SINTETIZADOR ✦</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="text-align:center; padding:15px;">
+            
+            <div id="synth-face" style="font-size: 32px; color: var(--accent); margin: 15px 0; font-family: 'MS Gothic', sans-serif; transition: all 0.1s ease; font-weight: bold; white-space: nowrap; overflow: hidden;">
+              (・_・)
+            </div>
+
+            <div style="margin-bottom: 15px;">
+              <input type="range" id="synth-wah" min="100" max="3000" value="3000" class="cyber-slider">
+              <div style="font-family: var(--font-pixel); font-size: 8px; color: var(--text-dim); margin-top: 4px;">
+                ← MMMM ... WAAAAH →
+              </div>
+            </div>
+
+            <div style="display:flex; gap:4px; margin-bottom: 12px;">
+              <button class="synth-mode active-mode" data-type="sawtooth">BUZZ</button>
+              <button class="synth-mode" data-type="square">8-BIT</button>
+              <button class="synth-mode" data-type="sine">ALIEN</button>
+            </div>
+
+            <div id="synth-keys" style="display:flex; gap:4px;">
+              <button class="synth-key" data-freq="261.63">C</button>
+              <button class="synth-key" data-freq="293.66">D</button>
+              <button class="synth-key" data-freq="329.63">E</button>
+              <button class="synth-key" data-freq="392.00">G</button>
+              <button class="synth-key" data-freq="440.00">A</button>
+            </div>
           </div>
         </div>
 
@@ -129,27 +202,6 @@
 
       <!-- CENTER FEED -->
       <main id="center-feed" style="flex:1;min-width:0">
-
-        <!-- HERO - CURRENTLY OBSESSED -->
-        <div class="panel post">
-          <div class="panel-titlebar">
-            <span class="panel-title">★ OBSESIONADO CON</span>
-            <div class="panel-controls">
-              <span class="panel-btn">─</span>
-              <span class="panel-btn">✕</span>
-            </div>
-          </div>
-          <div class="panel-body" id="hero-obsessed">
-            <div id="hero-artist">ADO</div>
-            <div id="hero-desc">
-              no sé cómo explicar lo que hace su voz. 
-              es rabia y ternura al mismo tiempo. 
-              cada canción es un mundo diferente y 
-              todos son perfectos。
-              怒と聴くたびに何か新しいものを発見する。✦
-            </div>
-          </div>
-        </div>
 
         <!-- FAVORITE PLAYLIST -->
         <div class="panel post">
@@ -207,7 +259,7 @@
         </div>
 
         <!-- LETRA FAVORITA -->
-        <div class="panel post">
+        <div class="panel post neon-pulse" id="panel-letra">
           <div class="panel-titlebar">
             <span class="panel-title">★ LETRA FAVORITA</span>
             <div class="panel-controls">
@@ -225,70 +277,35 @@
           </div>
         </div>
 
-        <!-- TWO SMALL PANELS SIDE BY SIDE -->
-        <div style="display:flex;gap:8px;margin-bottom:8px">
-
-          <!-- ESTE MES -->
-          <div class="panel post" style="flex:1">
-            <div class="panel-titlebar">
-              <span class="panel-title">★ ESTE MES</span>
-              <div class="panel-controls">
-                <span class="panel-btn">─</span>
-                <span class="panel-btn">✕</span>
-              </div>
-            </div>
-            <div class="panel-body">
-              <ul id="discoveries-list">
-                <li>
-                  <span class="disc-new">NEW</span>
-                  propose — 9Lana
-                </li>
-                <li>
-                  <span class="disc-new">NEW</span>
-                  DYNA MIND — 9Lana
-                </li>
-                <li>
-                  <span class="disc-new">NEW</span>
-                  Alkatraz — DEMONDICE
-                </li>
-              </ul>
+        <!-- COVERS GRID -->
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ COVERS</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
             </div>
           </div>
-
-          <!-- RECIENTES -->
-          <div class="panel post" style="flex:1">
-            <div class="panel-titlebar">
-              <span class="panel-title">★ RECIENTES</span>
-              <div class="panel-controls">
-                <span class="panel-btn">─</span>
-                <span class="panel-btn">✕</span>
+          <div class="panel-body">
+            <div id="covers-grid">
+              <div class="cover-item">
+                <img src="assets/images/music/AIAIA.jpg" class="cover-img" alt="AIAIA">
+                <div class="cover-title">AIAIA</div>
               </div>
-            </div>
-            <div class="panel-body">
-              <div class="recent-track">
-                <div class="recent-cover">♪</div>
-                <div class="recent-info">
-                  <div class="recent-title">AIAIA</div>
-                  <div class="recent-artist">Ado</div>
-                </div>
+              <div class="cover-item">
+                <img src="assets/images/music/vivarium.jpg" class="cover-img" alt="vivarium">
+                <div class="cover-title">vivarium</div>
               </div>
-              <div class="recent-track">
-                <div class="recent-cover">♩</div>
-                <div class="recent-info">
-                  <div class="recent-title">vivarium</div>
-                  <div class="recent-artist">Ado</div>
-                </div>
+              <div class="cover-item">
+                <img src="assets/images/music/propose.jpg" class="cover-img" alt="propose">
+                <div class="cover-title">propose</div>
               </div>
-              <div class="recent-track">
-                <div class="recent-cover">♫</div>
-                <div class="recent-info">
-                  <div class="recent-title">propose</div>
-                  <div class="recent-artist">9Lana</div>
-                </div>
+              <div class="cover-item">
+                <img src="assets/images/music/dyna_mind.jpg" class="cover-img" alt="DYNA MIND">
+                <div class="cover-title">DYNA MIND</div>
               </div>
             </div>
           </div>
-
         </div>
 
         <!-- BLOG POST -->
@@ -346,6 +363,27 @@
       <!-- SIDEBAR RIGHT -->
       <aside id="sidebar-right" style="width:240px; flex-shrink:0">
 
+        <!-- HERO - CURRENTLY OBSESSED -->
+        <div class="panel post">
+          <div class="panel-titlebar">
+            <span class="panel-title">★ OBSESIONADO CON</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" id="hero-obsessed">
+            <div id="hero-artist">ADO</div>
+            <div id="hero-desc">
+              no sé cómo explicar lo que hace su voz. 
+              es rabia y ternura al mismo tiempo. 
+              cada canción es un mundo diferente y 
+              todos son perfectos。
+              怒と聴くたびに何か新しいものを発見する。✦
+            </div>
+          </div>
+        </div>
+
         <!-- CAT SITTING ON PANEL -->
         <div style="text-align:right; margin-bottom:-14px; position:relative; z-index:10; pointer-events:none; padding-right:12px">
           <img src="assets/gifs/music/cat-sing.gif" style="height:52px;width:auto">
@@ -361,29 +399,29 @@
             </div>
           </div>
           <div class="panel-body" style="padding:6px">
-            <div class="artist-card" style="--card-color:#FF0080">
-              <div class="artist-initial">A</div>
+            <div class="artist-card neon-blue-fave" style="--card-color:#FF0080">
+              <img src="assets/images/music/ado.jpg" class="artist-thumb" alt="ADO">
               <div class="artist-info">
                 <div class="artist-name">ADO</div>
                 <div class="artist-genre">jpop · experimental</div>
               </div>
             </div>
             <div class="artist-card" style="--card-color:#00FF41">
-              <div class="artist-initial">9</div>
+              <img src="assets/images/music/9lana.jpg" class="artist-thumb" alt="9LANA">
               <div class="artist-info">
                 <div class="artist-name">9LANA</div>
                 <div class="artist-genre">jpop · r&b</div>
               </div>
             </div>
             <div class="artist-card" style="--card-color:#FF4500">
-              <div class="artist-initial">D</div>
+              <img src="assets/images/music/demondice.jpg" class="artist-thumb" alt="DEMONDICE">
               <div class="artist-info">
                 <div class="artist-name">DEMONDICE</div>
                 <div class="artist-genre">rap · vocaloid</div>
               </div>
             </div>
             <div class="artist-card" style="--card-color:#FFD700">
-              <div class="artist-initial">Y</div>
+              <img src="assets/images/music/yui.jpg" class="artist-thumb" alt="YUI">
               <div class="artist-info">
                 <div class="artist-name">YUI</div>
                 <div class="artist-genre">jpop · rock</div>
@@ -393,7 +431,7 @@
         </div>
 
         <!-- MY FAVE ARTIST PANEL -->
-        <div class="panel">
+        <div class="panel neon-soft">
           <div class="panel-titlebar">
             <span class="panel-title">✦ MY FAVE ARTIST</span>
             <div class="panel-controls">
@@ -416,32 +454,62 @@
           </div>
         </div>
 
-        <!-- COVERS GRID -->
-        <div class="panel">
+        <!-- ESTE MES -->
+        <div class="panel post">
           <div class="panel-titlebar">
-            <span class="panel-title">✦ COVERS</span>
+            <span class="panel-title">★ ESTE MES</span>
             <div class="panel-controls">
               <span class="panel-btn">─</span>
               <span class="panel-btn">✕</span>
             </div>
           </div>
           <div class="panel-body">
-            <div id="covers-grid">
-              <div class="cover-item">
-                <div class="cover-img">A</div>
-                <div class="cover-title">AIAIA</div>
+            <ul id="discoveries-list">
+              <li>
+                <span class="disc-new">NEW</span>
+                propose — 9Lana
+              </li>
+              <li>
+                <span class="disc-new">NEW</span>
+                DYNA MIND — 9Lana
+              </li>
+              <li>
+                <span class="disc-new">NEW</span>
+                Alkatraz — DEMONDICE
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- RECIENTES -->
+        <div class="panel post">
+          <div class="panel-titlebar">
+            <span class="panel-title">★ RECIENTES</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="recent-track">
+              <img src="assets/images/music/AIAIA.jpg" class="recent-cover" alt="AIAIA">
+              <div class="recent-info">
+                <div class="recent-title">AIAIA</div>
+                <div class="recent-artist">Ado</div>
               </div>
-              <div class="cover-item">
-                <div class="cover-img">V</div>
-                <div class="cover-title">vivarium</div>
+            </div>
+            <div class="recent-track">
+              <img src="assets/images/music/vivarium.jpg" class="recent-cover" alt="vivarium">
+              <div class="recent-info">
+                <div class="recent-title">vivarium</div>
+                <div class="recent-artist">Ado</div>
               </div>
-              <div class="cover-item">
-                <div class="cover-img">P</div>
-                <div class="cover-title">propose</div>
-              </div>
-              <div class="cover-item">
-                <div class="cover-img">D</div>
-                <div class="cover-title">DYNA MIND</div>
+            </div>
+            <div class="recent-track">
+              <img src="assets/images/music/propose.jpg" class="recent-cover" alt="propose">
+              <div class="recent-info">
+                <div class="recent-title">propose</div>
+                <div class="recent-artist">9Lana</div>
               </div>
             </div>
           </div>

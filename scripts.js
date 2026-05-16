@@ -60,30 +60,30 @@ const diaryEntries = [
 const obsessions = [
   "city pop 🎵", "moda callejera japonesa", "estética Y2K ✦",
   "archivos de la web antigua", "openings de anime de 2005", "música synth",
-  "aprender japonés 日本語", "fotografía analógica", "diseño web retro",
+  "aprender japonés 日本語", "fotografía analógica", "Japon antiguo",
   "videojuegos viejos", "beats lo-fi", "historia de la moda"
 ];
 
 function updateDaily() {
   const now = new Date();
-  
+
   // Format: 2025.01.23 ★
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
   const dateStr = `${year}.${month}.${day} ★`;
-  
+
   const dailyDateEl = document.getElementById('daily-date');
   if (dailyDateEl) dailyDateEl.innerText = dateStr;
 
   // Pick deterministically based on date
   const dayIndex = Math.floor(Date.now() / 86400000);
-  
+
   const entryEl = document.getElementById('daily-entry');
   if (entryEl) {
     entryEl.innerText = diaryEntries[dayIndex % diaryEntries.length];
   }
-  
+
   const obsessionEl = document.getElementById('obsession-text');
   if (obsessionEl) {
     obsessionEl.innerText = obsessions[dayIndex % obsessions.length];
@@ -92,13 +92,13 @@ function updateDaily() {
 
 function updateClock() {
   const now = new Date();
-  
+
   // Time HH:MM:SS
   const h = String(now.getHours()).padStart(2, '0');
   const m = String(now.getMinutes()).padStart(2, '0');
   const s = String(now.getSeconds()).padStart(2, '0');
   const timeStr = `${h}:${m}:${s}`;
-  
+
   const clockTimeEl = document.getElementById('clock-time');
   if (clockTimeEl) clockTimeEl.innerText = timeStr;
 
@@ -109,7 +109,7 @@ function updateClock() {
   const date = String(now.getDate()).padStart(2, '0');
   const dayJP = daysJP[now.getDay()];
   const dateStr = `${year}.${month}.${date} (${dayJP})`;
-  
+
   const clockDateEl = document.getElementById('clock-date');
   if (clockDateEl) clockDateEl.innerText = dateStr;
 }
@@ -147,7 +147,7 @@ function initRunner() {
   function run() {
     runner.style.display = 'block';
     runner.style.animation = 'run-across 8s linear forwards';
-    
+
     setTimeout(() => {
       runner.style.display = 'none';
       runner.style.animation = 'none';
@@ -169,12 +169,12 @@ function initPanelControls() {
       const panel = btn.closest('.panel');
       const body = panel.querySelector('.panel-body');
       const action = btn.innerText.trim();
-      
+
       if (action === '✕') {
         panel.style.display = 'none';
       }
       if (action === '─') {
-        body.style.display = 
+        body.style.display =
           body.style.display === 'none' ? 'block' : 'none';
       }
     });
@@ -201,7 +201,7 @@ const playlist = [
 ];
 
 let npIndex = parseInt(localStorage.getItem('npIndex') || Math.floor(Math.random() * playlist.length));
-let isPlaying = localStorage.getItem('isPlaying') === 'true';
+let isPlaying = localStorage.getItem('isPlaying') === 'true'; // default false
 let startFrom = parseFloat(localStorage.getItem('npTime') || 0);
 let npVolume = parseFloat(localStorage.getItem('npVolume') || 0.5);
 
@@ -210,24 +210,23 @@ function updateNP() {
   const artistEl = document.getElementById('np-artist');
   const audio = document.getElementById('audio-player');
   const playBtn = document.getElementById('np-play');
-  
+
   if (titleEl) titleEl.textContent = playlist[npIndex].title;
   if (artistEl) artistEl.textContent = playlist[npIndex].artist;
-  
+
   if (audio) {
-    // Only set src if it's different or empty
     if (!audio.src.includes(playlist[npIndex].src)) {
       audio.src = playlist[npIndex].src;
       audio.currentTime = startFrom;
-      startFrom = 0; // Reset for next song change
+      startFrom = 0;
     }
-    
+
     localStorage.setItem('npIndex', npIndex);
+    
     if (isPlaying) {
       audio.play().then(() => {
         if (playBtn) playBtn.textContent = '⏸';
-      }).catch(e => {
-        console.log("Autoplay bloqueado");
+      }).catch(() => {
         isPlaying = false;
         localStorage.setItem('isPlaying', 'false');
         if (playBtn) playBtn.textContent = '▶';
@@ -238,6 +237,7 @@ function updateNP() {
   }
 }
 
+
 function initNowPlaying() {
   const nextBtn = document.getElementById('np-next');
   const prevBtn = document.getElementById('np-prev');
@@ -247,15 +247,17 @@ function initNowPlaying() {
   if (playBtn && audio) {
     playBtn.addEventListener('click', () => {
       if (audio.paused) {
-        audio.play();
-        playBtn.textContent = '⏸';
-        isPlaying = true;
+        audio.play().then(() => {
+          playBtn.textContent = '⏸';
+          isPlaying = true;
+          localStorage.setItem('isPlaying', 'true');
+        }).catch(() => {});
       } else {
         audio.pause();
         playBtn.textContent = '▶';
         isPlaying = false;
+        localStorage.setItem('isPlaying', 'false');
       }
-      localStorage.setItem('isPlaying', isPlaying);
     });
   }
 
@@ -265,7 +267,7 @@ function initNowPlaying() {
       updateNP();
     });
   }
-  
+
   if (prevBtn) {
     prevBtn.addEventListener('click', () => {
       npIndex = (npIndex - 1 + playlist.length) % playlist.length;
@@ -298,7 +300,7 @@ function initNowPlaying() {
     audio.addEventListener('timeupdate', () => {
       localStorage.setItem('npTime', audio.currentTime);
       if (curTimeEl) curTimeEl.textContent = formatTime(audio.currentTime);
-      
+
       if (mainProgress && !isNaN(audio.duration)) {
         const pct = (audio.currentTime / audio.duration) * 100;
         mainProgress.value = pct;
@@ -410,7 +412,7 @@ function createFallingElements() {
   for (let i = 0; i < 15; i++) {
     const el = document.createElement('div');
     el.className = 'falling-element';
-    
+
     if (isMusicPage && Math.random() < 0.2) {
       const img = document.createElement('img');
       img.src = 'assets/images/music/falling-char.png';
@@ -436,7 +438,7 @@ function createFallingElements() {
     el.style.zIndex = '1';
     el.style.pointerEvents = 'none';
     el.style.animation = `fall-down ${duration}s linear ${delay}s infinite`;
-    
+
     const computedStyle = getComputedStyle(document.body);
     const accent = computedStyle.getPropertyValue('--accent').trim();
     const primary = computedStyle.getPropertyValue('--primary').trim();
@@ -447,6 +449,108 @@ function createFallingElements() {
 }
 
 window.addEventListener('DOMContentLoaded', createFallingElements);
+
+// --- SUPER SYNTH LOGIC ---
+let audioCtx;
+let currentOsc = null;
+let currentFilter = null;
+let currentLFO = null; // Para el modo ALIEN
+let synthType = 'sawtooth';
+
+// Cambiar modos de sonido (Buzz, 8-bit, Alien)
+document.querySelectorAll('.synth-mode').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    document.querySelectorAll('.synth-mode').forEach(b => b.classList.remove('active-mode'));
+    e.target.classList.add('active-mode');
+    synthType = e.target.getAttribute('data-type');
+  });
+});
+
+// Barra Wah-Wah
+const wahSlider = document.getElementById('synth-wah');
+const face = document.getElementById('synth-face');
+
+if (wahSlider && face) {
+  wahSlider.addEventListener('input', (e) => {
+    const val = e.target.value;
+    // Cambiar el filtro si está sonando
+    if(currentFilter) {
+      currentFilter.frequency.value = val;
+    }
+    // Cambiar la boca de la cara
+    if(val < 800) face.innerText = '(・_・)';
+    else if(val < 2000) face.innerText = '(・o・)';
+    else face.innerText = '(・O・)';
+  });
+}
+
+// Reproducir notas
+document.querySelectorAll('.synth-key').forEach(btn => {
+  // Soportar mouse y táctil
+  btn.addEventListener('mousedown', () => startNote(btn.getAttribute('data-freq')));
+  btn.addEventListener('mouseup', stopNote);
+  btn.addEventListener('mouseleave', stopNote);
+  
+  btn.addEventListener('touchstart', (e) => { e.preventDefault(); startNote(btn.getAttribute('data-freq')); });
+  btn.addEventListener('touchend', stopNote);
+});
+
+function startNote(freq) {
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  stopNote(); // Detener cualquier nota previa
+
+  currentOsc = audioCtx.createOscillator();
+  currentFilter = audioCtx.createBiquadFilter();
+  const gainNode = audioCtx.createGain();
+
+  currentOsc.type = synthType;
+  currentOsc.frequency.value = parseFloat(freq);
+
+  // El filtro Wah-Wah (Lowpass)
+  currentFilter.type = 'lowpass';
+  currentFilter.frequency.value = wahSlider ? wahSlider.value : 3000;
+  currentFilter.Q.value = 5; // Le da resonancia para que suene más "plástico"
+
+  // Modo Alien: Agrega vibrato loco
+  if(synthType === 'sine') {
+    currentLFO = audioCtx.createOscillator();
+    currentLFO.frequency.value = 6; // Velocidad del temblor
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 30; // Profundidad del temblor
+    currentLFO.connect(lfoGain);
+    lfoGain.connect(currentOsc.frequency);
+    currentLFO.start();
+  }
+
+  gainNode.gain.value = 0.05; // Volumen bajo para no reventar parlantes
+
+  currentOsc.connect(currentFilter);
+  currentFilter.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+
+  currentOsc.start();
+
+  // Animación alocada
+  if (face) {
+    face.style.textShadow = '0 0 20px var(--accent)';
+    face.style.transform = 'scale(1.2) rotate(' + (Math.random() * 10 - 5) + 'deg)';
+  }
+}
+
+function stopNote() {
+  if(currentOsc) {
+    try { currentOsc.stop(); } catch(e) {}
+    currentOsc = null;
+  }
+  if(currentLFO) {
+    try { currentLFO.stop(); } catch(e) {}
+    currentLFO = null;
+  }
+  if (face) {
+    face.style.textShadow = 'none';
+    face.style.transform = 'scale(1) rotate(0deg)';
+  }
+}
 
 
 
