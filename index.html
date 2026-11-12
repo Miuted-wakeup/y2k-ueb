@@ -53,6 +53,7 @@
   <div id="main-wrapper">
     <div id="layout">
       <aside id="sidebar-left">
+        <!-- PERFIL -->
         <div class="panel">
           <div class="panel-titlebar">
             <span class="panel-title">✦ PERFIL</span>
@@ -76,9 +77,10 @@
           </div>
         </div>
 
+        <!-- HOY -->
         <div class="panel">
           <div class="panel-titlebar">
-            <span class="panel-title">✦ HOY</span>
+            <span class="panel-title">✦ HOY (TODAY)</span>
             <div class="panel-controls">
               <span class="panel-btn">─</span>
               <span class="panel-btn">✕</span>
@@ -94,22 +96,172 @@
           </div>
         </div>
 
+        <!-- MASCOTAS & GIFS REALES -->
         <div class="panel">
           <div class="panel-titlebar">
-            <span class="panel-title">✦ GIFs</span>
+            <span class="panel-title">✦ MASCOTAS & GIFS</span>
             <div class="panel-controls">
               <span class="panel-btn">─</span>
               <span class="panel-btn">✕</span>
             </div>
           </div>
-          <div class="panel-body" style="display:flex;gap:6px;flex-wrap:wrap; justify-content:center">
-            <div class="gif-slot">GIF</div>
-            <div class="gif-slot">GIF</div>
+          <div class="panel-body" style="display:flex;gap:10px;justify-content:center;align-items:center;padding:10px;">
+            <img src="assets/gifs/home/kirby-walk.gif" style="height:46px;width:auto;image-rendering:pixelated;" alt="kirby walk">
+            <img src="assets/gifs/home/kirby-hang.gif" style="height:46px;width:auto;image-rendering:pixelated;" alt="kirby hang">
+          </div>
+        </div>
+
+        <!-- 88x31 WEBRING BUTTONS -->
+        <div class="panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ 88x31 WEBRING</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="padding:6px;">
+            <div class="home-badges-grid">
+              <span class="badge-88x31">MADE W/ NOTEPAD</span>
+              <span class="badge-88x31 pink">NETSCAPE NOW</span>
+              <span class="badge-88x31 pink">VOCALOID 01</span>
+              <span class="badge-88x31">HTML5 VALID</span>
+              <span class="badge-88x31">WINAMP READY</span>
+              <span class="badge-88x31 pink">NO AI / PURE HANDS</span>
+            </div>
           </div>
         </div>
       </aside>
+
       <main id="center-feed">
-        <!-- MICRO POST -->
+
+        <!-- 1. HERO BANNER DE BIENVENIDA -->
+        <div class="panel" id="home-hero-banner">
+          <div class="panel-titlebar">
+            <span class="panel-title">★ようこそ★ GOS'S DIGITAL SANCTUARY · わたしのせかい</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" id="home-hero-body">
+            <div id="home-hero-top">
+              <div id="home-hero-headline">
+                <span id="home-hero-title">★ MI RINCÓN DIGITAL Y2K ★</span>
+                <span id="home-hero-sub">インターネットの黄金時代 ✦ nostalgia, música, japón y código</span>
+              </div>
+              <div id="home-hero-badges">
+                <span class="hero-chip">SERVER: ONLINE ●</span>
+                <span class="hero-chip red">VER: 2005.REV8</span>
+                <span class="hero-chip">BEST ON 1024x768</span>
+                <span class="hero-chip red">PURE VANILLA JS</span>
+              </div>
+            </div>
+            <p id="home-hero-desc">
+              Bienvenido a mi espacio personal en la red. No es un portfolio corporativo ni una red social moderna: es una casa digital interactiva construida a mano, inspirada en las páginas web japonesas de la era 2005-2010.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2. MAPA DE CUARTOS / ROOM SELECTOR -->
+        <div class="panel" id="home-rooms-panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ MAPA DEL SITIO · ROOM SELECTOR (部屋)</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="padding:6px;">
+            <div class="home-rooms-grid">
+              <a href="japan.html" class="home-room-card room-japan">
+                <span class="room-icon">🇯🇵</span>
+                <div class="room-info">
+                  <span class="room-title">日本 JAPAN</span>
+                  <span class="room-sub">Shibuya, Nihongo & Vivarium</span>
+                </div>
+                <span class="room-arrow">GO ▶</span>
+              </a>
+              <a href="music.html" class="home-room-card room-music">
+                <span class="room-icon">🎧</span>
+                <div class="room-info">
+                  <span class="room-title">MUSIC</span>
+                  <span class="room-sub">Last.fm, Vocaloid & J-Pop</span>
+                </div>
+                <span class="room-arrow">GO ▶</span>
+              </a>
+              <a href="canto.html" class="home-room-card room-canto">
+                <span class="room-icon">🎤</span>
+                <div class="room-info">
+                  <span class="room-title">CANTO</span>
+                  <span class="room-sub">Midnight Karaoke & Takes</span>
+                </div>
+                <span class="room-arrow">GO ▶</span>
+              </a>
+              <a href="tech.html" class="home-room-card room-tech">
+                <span class="room-icon">🫧</span>
+                <div class="room-info">
+                  <span class="room-title">TECH</span>
+                  <span class="room-sub">Frutiger Aero & Web Retro</span>
+                </div>
+                <span class="room-arrow">GO ▶</span>
+              </a>
+              <a href="sobre-mi.html" class="home-room-card room-about">
+                <span class="room-icon">👤</span>
+                <div class="room-info">
+                  <span class="room-title">SOBRE MÍ</span>
+                  <span class="room-sub">Ficha personal y gustos</span>
+                </div>
+                <span class="room-arrow">GO ▶</span>
+              </a>
+              <a href="cosas.html" class="home-room-card room-cosas">
+                <span class="room-icon">♥</span>
+                <div class="room-info">
+                  <span class="room-title">COSAS QUE AMO</span>
+                  <span class="room-sub">Colección de tesoros</span>
+                </div>
+                <span class="room-arrow">GO ▶</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. ACTUALIZACIONES RECIENTES / CHANGELOG -->
+        <div class="panel" id="home-updates-panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ ACTUALIZACIONES RECIENTES (更新履歴)</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="padding:6px;">
+            <ul class="home-updates-list">
+              <li class="update-item">
+                <span class="update-date">2026.08.17</span>
+                <span class="update-badge canto">CANTO</span>
+                <span class="update-text">Rediseño Midnight Karaoke Booth 01 & layout estático implementado.</span>
+              </li>
+              <li class="update-item">
+                <span class="update-date">2026.08.16</span>
+                <span class="update-badge music">MUSIC</span>
+                <span class="update-text">Añadido sintetizador interactivo Wah-Wah y tabla de canciones favoritas.</span>
+              </li>
+              <li class="update-item">
+                <span class="update-date">2026.08.14</span>
+                <span class="update-badge japan">JAPAN</span>
+                <span class="update-text">Nueva palabra del día en Shibuya y reproductor de Vivarium integrado.</span>
+              </li>
+              <li class="update-item">
+                <span class="update-date">2026.08.10</span>
+                <span class="update-badge home">PORTAL</span>
+                <span class="update-text">Despliegue del blog personal con estética retro Y2K y reproductor global.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 4. MICRO POST -->
         <div class="panel post">
           <div class="panel-titlebar">
             <span class="panel-title">★ つぶやき — 2026.05.12</span>
@@ -129,7 +281,7 @@
           </div>
         </div>
 
-        <!-- LONG ENTRY -->
+        <!-- 5. LONG ENTRY -->
         <div class="panel post">
           <div class="panel-titlebar">
             <span class="panel-title">
@@ -157,7 +309,7 @@
           </div>
         </div>
 
-        <!-- PHOTO DUMP -->
+        <!-- 6. PHOTO DUMP CON FOTOS REALES Y2K -->
         <div class="panel post">
           <div class="panel-titlebar">
             <span class="panel-title">★ fotos ✦ — esta semana</span>
@@ -170,26 +322,28 @@
             <span class="post-tag tag-photos">FOTOS</span>
             <div class="photo-grid">
               <div class="polaroid">
-                <div class="polaroid-img">✿</div>
+                <img src="assets/images/home/photo1.jpg" class="polaroid-real-img" alt="café y2k">
                 <span class="polaroid-caption">café de siempre</span>
               </div>
               <div class="polaroid" style="transform:rotate(2deg)">
-                <div class="polaroid-img">♪</div>
+                <img src="assets/images/home/photo2.jpg" class="polaroid-real-img" alt="walkman y2k">
                 <span class="polaroid-caption">vibes del día</span>
               </div>
               <div class="polaroid" style="transform:rotate(-1.5deg)">
-                <div class="polaroid-img">★</div>
+                <img src="assets/images/home/photo3.jpg" class="polaroid-real-img" alt="tokyo sky">
                 <span class="polaroid-caption">空が綺麗だった</span>
               </div>
               <div class="polaroid" style="transform:rotate(1deg)">
-                <div class="polaroid-img">✦</div>
-                <span class="polaroid-caption">Crazy things</span>
+                <img src="assets/images/home/photo4.jpg" class="polaroid-real-img" alt="crazy gaming nights">
+                <span class="polaroid-caption">crazy nights</span>
               </div>
             </div>
           </div>
         </div>
       </main>
+
       <aside id="sidebar-right">
+        <!-- RELOJ -->
         <div class="panel">
           <div class="panel-titlebar">
             <span class="panel-title">✦ RELOJ</span>
@@ -204,6 +358,7 @@
           </div>
         </div>
 
+        <!-- VISITANTES -->
         <div class="panel">
           <div class="panel-titlebar">
             <span class="panel-title">✦ VISITANTES</span>
@@ -225,6 +380,28 @@
           </div>
         </div>
 
+        <!-- FORTUNA JAPONESA OMIKUJI -->
+        <div class="panel" id="home-omikuji-panel">
+          <div class="panel-titlebar">
+            <span class="panel-title">✦ OMIKUJI · おみくじ</span>
+            <div class="panel-controls">
+              <span class="panel-btn">─</span>
+              <span class="panel-btn">✕</span>
+            </div>
+          </div>
+          <div class="panel-body" style="text-align:center;padding:8px;">
+            <div id="omikuji-box">
+              <div id="omikuji-result-badge">今日の運勢</div>
+              <div id="omikuji-result-text">Haz clic para descubrir tu fortuna de hoy ✦</div>
+              <div id="omikuji-result-lucky" style="display:none;">
+                <span>★ Ítem de suerte: </span><strong id="omikuji-item">-</strong>
+              </div>
+              <button type="button" id="omikuji-btn">おみくじを引く (Sacar Fortuna)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIBRO DE VISITAS -->
         <div class="panel">
           <div class="panel-titlebar">
             <span class="panel-title">✦ LIBRO DE VISITAS</span>
@@ -245,6 +422,7 @@
             <div id="coming-soon-stamp">PRÓXIMAMENTE</div>
           </div>
         </div>
+
         <div id="character-wrap">
           <img src="assets/images/home/character.png" id="character-img" alt="">
         </div>

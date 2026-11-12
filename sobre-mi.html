@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=1024" />
-  <meta name="description" content="Y2K Japanese internet portal — personal blog" />
-  <title>y2k-blog | SOBRE MÍ</title>
+  <meta name="description" content="El rincón personal de Gos: música, Japón, canto y una web hecha a mano." />
+  <title>y2k-blog | SOBRE MÍ ✦ El mundo de Gos</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
     href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Noto+Sans+JP:wght@400;700&family=Caveat:wght@400;700&family=Russo+One&display=swap"
-    rel="stylesheet"
-  />
+    rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="sections.css" />
 </head>
-<body>
 
+<body id="section-sobre-mi">
+
+  <!-- HEADER -->
   <header id="site-header">
     <div id="header-inner">
       <div id="header-logo">
@@ -26,14 +29,14 @@
       </div>
       <div id="header-marquee">
         <marquee behavior="scroll" direction="left" scrollamount="3">
-          ★ようこそ★ BIENVENIDOS A MI BLOG ★ 更新しました ★ ¡nueva entrada!
-          ★ gracias por visitar ★ どうぞよろしく ★
-          deja un mensaje en mi libro de visitas ★ (✿◠‿◠) ★
+          🌹 SOBRE MÍ · 電脳市民証 ✦ GOS CYBER PROFILE ✦ Digital Wanderer ✦ Visual Kei & Cyber Y2K ✦ J-Pop & Canto ✦
+          響きとノスタルジア ✦ 一期一会 ✦ No algoritmos, solo alma 🌹
         </marquee>
       </div>
     </div>
   </header>
 
+  <!-- NAV -->
   <nav id="site-nav">
     <div id="nav-inner">
       <a href="index.html" class="nav-tab">HOME</a>
@@ -46,60 +49,1234 @@
     </div>
   </nav>
 
+  <!-- Reference-led profile layout: sidebar, two upper rows, tiles, then about. -->
   <div id="main-wrapper">
-    <div id="layout">
-      <main id="center-feed" style="flex:1">
-        <div class="panel">
+    <div id="sm-layout" class="sm-reference-frame">
+      <aside id="sm-sidebar" aria-label="Perfil y navegación">
+        <div class="sm-sidebar-surface sm-late-reveal" aria-hidden="true"></div>
+        <div class="sm-profile-spread" id="sm-profile">
+          <aside class="sm-welcome-card" aria-labelledby="sm-welcome-title">
+            <h1 id="sm-welcome-title" class="sm-card-caption">Gos <small>ゴス</small><span>♡</span></h1>
+            <div class="sm-card-face">
+              <img src="assets/images/sobre-mi/profile-avatar.jpg" alt="Avatar de Gos" width="88" height="88" />
+              <span>● EN LÍNEA</span>
+            </div>
+            <p class="sm-card-message">Bienvenido a mi pequeño mundo.</p>
+            <div class="sm-card-notes">
+              <p>Cyber Bard & Web Alchemist · 響きの錬金術師</p>
+              <p>Nacido en el Otoño de 2005</p>
+              <p>Origen: La Internet Dorada</p>
+            </div>
+            <p class="sm-card-signature">«No algoritmos, solo alma.»</p>
+            <span class="sm-card-serial">#GOS-2005-秋 · ID-097568230-Y2K-HIBIKI</span>
+          </aside>
+          <a class="sm-greeting-mascot" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"
+            rel="noopener noreferrer" aria-label="Saludar al gatito: una sorpresa musical (abre otra pestaña)"
+            title="¿Me saludas?">
+            <span>¡hola! ♡</span>
+            <img src="assets/gifs/sobre-mi/cat-arms.gif" alt="Gatito saludando con las patitas" width="76"
+              height="80" />
+          </a>
+        </div>
+        <section class="panel" id="sm-contact">
           <div class="panel-titlebar">
-            <span class="panel-title">✦ SOBRE MÍ</span>
+            <h2 class="panel-title">MIS RINCONES</h2>
+            <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+          </div>
+          <div class="panel-body">
+            <nav class="sm-contact-grid" aria-label="Mis rincones y contacto"><a href="index.html">⌂ Volver a HOME</a><a
+                href="#sm-guestbook">✉ Dejar un sello</a><a href="japan.html">日本 Visitar JAPAN</a><a href="music.html">♫
+                Visitar MUSIC</a><a href="canto.html">♪ Visitar CANTO</a><a href="tech.html">&lt;/&gt; Visitar TECH</a>
+            </nav>
+          </div>
+        </section>
+        <section class="panel" id="sm-site-note">
+          <div class="panel-titlebar">
+            <h2 class="panel-title">ESTE SITIO</h2>
+            <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+          </div>
+          <div class="panel-body">
+            <div class="sm-site-buttons"><a class="sm-web-button" href="tech.html">HTML / CSS<span>HECHO A
+                  MANO</span></a><a class="sm-web-button sm-web-button-pink" href="index.html">GOS'S WEB<span>NO
+                  ALGORITHMS</span></a></div>
+            <p>a veces el internet se siente más como un hogar que cualquier otro lugar ♥</p><small>★ 100% ARTESANAL NO
+              ALGORÍTMICO ★</small>
+          </div>
+        </section>
+        <div class="sm-sidebar-banners" aria-label="Imágenes personales">
+          <figure class="sm-image-slot sm-late-reveal" data-sm-banner="sidebar-01">
+            <img src="assets/images/sobre-mi/banner-sidebar-01.jpg" alt="PSP como imagen personal de muestra 1"
+              width="640" height="160" loading="lazy" />
+          </figure>
+          <figure class="sm-image-slot sm-late-reveal" data-sm-banner="sidebar-02">
+            <img src="assets/images/sobre-mi/banner-sidebar-02.jpg" alt="PSP como imagen personal de muestra 2"
+              width="640" height="160" loading="lazy" />
+          </figure>
+        </div>
+        <div class="sm-character-slot sm-late-reveal">
+          <!-- Cambia href por la página de destino y src por tu personaje (mejor con fondo transparente). -->
+          <a id="sm-sidebar-character" href="music.html" aria-label="Visitar mi rincón musical"
+            title="Ven a mi rincón musical ♫">
+            <img src="assets/images/sobre-mi/sidebar-character.png" alt="Personaje de bienvenida a mi rincón musical"
+              width="500" height="500" loading="lazy" />
+          </a>
+        </div>
+      </aside>
+      <main class="sm-portal-main">
+        <div class="sm-content-surface sm-late-reveal" aria-hidden="true"></div>
+        <div class="sm-upper-row sm-cover-row">
+          <figure class="sm-postcard sm-late-reveal" id="sm-banner"><img src="assets/images/sobre-mi/photo3.jpg"
+              alt="Recorte panorámico de Tokio al atardecer" width="1080" height="190" />
+            <p class="sm-cover-title">ようこそ! <span>mi pequeño mundo</span></p>
+            <figcaption>Algún día voy a caminar por Shibuya y va a sentirse como volver a casa aunque nunca haya estado.
+              ✦</figcaption>
+          </figure>
+          <div class="sm-cover-poster sm-late-reveal" aria-label="Collage de mis pequeños tesoros"><img
+              src="assets/images/sobre-mi/candy_drops.jpg" alt="Drops de Tokio" width="100" height="100" /><img
+              src="assets/images/sobre-mi/tamagotchi.jpg" alt="Tamagotchi Connection" width="100" height="100" /><img
+              src="assets/images/sobre-mi/casete_mixtape.jpg" alt="Casete Mixtape" width="100" height="100" /><img
+              src="assets/images/sobre-mi/omamori.jpg" alt="Omamori de Asakusa" width="100" height="100" /></div>
+        </div>
+        <div class="sm-upper-row sm-interests-row">
+          <section class="panel" id="sm-interests">
+            <div class="panel-titlebar">
+              <h2 class="panel-title">INTERESES · 好きなもの</h2>
+              <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+            </div>
+            <div class="panel-body">
+              <div class="sm-interests-grid">
+                <section>
+                  <h3>GENERAL</h3>
+                  <p>Cultura Y2K, Japón, música, canto y pequeños objetos con historia. Mi rincón de internet, hecho a
+                    mano.</p>
+                </section>
+                <section>
+                  <h3>MÚSICA</h3>
+                  <p>J-pop y Vocaloid. Ado, Hatsune Miku, Sheena Ringo y Kikuo: voces y mundos que me inspiran.</p>
+                </section>
+                <section>
+                  <h3>WEB & TECH</h3>
+                  <p>HTML, CSS y JavaScript puro. Páginas personales, la web antigua y diseño retro con personalidad.
+                  </p>
+                </section>
+                <section>
+                  <h3>CANTO</h3>
+                  <p>Cyber Bard. Baritenor (F2 - G4 - C5). Resonancia, agudos sin tensión y técnica Twang.</p>
+                </section>
+                <section>
+                  <h3>JAPÓN</h3>
+                  <p>Aprendo japonés. Algún día, caminar por Shibuya y sentir que vuelvo a casa.</p>
+                </section>
+                <section>
+                  <h3>IDEAS</h3>
+                  <p>「響」Hibiki: resonancia. 「一期一会」Cada encuentro es irrepetible. No algoritmos, solo alma.</p>
+                </section>
+              </div>
+            </div>
+          </section>
+          <section class="panel" id="sm-links">
+            <div class="panel-titlebar">
+              <h2 class="panel-title">ENLACES</h2>
+              <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+            </div>
+            <div class="panel-body">
+              <nav class="sm-link-rows" aria-label="Enlaces de mis secciones"><a href="music.html"><span>♫
+                    MUSIC</span>mi rincón musical</a><a href="canto.html"><span>♪ CANTO</span>la voz y sus cosas</a><a
+                  href="tech.html"><span>&lt;/&gt; TECH</span>web hecha a mano</a></nav>
+              <figure class="sm-image-slot sm-image-slot--links" data-sm-banner="links">
+                <img src="assets/images/sobre-mi/banner-links.jpg" alt="PSP como imagen personal de muestra 3"
+                  width="420" height="120" loading="lazy" />
+              </figure>
+            </div>
+          </section>
+        </div>
+        <div class="sm-center-row">
+          <aside class="sm-blog-column" aria-label="Índice del blog">
+            <section class="panel" id="sm-blog-index">
+              <div class="panel-titlebar">
+                <h2 class="panel-title">BLOG</h2>
+                <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+              </div>
+              <div class="panel-body">
+                <ul class="sm-blog-links">
+                  <li><a href="#sm-note-web">No era solo la estética <small>(leer)</small></a></li>
+                  <li><a href="#sm-note-voice">¿Por qué cantar? <small>(leer)</small></a></li>
+                  <li><a href="#sm-note-ideas">響 / 一期一会 <small>(leer)</small></a></li>
+                  <li><a href="japan.html">Un lugar pendiente <small>(JAPAN)</small></a></li>
+                  <li><a href="#sm-vocal-archive">Mi rincón de canto <small>(abrir)</small></a></li>
+                </ul>
+              </div>
+            </section><a class="sm-blog-strip sm-late-reveal" data-sm-banner="blog" href="music.html" aria-label="Abrir MUSIC"><img
+                src="assets/images/sobre-mi/banner-blog.jpg" alt="PSP como banner personal del blog" width="240" height="70" /></a>
+          </aside>
+          <section class="panel" id="sm-treasures">
+            <div class="panel-titlebar">
+              <h2 class="panel-title">FAVORITOS · MI PEQUEÑO MUNDO</h2>
+              <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+            </div>
+            <div class="panel-body">
+              <p class="sm-favorites-caption">Algunas cosas que viven por aquí.</p>
+              <div class="sm-favorites-grid"><a class="sm-favorite" href="japan.html"><span>DROPS DE TOKIO</span><img
+                    src="assets/images/sobre-mi/candy_drops.jpg" alt="Drops de Tokio" width="70" height="70"
+                    loading="lazy" /></a>
+                <a class="sm-favorite" href="tech.html"><span>TAMAGOTCHI 2004</span><img
+                    src="assets/images/sobre-mi/tamagotchi.jpg" alt="Tamagotchi Connection" width="70" height="70"
+                    loading="lazy" /></a>
+                <a class="sm-favorite" href="canto.html"><span>MIXTAPE J-POP 2005</span><img
+                    src="assets/images/sobre-mi/casete_mixtape.jpg" alt="Casete Mixtape" width="70" height="70"
+                    loading="lazy" /></a>
+                <a class="sm-favorite" href="music.html"><span>OMAMORI SENSO-JI</span><img
+                    src="assets/images/sobre-mi/omamori.jpg" alt="Omamori de Asakusa" width="70" height="70"
+                    loading="lazy" /></a>
+                <a class="sm-favorite" href="music.html"><span>Vivarium / Ado</span><img
+                    src="assets/images/sobre-mi/vivarium1.jpg" alt="Arte de Vivarium de Ado" width="70" height="70"
+                    loading="lazy" /></a>
+                <a class="sm-favorite" href="japan.html"><span>Japón</span><img src="assets/images/sobre-mi/japon.jpg"
+                    alt="Recorte de Tokio al atardecer" width="70" height="70" loading="lazy" /></a>
+                <a class="sm-favorite" href="tech.html"><span>Web retro</span><img
+                    src="assets/images/sobre-mi/photo2.jpg" alt="Discman, casete y cuadernos sobre un escritorio"
+                    width="70" height="70" loading="lazy" /></a>
+                <a class="sm-favorite" href="music.html"><span>Ado</span><img src="assets/images/sobre-mi/ado.jpg"
+                    alt="Imagen de Ado de la sección MUSIC" width="70" height="70" loading="lazy" /></a>
+              </div>
+              <details class="sm-collection-fold">
+                <summary>Notas de los pequeños tesoros</summary>
+                <dl>
+                  <dt>DROPS DE TOKIO</dt>
+                  <dd>Dulces frutales de lata nostálgica de Shinjuku. Sabor a tarde soleada de verano en 2006.</dd>
+                  <dt>TAMAGOTCHI 2004</dt>
+                  <dd>Carcasa translúcida y píxeles retro. Criar a Mimitchi me enseñó paciencia digital.</dd>
+                  <dt>MIXTAPE J-POP 2005</dt>
+                  <dd>Cinta de cromo con grabaciones caseras, tomas vocales de medianoche y ruido analógico.</dd>
+                  <dt>OMAMORI SENSO-JI</dt>
+                  <dd>Amuleto sagrado de seda para la protección de la voz, la salud y la inspiración artística.</dd>
+                </dl>
+              </details>
+            </div>
+          </section>
+        </div>
+        <article class="panel" id="sm-profile-bio">
+          <div class="panel-titlebar">
+            <h2 class="panel-title">SOBRE MÍ · 自己紹介</h2>
+            <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+          </div>
+          <div class="panel-body sm-profile-story">
+            <section class="sm-about-chunk">
+              <h3>ABOUT ME</h3>
+              <p>Canto, aprendo japonés y construyo mi propio rincón de internet. Este espacio reúne lo que me mueve: la
+                música, Japón y una web hecha a mano, con personalidad.</p>
+            </section>
+            <section class="sm-about-chunk">
+              <h3>ESTE RINCÓN</h3>
+              <p>Un lugar mío de verdad, para escribir, guardar lo que me gusta y dejar un poquito de mí. No algoritmos,
+                solo alma. ✦</p>
+            </section>
+          </div>
+        </article>
+        <div class="panel" id="sm-notebook">
+          <div class="panel-titlebar">
+            <h2 class="panel-title">APUNTES · 響きの日記</h2>
+            <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+          </div>
+          <div class="panel-body">
+            <div class="sm-sketchbook-wrap">
+              <div class="sm-sketchbook-spiral-header"><span class="sm-sketchbook-rings" aria-hidden="true">◎ ◎ ◎ ◎
+                  ◎</span><span class="sm-sketchbook-title">páginas de mi pequeño mundo</span></div>
+              <article class="sm-journal-entry" id="sm-note-web">
+                <p class="sm-paper-label">01 / INTERNET · PENSAMIENTOS</p>
+                <h3>No era solo la estética.</h3>
+                <p>No era la estética solamente — era la intención. Cada sitio era la casa de alguien.
+                  Podías sentir a la persona detrás de cada GIF animado, cada contador de visitas, cada entrada de
+                  guestbook.</p>
+                <blockquote>«Cada sitio era la casa de alguien.»</blockquote>
+                <p>Alquimia Web: En un internet homogeneizado por algoritmos insípidos, interfaces corporativas y redes
+                  sociales idénticas,
+                  este portal es un santuario construido a mano, línea por línea con HTML puro, CSS nostálgico y
+                  devoción artesanal.</p>
+                <a class="sm-paper-link" href="tech.html">más píxeles y otras obsesiones → TECH</a>
+              </article>
+              <article class="sm-vocal-note" id="sm-note-voice">
+                <p class="sm-paper-label">02 / UNA NOTA SOBRE LA VOZ</p>
+                <h3>¿Por qué cantar?</h3>
+                <p>Porque hay emociones humanas y frecuencias vibratorias que no caben en una línea de código ni en una
+                  simple frase de texto.
+                  El canto es la resonancia física del alma penetrando el silencio del mundo.</p>
+                <a class="sm-paper-link" href="canto.html">mi otro lugar para expresarme → CANTO</a>
+              </article>
+              <details class="sm-notebook-fold" id="sm-note-ideas">
+                <summary>Dos ideas que me acompañan: 響 / 一期一会 <span>＋</span></summary>
+                <div class="sm-kanji-highlight-box">
+                  <div class="sm-kanji-big">響</div>
+                  <div class="sm-kanji-desc">
+                    <strong>HIBIKI (Resonancia y Eco):</strong>
+                    <br />
+                    Mi kanji guía. Representa la vibración compartida: cuando el aire vibra en las cuerdas y resuena en
+                    quien escucha del otro lado.
+                  </div>
+                </div>
+                <div class="sm-kanji-highlight-box sm-kanji-highlight-box--encounter">
+                  <div class="sm-kanji-big">一期一会</div>
+                  <div class="sm-kanji-desc">
+                    <strong>ICHIGO ICHIE (Cada encuentro es irrepetible):</strong>
+                    <br />
+                    Cada take vocal grabado a las 3am, cada visitante que llega a este sitio y cada estampa dejada
+                    ocurre exactamente una sola vez en el universo.
+                  </div>
+                </div>
+              </details>
+              <p class="sm-notebook-signature">sin algoritmo, sin prisa. <span>~ Gos / ゴス</span></p>
+            </div>
+          </div>
+        </div>
+        <div class="panel" id="sm-artists">
+          <div class="panel-titlebar">
+            <h2 class="panel-title">MÚSICA · LO QUE ME INSPIRA</h2>
+            <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+          </div>
+          <div class="panel-body">
+            <div class="sm-record-sleeve">
+              <a class="sm-record-art" href="music.html" aria-label="Visitar MUSIC: Vivarium y Ado"><img
+                  src="assets/images/sobre-mi/vivarium1.jpg" alt="Arte de Vivarium de Ado" width="128" height="128"
+                  loading="lazy" /><span>VIVARIUM / ADO</span></a>
+              <div class="sm-record-copy">
+                <p class="sm-paper-label">UNA VOZ QUE ME INSPIRA</p>
+                <h3>Rabia y ternura.</h3>
+                <p>No sé cómo explicar lo que hace su voz. Es rabia y ternura al mismo tiempo. Cada canción es un mundo
+                  diferente.</p><a href="music.html">entrar a mi rincón musical ↗</a>
+              </div>
+            </div>
+            <details class="sm-inspiration-fold">
+              <summary>Otras voces que me acompañan <span>＋</span></summary>
+              <div class="sm-insp-item">
+                <strong>Ado (アド)</strong>
+                <span>TWANG REINA ★</span>
+              </div>
+              <div class="sm-insp-item">
+                <strong>Hatsune Miku / Vocaloid</strong>
+                <span>VELOCIDAD & DICCIÓN</span>
+              </div>
+              <div class="sm-insp-item">
+                <strong>Sheena Ringo (椎名林檎)</strong>
+                <span>GRAVES & PERSONALIDAD</span>
+              </div>
+              <div class="sm-insp-item">
+                <strong>Kikuo (きくお)</strong>
+                <span>OSCURIDAD POÉTICA</span>
+              </div>
+            </details>
+          </div>
+        </div>
+        <div class="panel" id="sm-guestbook">
+          <div class="panel-titlebar">
+            <h2 class="panel-title">✦ DEJA TU SELLO · 記念スタンプ</h2>
             <div class="panel-controls">
               <span class="panel-btn">─</span>
               <span class="panel-btn">✕</span>
             </div>
           </div>
-          <div class="panel-body">
-            <h2 class="post-title">Próximamente...</h2>
-            <p>Sección en construcción. ✦</p>
+          <div class="panel-body sm-stamp-pad">
+            <p style="font-size:10px;font-family:var(--font-jp);color:var(--text);margin:0;">
+              Deja una estampa antes de continuar tu viaje:
+            </p>
+
+            <div class="sm-stamp-picker">
+              <button type="button" class="sm-stamp-btn" data-stamp="♥">♥ AMOR</button>
+              <button type="button" class="sm-stamp-btn" data-stamp="★">★ BRILLO</button>
+              <button type="button" class="sm-stamp-btn" data-stamp="🌹">🌹 ROSA</button>
+              <button type="button" class="sm-stamp-btn" data-stamp="✦">✦ MAGIA</button>
+              <button type="button" class="sm-stamp-btn" data-stamp="⚡">⚡ TWANG</button>
+              <button type="button" class="sm-stamp-btn" data-stamp="🎤">🎤 CANTO</button>
+              <button type="button" class="sm-stamp-btn" data-stamp="🌸">🌸 SAKURA</button>
+              <button type="button" class="sm-stamp-btn" data-stamp="🔥">🔥 PASIÓN</button>
+            </div>
+
+            <div id="stamp-display-wall">
+              <span style="transform:rotate(-8deg)">♥</span>
+              <span style="transform:rotate(12deg)">⚡</span>
+              <span style="transform:rotate(-15deg)">🎤</span>
+              <span style="transform:rotate(6deg)">★</span>
+              <span style="transform:rotate(-4deg)">🌹</span>
+              <span style="transform:rotate(10deg)">✦</span>
+              <span style="transform:rotate(-12deg)">🌸</span>
+            </div>
+
+            <div class="sm-stamp-counter-row">
+              <span>Estampas fijadas: <strong id="stamp-count">24</strong></span>
+              <button type="button" class="sm-stamp-clear-btn" id="sm-clear-stamps">Limpiar</button>
+            </div>
           </div>
         </div>
+        <details id="sm-vocal-archive" class="sm-late-reveal">
+          <summary>
+            <span class="sm-archive-label">♪ MI RINCÓN DE CANTO <small>5 fases · vídeos · práctica diaria ·
+                afinador</small></span>
+            <span class="sm-archive-action"><span class="sm-archive-open">ABRIR +</span><span
+                class="sm-archive-close">CERRAR −</span></span>
+          </summary>
+          <div class="sm-vocal-workspace">
+            <div class="panel" id="sm-routine">
+              <div class="panel-titlebar">
+                <h2 class="panel-title">✦ RUTINA VOCAL DIARIA · 5 FASES DE ENTRENAMIENTO</h2>
+                <div class="panel-controls">
+                  <span class="panel-btn">─</span>
+                  <span class="panel-btn">✕</span>
+                </div>
+              </div>
+              <div class="panel-body">
+
+                <!-- Banner de Cabecera de la Rutina -->
+                <div class="sm-vocal-routine-header">
+                  <span class="sm-vocal-routine-title">
+                    ♪ MI RUTINA DIARIA DE ENTRENAMIENTO VOCAL (日常のボイストレーニング)
+                  </span>
+                  <p class="sm-vocal-routine-desc">
+                    Cantar no es forzar la garganta ni empujar aire con desesperación; es dominar la resonancia
+                    acústica, la relajación muscular y la biomecánica precisa. Aquí documento de forma minuciosa las 5
+                    etapas que componen mi práctica diaria, fundamentadas en las lecciones maestras de <strong>Canto Sin
+                      Fronteras</strong> y <strong>Yeka Coach</strong>.
+                  </p>
+                </div>
+
+                <!-- Tabs de Navegación entre las 5 Fases -->
+                <div class="sm-routine-tabs-nav">
+                  <button type="button" class="sm-routine-tab-btn active" data-phase="1">
+                    <span>01. Calentamiento</span>
+                  </button>
+                  <button type="button" class="sm-routine-tab-btn" data-phase="2">
+                    <span>02. Agudos Altos</span>
+                  </button>
+                  <button type="button" class="sm-routine-tab-btn" data-phase="3">
+                    <span>03. Graves & Control</span>
+                  </button>
+                  <button type="button" class="sm-routine-tab-btn" data-phase="4">
+                    <span>04. Fortalecer & Fry</span>
+                  </button>
+                  <button type="button" class="sm-routine-tab-btn" data-phase="5">
+                    <span>05. Técnica Twang ★</span>
+                  </button>
+                </div>
+
+                <!-- FASE 1: CALENTAMIENTO (CANTO SIN FRONTERAS) -->
+                <div class="sm-phase-container">
+                  <div class="sm-phase-pane active" id="phase-1">
+                    <div class="sm-phase-banner">
+                      <div class="sm-phase-badge-title">
+                        <strong>FASE 1: CALENTAMIENTO CORPORAL Y VOCAL (5 PASOS)</strong>
+                        <span>Guía por Canto Sin Fronteras · Preparación fisiológica total antes de emitir sonido
+                          fuerte</span>
+                      </div>
+                      <div class="sm-yt-actions">
+                        <button type="button" class="sm-yt-player-toggle" data-video="T-XpMyNkfPU"
+                          data-target="tv-embed-1">
+                          <span>📺 Mini TV Player</span>
+                        </button>
+                        <a href="https://youtu.be/T-XpMyNkfPU?si=3Xs6asR-OgVlakvV" target="_blank"
+                          rel="noopener noreferrer" class="sm-yt-guide-btn">
+                          <span>▶ Abrir en YouTube</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Mini TV Player Container -->
+                    <div class="sm-cyber-tv-embed" id="tv-embed-1" style="display:none;">
+                      <div class="sm-cyber-tv-topbar">
+                        <span class="sm-cyber-tv-title">📺 CYBER TV // FASE 1: CALENTAMIENTO (CANTO SIN
+                          FRONTERAS)</span>
+                        <button type="button" class="sm-cyber-tv-close" data-target="tv-embed-1">✕ CERRAR</button>
+                      </div>
+                      <div class="sm-cyber-tv-frame-wrap"></div>
+                    </div>
+
+                    <div class="sm-exercise-cards-grid">
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">PASO 01</span>
+                          <span class="sm-ex-title">Calentar el Cuerpo & Alineación Postural</span>
+                          <span class="sm-ex-tag">CUERPO</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          El instrumento vocal es el cuerpo entero. Comenzar desperezando las articulaciones, hombros y
+                          columna para eliminar cualquier bloqueo o tensión parasitaria que restrinja la caja torácica.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Tip: Rodar suavemente los hombros hacia atrás 10 veces mientras inhalas con tranquilidad.
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">PASO 02</span>
+                          <span class="sm-ex-title">Activar los Músculos Respiratorios (Soporte)</span>
+                          <span class="sm-ex-tag">RESPIRACIÓN</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Activación costodiafragmática. Inhalar sintiendo cómo las costillas flotantes se abren
+                          lateralmente y el abdomen bajo se expande sin subir jamás el pecho ni los hombros.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Tip: Exhalar en "S" o "Sh" sostenida manteniendo las costillas expandidas para activar el
+                          suelo pélvico.
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">PASO 03</span>
+                          <span class="sm-ex-title">Relajar Cuello, Hombros y Zona Cervical</span>
+                          <span class="sm-ex-tag">LARINGE LIBRE</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Liberar el músculo esternocleidomastoideo y el hueso hioides. Movimientos pendulares de cabeza
+                          en semicírculo para que la laringe quede suspendida libremente y sin estrangulamiento.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Tip: Jamás hacer giros bruscos hacia atrás; solo semicírculos suaves por delante del pecho.
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">PASO 04</span>
+                          <span class="sm-ex-title">Articulación: Labios, Mandíbula y Lengua</span>
+                          <span class="sm-ex-tag">TRACTO VOCAL</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Trompetillas labiales (<em>lip trills</em>) y vibración con la lengua (<em>tongue
+                            trills</em>). Esta resistencia frontal alivia el impacto directo en las cuerdas vocales e
+                          iguala la presión subglótica.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Tip: Masajear las articulaciones temporomandibulares mientras haces trompetillas en tono
+                          medio.
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">PASO 05</span>
+                          <span class="sm-ex-title">Despertar Músculos Vocales con Escalas Suaves</span>
+                          <span class="sm-ex-tag">CUERDAS</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Sirenas descendentes muy suaves en volumen medio-bajo usando vocales cerradas ("u" o "i") o
+                          semi-oclusivas (trompetilla), conectando suavemente los registros sin forzar volumen.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="sm-anatomy-box">
+                      <span class="sm-anatomy-title">⚙️ PRINCIPIO BIOMECÁNICO DEL CALENTAMIENTO:</span>
+                      <p class="sm-anatomy-text">
+                        Las cuerdas vocales son músculos recubiertos de mucosa. El calentamiento incrementa la
+                        vascularización, temperatura y viscosidad del tejido, reduciendo el riesgo de nódulos o fatiga
+                        temprana en un 90%.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- FASE 2: AGUDOS SIN DOLOR (YEKA COACH) -->
+                  <div class="sm-phase-pane" id="phase-2">
+                    <div class="sm-phase-banner">
+                      <div class="sm-phase-badge-title">
+                        <strong>FASE 2: AGUDOS POTENTES SIN QUE TE DUELA LA GARGANTA</strong>
+                        <span>4 Ejercicios Clave por Yeka Coach · Registro Alto Seguro & Voz Mixta</span>
+                      </div>
+                      <div class="sm-yt-actions">
+                        <button type="button" class="sm-yt-player-toggle" data-video="p6KUgtvQpv8"
+                          data-target="tv-embed-2">
+                          <span>📺 Mini TV Player</span>
+                        </button>
+                        <a href="https://youtu.be/p6KUgtvQpv8?si=SZlVyYm1Ge3Oehib" target="_blank"
+                          rel="noopener noreferrer" class="sm-yt-guide-btn">
+                          <span>▶ Abrir en YouTube</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Mini TV Player Container -->
+                    <div class="sm-cyber-tv-embed" id="tv-embed-2" style="display:none;">
+                      <div class="sm-cyber-tv-topbar">
+                        <span class="sm-cyber-tv-title">📺 CYBER TV // FASE 2: AGUDOS SIN DOLOR (YEKA COACH)</span>
+                        <button type="button" class="sm-cyber-tv-close" data-target="tv-embed-2">✕ CERRAR</button>
+                      </div>
+                      <div class="sm-cyber-tv-frame-wrap"></div>
+                    </div>
+
+                    <div class="sm-exercise-cards-grid">
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 01</span>
+                          <span class="sm-ex-title">Glissandos Continuos (Sirenas de Resonancia)</span>
+                          <span class="sm-ex-tag">TRANSICIÓN</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Deslizarse suavemente de notas graves hacia notas agudas y viceversa sin interrupciones. En
+                          lugar de "saltar" a la nota aguda golpeando con el pecho, permite que la masa muscular de la
+                          cuerda se estire como una banda elástica.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Regla de oro: No subas con fuerza de volumen; sube con ligereza y dirección hacia la cabeza.
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 02</span>
+                          <span class="sm-ex-title">Staccato Ágil ("Mum" / Oclusivas Cortas)</span>
+                          <span class="sm-ex-tag">APOYO ACTIVO</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Emitir notas agudas en ataques cortos, ligeros y rítmicos usando la sílaba "mum" o "gut". Esto
+                          activa el reflejo del diafragma de inmediato y evita que empujes una columna continua de aire
+                          descontrolado que inflama la garganta.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Sensación: Piensa en pequeños toques de luz rebotando en el paladar superior.
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 03</span>
+                          <span class="sm-ex-title">Humming & Colocación en la Máscara Facial ("M")</span>
+                          <span class="sm-ex-tag">RESONANCIA</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Zumbar con la boca cerrada sintiendo la vibración en los pómulos, puente de la nariz y frente.
+                          Al colocar el sonido en los resonadores frontales óseos, amplificas los armónicos superiores
+                          sin aplicar presión en la laringe.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 04</span>
+                          <span class="sm-ex-title">Control Biomecánico: Barbilla Neutra y Cero Tensión</span>
+                          <span class="sm-ex-tag">POSTURA</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          El error más habitual al cantar notas altas es elevar la barbilla hacia el techo. Esto
+                          estrangula el espacio faríngeo posterior. Mantén la barbilla paralela al suelo o incluso
+                          levemente inclinada hacia abajo para dejar que la laringe bascule libre.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Corrección: Mírate al espejo; si tu cuello se estira hacia arriba en el agudo, detente y
+                          reajusta.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="sm-anatomy-box">
+                      <span class="sm-anatomy-title">💡 POR QUÉ DUELE LA GARGANTA AL CANTAR AGUDOS:</span>
+                      <p class="sm-anatomy-text">
+                        El dolor surge cuando el cantante intenta arrastrar el registro de pecho pesado demasiado arriba
+                        (tensión de constrictores) o sopla exceso de aire por falta de cierre glótico. La solución es
+                        aligerar la masa cordal y usar resonancia en máscara.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- FASE 3: GRAVES Y CONTROL (CANTO SIN FRONTERAS) -->
+                  <div class="sm-phase-pane" id="phase-3">
+                    <div class="sm-phase-banner">
+                      <div class="sm-phase-badge-title">
+                        <strong>FASE 3: PRACTICAR GRAVES & AUMENTAR REGISTRO GRAVE Y CONTROL</strong>
+                        <span>Guía por Canto Sin Fronteras · Descenso Laríngeo, Formantes & Consistencia Sonora</span>
+                      </div>
+                      <div class="sm-yt-actions">
+                        <button type="button" class="sm-yt-player-toggle" data-video="IiPrM9CLDHY"
+                          data-target="tv-embed-3">
+                          <span>📺 Mini TV Player</span>
+                        </button>
+                        <a href="https://youtu.be/IiPrM9CLDHY?si=-rE6OJxRKJHzN6Eu" target="_blank"
+                          rel="noopener noreferrer" class="sm-yt-guide-btn">
+                          <span>▶ Abrir en YouTube</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Mini TV Player Container -->
+                    <div class="sm-cyber-tv-embed" id="tv-embed-3" style="display:none;">
+                      <div class="sm-cyber-tv-topbar">
+                        <span class="sm-cyber-tv-title">📺 CYBER TV // FASE 3: GRAVES Y CONTROL (CANTO SIN
+                          FRONTERAS)</span>
+                        <button type="button" class="sm-cyber-tv-close" data-target="tv-embed-3">✕ CERRAR</button>
+                      </div>
+                      <div class="sm-cyber-tv-frame-wrap"></div>
+                    </div>
+
+                    <div class="sm-exercise-cards-grid">
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">PRINCIPIO 01</span>
+                          <span class="sm-ex-title">Ampliación de Formantes y Resonancia Oscura</span>
+                          <span class="sm-ex-tag">ACÚSTICA</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Para que los graves suenen con cuerpo, peso y profundidad, es necesario agrandar el tracto
+                          vocal. Esto se consigue bajando suavemente la laringe de forma natural (sensación de inicio de
+                          bostezo) y adelantando los labios.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 02</span>
+                          <span class="sm-ex-title">Ejercicio de Laringe Baja: Sílabas "BO" / "BU"</span>
+                          <span class="sm-ex-tag">ESPACIO FARÍNGEO</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Emitir las sílabas "BO" o "BU" inflando suavemente las mejillas. Esto ensancha las paredes de
+                          la faringe y amplifica los primeros formantes acústicos graves sin apretar las cuerdas vocales
+                          ni forzar el cuello.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Sensación: Emisión ágil, oscura y redonda, como si tu boca tuviera forma de campana amplia.
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 03</span>
+                          <span class="sm-ex-title">Escalas Descendentes en Registro Débil (Conexión)</span>
+                          <span class="sm-ex-tag">ESTIRAMIENTO</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Bajar en escalas o arpegios hacia la zona más profunda de tu voz manteniendo el registro débil
+                          (voz de cabeza/falsete) conectado lo más abajo posible, sin soltar abruptamente al registro de
+                          pecho soplado.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 04</span>
+                          <span class="sm-ex-title">Cierre Glótico Firme ("KI" / "GUG" y Nasales "M/Ñ")</span>
+                          <span class="sm-ex-tag">CLARIDAD</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Los graves suelen flaquear y sonar débiles o aireados por falta de coaptación cordal. Usar
+                          consonantes oclusivas ("K", "G") y resonancias nasales ("M", "Ñ") para mantener el timbre
+                          enfocado y brillante.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">ADVERTENCIA</span>
+                          <span class="sm-ex-title">¡Cero Empuje Subglótico! (No Apretujes el Cuello)</span>
+                          <span class="sm-ex-tag">SALUD VOCAL</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Uno de los errores más destructivos al buscar graves es apretar la panza o el cuello para
+                          "engrosar" la voz. La potencia del grave proviene del espacio resonante ampliado, jamás de
+                          empujar aire a la fuerza.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="sm-anatomy-box">
+                      <span class="sm-anatomy-title">🔬 FÍSICA ACÚSTICA DEL GRAVE:</span>
+                      <p class="sm-anatomy-text">
+                        Bajar la laringe aumenta la longitud efectiva del tubo vocal de ~17cm a ~19cm, lo cual reduce la
+                        frecuencia de resonancia de los formantes F1 y F2, confiriéndole a la voz ese color
+                        aterciopelado y cavernoso característico.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- FASE 4: FORTALECER Y VOCAL FRY (CANTO SIN FRONTERAS) -->
+                  <div class="sm-phase-pane" id="phase-4">
+                    <div class="sm-phase-banner">
+                      <div class="sm-phase-badge-title">
+                        <strong>FASE 4: FORTALECER LA VOZ Y PRACTICAR VOCAL FRY</strong>
+                        <span>Guía por Canto Sin Fronteras · Fritura Vocal, Bandas Ventriculares & Kargyraa</span>
+                      </div>
+                      <div class="sm-yt-actions">
+                        <button type="button" class="sm-yt-player-toggle" data-video="fDpUA_IG-os"
+                          data-target="tv-embed-4">
+                          <span>📺 Mini TV Player</span>
+                        </button>
+                        <a href="https://youtu.be/fDpUA_IG-os?si=33Mcnpick5OVa78O" target="_blank"
+                          rel="noopener noreferrer" class="sm-yt-guide-btn">
+                          <span>▶ Abrir en YouTube</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Mini TV Player Container -->
+                    <div class="sm-cyber-tv-embed" id="tv-embed-4" style="display:none;">
+                      <div class="sm-cyber-tv-topbar">
+                        <span class="sm-cyber-tv-title">📺 CYBER TV // FASE 4: VOCAL FRY & FORTALECER (CANTO SIN
+                          FRONTERAS)</span>
+                        <button type="button" class="sm-cyber-tv-close" data-target="tv-embed-4">✕ CERRAR</button>
+                      </div>
+                      <div class="sm-cyber-tv-frame-wrap"></div>
+                    </div>
+
+                    <div class="sm-exercise-cards-grid">
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">FUNDAMENTO</span>
+                          <span class="sm-ex-title">¿Qué es el Vocal Fry (Fritura Vocal)?</span>
+                          <span class="sm-ex-tag">MÍNIMO ESFUERZO</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Es el modo de vibración más bajo de las cuerdas vocales (pulso glótico). Las cuerdas están
+                          cortas y gruesas, vibrando con paquetes lentos e individuales de aire. Es una herramienta
+                          terapéutica magnífica para relajar la voz y fortalecer el cierre limpio.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Sonido: Imitar el crujido lento de una puerta vieja de madera o el sonido de una freidora.
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 01</span>
+                          <span class="sm-ex-title">Fritura Limpia Continua (Sin Escape de Aire)</span>
+                          <span class="sm-ex-tag">COAPTACIÓN</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Producir el crujido continuo a muy bajo volumen sin que se escuche aire soplado. Sirve para
+                          calibrar la coaptación completa de las cuerdas vocales sin que intervenga ninguna tensión
+                          muscular externa.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 02</span>
+                          <span class="sm-ex-title">Fritura + Presión de Aire Progresiva</span>
+                          <span class="sm-ex-tag">COMPRESIÓN</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Iniciar en vocal fry puro e ir añadiendo gradualmente flujo de aire con apoyo abdominal.
+                          Permite desarrollar la compresión sana necesaria para ataques potentes, transiciones dinámicas
+                          y matices de rock o J-Pop moderno.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 03</span>
+                          <span class="sm-ex-title">Activación de Bandas Ventriculares (Falsas Cuerdas)</span>
+                          <span class="sm-ex-tag">DISTORSIÓN SANA</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Aprender a involucrar las estructuras supraglóticas (bandas ventriculares) utilizando la
+                          técnica de voz aspirada controlada. Esto permite generar distorsiones vocales agresivas
+                          (screaming, raspado) protegiendo las cuerdas vocales verdaderas.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 04</span>
+                          <span class="sm-ex-title">Kargyraa & Saltos de Octava Fuerte-Débil</span>
+                          <span class="sm-ex-tag">ELASTICIDAD</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Práctica derivada del canto gutural tradicional de Tuva (Kargyraa), combinada con saltos de
+                          octava pasando de sonido robusto a sonido débil para desarrollar máxima elasticidad y
+                          resistencia muscular.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="sm-anatomy-box">
+                      <span class="sm-anatomy-title">🛡️ REGLA DE PROTECCIÓN VOCAL:</span>
+                      <p class="sm-anatomy-text">
+                        Cualquier ejercicio de distorsión o vocal fry debe suspenderse de inmediato si sientes picor,
+                        ardor o necesidad de toser. La distorsión correcta no raspa las cuerdas vocales; es una
+                        vibración controlada de los pliegues vestibulares superiores.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- FASE 5: TÉCNICA ACTUAL: TWANG (CANTO SIN FRONTERAS) -->
+                  <div class="sm-phase-pane" id="phase-5">
+                    <div class="sm-phase-banner">
+                      <div class="sm-phase-badge-title">
+                        <strong>FASE 5: LA TÉCNICA QUE ESTOY PRACTICANDO — EL VERDADERO TWANG</strong>
+                        <span>Guía por Canto Sin Fronteras · ¡No es Nasal! · Esfínter Ariepiglótico & Megáfono
+                          Acústico</span>
+                      </div>
+                      <div class="sm-yt-actions">
+                        <button type="button" class="sm-yt-player-toggle" data-video="nopqB3Yk7-o"
+                          data-target="tv-embed-5">
+                          <span>📺 Mini TV Player</span>
+                        </button>
+                        <a href="https://youtu.be/nopqB3Yk7-o?si=3ldbmoLZ6fI-Ipow" target="_blank"
+                          rel="noopener noreferrer" class="sm-yt-guide-btn">
+                          <span>▶ Abrir en YouTube</span>
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Mini TV Player Container -->
+                    <div class="sm-cyber-tv-embed" id="tv-embed-5" style="display:none;">
+                      <div class="sm-cyber-tv-topbar">
+                        <span class="sm-cyber-tv-title">📺 CYBER TV // FASE 5: MASTERCLASS TWANG (CANTO SIN
+                          FRONTERAS)</span>
+                        <button type="button" class="sm-cyber-tv-close" data-target="tv-embed-5">✕ CERRAR</button>
+                      </div>
+                      <div class="sm-cyber-tv-frame-wrap"></div>
+                    </div>
+
+                    <div class="sm-exercise-cards-grid">
+                      <div class="sm-exercise-card sm-exercise-card--key">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">REVELACIÓN</span>
+                          <span class="sm-ex-title">¡Te lo explicaron mal: No existe el Twang Nasal!</span>
+                          <span class="sm-ex-tag sm-ex-tag--key">FUNDAMENTAL</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          El error pedagógico más extendido en el canto es creer que el twang se produce en la nariz. El
+                          twang se produce físicamente en la laringe por el estrechamiento del <strong>esfínter
+                            ariepiglótico</strong> (el embudo epilaringal). Es un fenómeno <strong>100%
+                            orofaríngeo</strong>. La nasalización puede o no acompañar, pero taparse la nariz no debe
+                          apagar el twang.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Prueba científica: Haz el sonido de twang y tápate la nariz con los dedos. Si el sonido se
+                          corta o se ahoga, estabas nasalizando; si el timbre metálico se mantiene idéntico, ¡tu twang
+                          es puro y orofaríngeo!
+                        </div>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">ACÚSTICA</span>
+                          <span class="sm-ex-title">El Megáfono Biológico: Ganancia de +15dB a +20dB</span>
+                          <span class="sm-ex-tag">PROYECCIÓN</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Al estrechar el embudo epiglótico, la impedancia acústica del tracto vocal se dispara entre
+                          los <strong>2.5 kHz y 4.0 kHz</strong> (la región del <em>singer's formant</em> y la máxima
+                          sensibilidad del oído humano). Esto permite cantar con un volumen masivo y un brillo cortante
+                          que atraviesa cualquier banda de rock o pista de J-Pop sin forzar las cuerdas.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 01</span>
+                          <span class="sm-ex-title">El Graznido de Pato ("Quack, Quack")</span>
+                          <span class="sm-ex-tag">SONIDO DETONANTE</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Imitar a un pato enojado diciendo "cuac" con un tono muy brillante, metálico y filoso. Ayuda a
+                          encontrar de forma intuitiva el estrechamiento epiglótico sin involucrar tensión en la
+                          garganta.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 02</span>
+                          <span class="sm-ex-title">La Risa de Bruja Malvada ("He-He-He")</span>
+                          <span class="sm-ex-tag">SONIDO DETONANTE</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Imitar la risa aguda y estridente de un personaje de cuento ("¡ñaca ñaca!" o "¡he-he-he!").
+                          Coloca la laringe en una posición ligeramente elevada y achica el embudo epilaringal de
+                          inmediato.
+                        </p>
+                      </div>
+
+                      <div class="sm-exercise-card">
+                        <div class="sm-ex-header">
+                          <span class="sm-ex-num">EJERCICIO 03</span>
+                          <span class="sm-ex-title">El Llanto de Bebé ("Nyaa / Waaa") & Vocal "E" Brillante</span>
+                          <span class="sm-ex-tag">J-POP KEY</span>
+                        </div>
+                        <p class="sm-ex-body">
+                          Emitir el llanto quejumbroso de un bebé o un maullido exagerado ("nyaaa"), transicionando
+                          luego hacia una vocal "E" ultra brillante dirigida hacia los incisivos superiores. Es el arma
+                          secreta de <strong>Ado</strong> y vocalistas de Visual Kei para agudos mordentes y emotivos.
+                        </p>
+                        <div class="sm-ex-tip">
+                          ✦ Aplicación práctica: Cantar frases rápidas de canciones como "Usseewa" o "Show" aplicando
+                          este brillo para evitar fatiga vocal.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="sm-anatomy-box">
+                      <span class="sm-anatomy-title">⚡ POR QUÉ ES MI TÉCNICA PRINCIPAL ACTUAL:</span>
+                      <p class="sm-anatomy-text">
+                        El Twang es el puente maestro: une el registro de pecho y de cabeza en una voz mixta compacta,
+                        amplifica la resonancia sin esfuerzo muscular y es el cimiento para todas las distorsiones
+                        limpias.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Tracker Diario Interactivo (Checklist de la Rutina) -->
+                <div class="sm-daily-tracker-box">
+                  <div class="sm-tracker-header">
+                    <span class="sm-tracker-title">✦ CHECKLIST DIARIO DE ENTRENAMIENTO VOCAL</span>
+                    <span class="sm-tracker-streak">RACHA: <strong id="sm-streak-count">5
+                        DÍAS</strong> 🔥</span>
+                  </div>
+
+                  <div class="sm-checklist-items">
+                    <label class="sm-check-row">
+                      <input type="checkbox" class="sm-routine-check" data-step="1" />
+                      <span class="sm-check-label">01. Calentamiento Corporal & 5 Pasos (Canto Sin Fronteras)</span>
+                    </label>
+                    <label class="sm-check-row">
+                      <input type="checkbox" class="sm-routine-check" data-step="2" />
+                      <span class="sm-check-label">02. Agudos Altos & Staccato "Mum" (Yeka Coach)</span>
+                    </label>
+                    <label class="sm-check-row">
+                      <input type="checkbox" class="sm-routine-check" data-step="3" />
+                      <span class="sm-check-label">03. Graves con Laringe Baja "BO/BU" (Canto Sin Fronteras)</span>
+                    </label>
+                    <label class="sm-check-row">
+                      <input type="checkbox" class="sm-routine-check" data-step="4" />
+                      <span class="sm-check-label">04. Fortalecer Voz & Vocal Fry Progresivo (Canto Sin
+                        Fronteras)</span>
+                    </label>
+                    <label class="sm-check-row">
+                      <input type="checkbox" class="sm-routine-check" data-step="5" />
+                      <span class="sm-check-label">05. Técnica Twang: Pato / Bruja / Nyaa (Canto Sin Fronteras)</span>
+                    </label>
+                  </div>
+
+                  <div class="sm-tracker-progress-wrap">
+                    <div class="sm-tracker-bar-track">
+                      <div id="sm-tracker-progress-fill"></div>
+                    </div>
+                    <span id="sm-tracker-pct-text">0%</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <aside class="sm-vocal-tools" aria-label="Herramientas de práctica vocal">
+              <div class="panel" id="sm-ficha">
+                <div class="panel-titlebar">
+                  <h2 class="panel-title">✦ FICHA DE PRÁCTICA · VOZ</h2>
+                  <div class="panel-controls"><span class="panel-btn">─</span><span class="panel-btn">✕</span></div>
+                </div>
+                <div class="panel-body">
+                  <div class="sm-id-fields-table">
+                    <div class="sm-id-row">
+                      <strong>CLASE:</strong>
+                      <span>Cyber Bard ♫</span>
+                    </div>
+                    <div class="sm-id-row">
+                      <strong>REGISTRO:</strong>
+                      <span>Baritenor (F2 - G4 - C5)</span>
+                    </div>
+                    <div class="sm-id-row">
+                      <strong>ENFOQUE:</strong>
+                      <span>Agudos sin tensión & Twang</span>
+                    </div>
+                    <div class="sm-id-row">
+                      <strong>KANJI GUÍA:</strong>
+                      <span>「響」(Hibiki · Resonancia)</span>
+                    </div>
+                    <div class="sm-id-row">
+                      <strong>FILOSOFÍA:</strong>
+                      <span>「一期一会」(Cada instante es único)</span>
+                    </div>
+                  </div>
+                  <div class="sm-voice-state-box">
+                    <div class="sm-voice-state-label">
+                      <span>ESTADO VOCAL:</span>
+                      <strong id="sm-active-state-txt">☕ Calentando</strong>
+                    </div>
+                    <div class="sm-voice-state-pills">
+                      <button type="button" class="sm-state-pill-btn active" data-state="☕ Calentando">☕
+                        Calentar</button>
+                      <button type="button" class="sm-state-pill-btn" data-state="⚡ Twang Activo">⚡ Twang</button>
+                      <button type="button" class="sm-state-pill-btn" data-state="🎙️ Grabando Take">🎙️ Take</button>
+                      <button type="button" class="sm-state-pill-btn" data-state="〰️ Vocal Fry">〰️ Fry</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel" id="sm-tuner">
+                <div class="panel-titlebar">
+                  <h2 class="panel-title">✦ AFINADOR VOCAL · TONE SYNTH</h2>
+                  <div class="panel-controls">
+                    <span class="panel-btn">─</span>
+                    <span class="panel-btn">✕</span>
+                  </div>
+                </div>
+                <div class="panel-body sm-tuner-box">
+                  <div class="sm-tuner-screen">
+                    <span class="sm-tuner-freq-display" id="sm-tuner-freq">440.0 Hz</span>
+                    <div class="sm-tuner-wave-anim" id="sm-tuner-wave">
+                      <span class="sm-tuner-wave-bar"></span>
+                      <span class="sm-tuner-wave-bar"></span>
+                      <span class="sm-tuner-wave-bar"></span>
+                      <span class="sm-tuner-wave-bar"></span>
+                    </div>
+                  </div>
+
+                  <p style="font-size:9.5px;color:var(--text-dim);font-family:var(--font-jp);margin:0;">
+                    Haz clic en una nota para entonar durante tu calentamiento:
+                  </p>
+
+                  <div class="sm-tuner-keys-grid">
+                    <button type="button" class="sm-tuner-key-btn" data-freq="220.0" data-note="A3">A3 220Hz</button>
+                    <button type="button" class="sm-tuner-key-btn" data-freq="261.63" data-note="C4">C4 261Hz</button>
+                    <button type="button" class="sm-tuner-key-btn" data-freq="329.63" data-note="E4">E4 330Hz</button>
+                    <button type="button" class="sm-tuner-key-btn" data-freq="392.00" data-note="G4">G4 392Hz</button>
+                    <button type="button" class="sm-tuner-key-btn" data-freq="440.00" data-note="A4">A4 440Hz</button>
+                    <button type="button" class="sm-tuner-key-btn" data-freq="523.25" data-note="C5">C5 523Hz</button>
+                  </div>
+
+                  <button type="button" class="sm-tuner-stop-btn" id="sm-tuner-stop">
+                    ■ DETENER TONO
+                  </button>
+                </div>
+              </div>
+              <div class="panel" id="sm-skills">
+                <div class="panel-titlebar">
+                  <h2 class="panel-title">✦ STATS VOCALES & SKILLS</h2>
+                  <div class="panel-controls">
+                    <span class="panel-btn">─</span>
+                    <span class="panel-btn">✕</span>
+                  </div>
+                </div>
+                <div class="panel-body sm-stats-list">
+                  <div class="sm-stat-item">
+                    <div class="sm-stat-meta">
+                      <span class="sm-stat-name">🚀 Registro Agudo & Sirenas</span>
+                      <span class="sm-stat-pct">88%</span>
+                    </div>
+                    <div class="sm-stat-track">
+                      <div class="sm-stat-fill" style="width: 88%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="sm-stat-item">
+                    <div class="sm-stat-meta">
+                      <span class="sm-stat-name">⚓ Graves con Formantes ("BO/BU")</span>
+                      <span class="sm-stat-pct">82%</span>
+                    </div>
+                    <div class="sm-stat-track">
+                      <div class="sm-stat-fill" style="width: 82%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="sm-stat-item">
+                    <div class="sm-stat-meta">
+                      <span class="sm-stat-name">⚡ Twang Epilaringal (Brillo)</span>
+                      <span class="sm-stat-pct">95%</span>
+                    </div>
+                    <div class="sm-stat-track">
+                      <div class="sm-stat-fill" style="width: 95%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="sm-stat-item">
+                    <div class="sm-stat-meta">
+                      <span class="sm-stat-name">〰️ Vocal Fry & Cierre Glótico</span>
+                      <span class="sm-stat-pct">85%</span>
+                    </div>
+                    <div class="sm-stat-track">
+                      <div class="sm-stat-fill" style="width: 85%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="sm-stat-item">
+                    <div class="sm-stat-meta">
+                      <span class="sm-stat-name">🔨 HTML/CSS Artesanal Puro</span>
+                      <span class="sm-stat-pct">100%</span>
+                    </div>
+                    <div class="sm-stat-track">
+                      <div class="sm-stat-fill" style="width: 100%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="sm-stat-item">
+                    <div class="sm-stat-meta">
+                      <span class="sm-stat-name">🎧 Pasión J-Pop & Ado</span>
+                      <span class="sm-stat-pct">MAX ★★★</span>
+                    </div>
+                    <div class="sm-stat-track">
+                      <div class="sm-stat-fill" style="width: 100%;"></div>
+                    </div>
+                  </div>
+
+                  <div
+                    style="font-size:9.5px;color:var(--text-dim);font-family:var(--font-jp);line-height:1.4;margin-top:2px;">
+                    * "El apoyo no es empujar aire con la panza; es una suspensión elástica que permite a las cuerdas
+                    vibrar sin fatiga."
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </details>
+        <p class="sm-page-signature sm-late-reveal">✦ Gracias por pasar por mi pequeño mundo. またね! <span>~ Gos /
+            ゴス</span></p>
       </main>
     </div>
   </div>
 
-  <div id="now-playing-bar">
-    <img id="np-kirby" src="assets/gifs/kirby-hang.gif" alt="kirby">
-    <div id="np-left">
-      <span id="np-label">♪ ESCUCHANDO</span>
-      <div id="np-equalizer">
-        <span class="eq-bar"></span>
-        <span class="eq-bar"></span>
-        <span class="eq-bar"></span>
-        <span class="eq-bar"></span>
-        <span class="eq-bar"></span>
+  <!-- DECORACIONES Y PERSONAJES FUERA DE LOS PANELES (OUTSIDE DECORATIONS) -->
+  <div class="sm-outside-decor" id="sm-decor-mascot-right">
+    <img src="assets/gifs/sobre-mi/ado.gif" alt="Ado Mascot" style="width:100%;display:block;" />
+  </div>
+
+  <!-- NOW PLAYING BAR PERSISTENTE -->
+  <div id="now-playing-bar" class="sm-late-reveal" role="region" aria-label="Reproductor de música">
+    <img id="np-kirby" src="assets/gifs/sobre-mi/kirby-hang.gif" alt="kirby">
+    <div class="sm-winamp-titlebar" aria-hidden="true">
+      <span class="sm-winamp-mark">▣</span>
+      <span class="sm-winamp-stripes"></span>
+      <span>WINAMP</span>
+      <span class="sm-winamp-stripes"></span>
+      <span class="sm-winamp-edition">GOS'S MIX</span>
+    </div>
+    <div class="sm-winamp-body">
+      <div class="sm-winamp-cover" role="img" aria-label="Ilustración de Vocaloid"></div>
+      <div id="np-info">
+        <span id="np-title">cargando...</span>
+        <span id="np-artist"></span>
       </div>
-    </div>
-    <div id="np-info">
-      <span id="np-title">cargando...</span>
-      <span id="np-artist"></span>
-    </div>
-    <div id="np-seek-wrap">
-      <span class="np-time" id="np-current-time">0:00</span>
-      <input type="range" id="np-progress" min="0" max="100" value="0">
-      <span class="np-time" id="np-duration">0:00</span>
-    </div>
-    <div id="np-controls">
-      <span class="np-btn" id="np-prev">◀◀</span>
-      <span class="np-btn" id="np-play">▶</span>
-      <span class="np-btn" id="np-next">▶▶</span>
-    </div>
-    <div id="np-volume-wrap">
-      <span id="vol-icon">VOL</span>
-      <input type="range" id="np-volume" min="0" max="1" step="0.1" value="0.5">
+      <div class="sm-winamp-timeline">
+        <div id="np-left">
+          <span id="np-label" aria-live="polite">DETENIDO</span>
+          <div id="np-equalizer" aria-hidden="true">
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+            <span class="eq-bar"></span>
+          </div>
+        </div>
+        <div id="np-seek-wrap">
+          <span class="np-time" id="np-current-time">0:00</span>
+          <input type="range" id="np-progress" min="0" max="100" value="0" aria-label="Posición de la canción">
+          <span class="np-time" id="np-duration">0:00</span>
+        </div>
+      </div>
+      <div id="np-controls">
+        <button type="button" class="np-btn" id="np-prev" aria-label="Canción anterior" title="Anterior">◀◀</button>
+        <button type="button" class="np-btn" id="np-play" aria-label="Reproducir" title="Reproducir">▶</button>
+        <button type="button" class="np-btn" id="sm-np-stop" aria-label="Detener" title="Detener">■</button>
+        <button type="button" class="np-btn" id="np-next" aria-label="Canción siguiente" title="Siguiente">▶▶</button>
+      </div>
+      <div id="np-volume-wrap">
+        <label id="vol-icon" for="np-volume">VOLUMEN <output id="sm-np-volume-value" for="np-volume">50%</output></label>
+        <input type="range" id="np-volume" min="0" max="1" step="0.1" value="0.5">
+      </div>
     </div>
     <audio id="audio-player"></audio>
   </div>
 
-  <div id="side-dock">
+  <!-- SIDE DOCK (GLOBAL) -->
+  <div id="side-dock" class="sm-late-reveal">
     <div id="dock-social">
       <a href="#" class="dock-link" id="dock-ig" title="Instagram">
         <span>ig</span>
@@ -119,6 +1296,8 @@
     </div>
   </div>
 
+  <!-- SCRIPTS -->
   <script src="scripts.js"></script>
 </body>
+
 </html>
