@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="20" viewBox="0 0 150 20" role="img" aria-labelledby="title">
+  <title id="title">Y2K SOUL</title>
+  <rect width="150" height="20" fill="#0d0d14"/>
+  <path d="M1 18V1h148" fill="none" stroke="#9296aa"/>
+  <path d="M149 1v18H1" fill="none" stroke="#393b4c"/>
+  <rect x="3" y="3" width="144" height="14" fill="#20212e"/>
+  <path d="M4 4h142M4 15h142" stroke="#696a89" stroke-dasharray="3 2 1 2"/>
+  <path d="M15 5h2v4h4v2h-4v4h-2v-4h-4V9h4Z" fill="#b3bed9" shape-rendering="crispEdges"/>
+  <path d="M9 5h2v2H9m11 9h2v2h-2" fill="#b17a91"/>
+  <text x="31" y="13" fill="#e6e8f2" font-family="Consolas, 'Courier New', monospace" font-size="9" font-weight="bold" letter-spacing="1.2">Y2K SOUL</text>
+  <path d="m129 7 3 3-3 3m7-6 3 3-3 3" fill="none" stroke="#b17a91"/>
+</svg>

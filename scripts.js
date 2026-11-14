@@ -128,13 +128,46 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ============================================================
+   DEFAULT VISUAL SCALE
+   ============================================================ */
+function updateSiteScale() {
+  const root = document.documentElement;
+  const preferred = Number(getComputedStyle(root).getPropertyValue('--site-default-scale')) || 1.3;
+  // Preserve the 1024px canvas; scrollable sections keep their preferred scale.
+  // Never shrink below the original design or alter the browser's own zoom.
+  let scale = CSS.supports('zoom', '1.3')
+    ? Math.max(1, Math.min(preferred, window.innerWidth / 1024))
+    : 1;
+  const apply = () => {
+    root.style.setProperty('--site-scale', scale);
+    // CSS zoom does not change media-query dimensions, unlike browser zoom.
+    root.classList.toggle('site-compact-height', window.innerHeight / scale <= 850);
+    root.classList.toggle('site-narrow-layout', window.innerWidth / scale <= 1280);
+  };
+  apply();
+  // The locked sidebar cannot scroll. Fit its actual contents, including the
+  // banners whose height grows with their width, instead of guessing a height.
+  const sidebar = document.getElementById('sm-sidebar');
+  for (let attempt = 0; sidebar && scale > 1 && attempt < 6; attempt++) {
+    const overflow = sidebar.scrollHeight - sidebar.clientHeight;
+    if (overflow <= 0) break;
+    scale = Math.max(1, scale * window.innerHeight / (window.innerHeight + (overflow + 2) * scale));
+    apply();
+  }
+}
+
+updateSiteScale();
+window.addEventListener('resize', updateSiteScale);
+
+/* ============================================================
    CURSOR TRAIL
    ============================================================ */
 document.addEventListener('mousemove', (e) => {
   const spark = document.createElement('span');
   spark.classList.add('cursor-spark');
-  spark.style.left = e.pageX + 'px';
-  spark.style.top = e.pageY + 'px';
+  const scale = Number(getComputedStyle(document.documentElement).zoom) || 1;
+  spark.style.left = e.pageX / scale + 'px';
+  spark.style.top = e.pageY / scale + 'px';
   spark.innerText = ['✦', '★', '♥', '✿', '⊹'][Math.floor(Math.random() * 5)];
   document.body.appendChild(spark);
   setTimeout(() => spark.remove(), 600);
@@ -679,7 +712,7 @@ function initTechSection() {
           response = '╔════════════════════════════════════════╗\n║ RIG SPECS · VISTA ULTIMATE 64-BIT     ║\n║ CPU: Intel Core 2 Duo E8400 @ 3.00GHz  ║\n║ RAM: 4.00 GB Corsair Dominator DDR2   ║\n║ GPU: NVIDIA GeForce 8800 GTX 768MB     ║\n║ DISPLAY: SyncMaster 226BW 1680x1050 2ms║\n║ AUDIO: Creative Sound Blaster X-Fi     ║\n║ OS: Windows Vista Ultimate SP2 (Aero)  ║\n╚════════════════════════════════════════╝';
           break;
         case 'neofetch':
-          response = '  .----.      gos@frutiger-rig\n /  ..  \\     ────────────────\n|  /  \\  |    OS: Windows Vista Aero 64-bit\n|  \\__/  |    Host: Custom 2007 Workstation\n \\      /     Kernel: NT 6.0.6002\n  `----`      Uptime: 247 days, 13 hours\n              Shell: Vista Command Prompt 1.0\n              Resolution: 1440x900 @ 75Hz\n              Theme: Aero Glass Pure Gloss';
+          response = '  .----.      muted@frutiger-rig\n /  ..  \\     ────────────────\n|  /  \\  |    OS: Windows Vista Aero 64-bit\n|  \\__/  |    Host: Custom 2007 Workstation\n \\      /     Kernel: NT 6.0.6002\n  `----`      Uptime: 247 days, 13 hours\n              Shell: Vista Command Prompt 1.0\n              Resolution: 1440x900 @ 75Hz\n              Theme: Aero Glass Pure Gloss';
           break;
         case 'quote':
           response = '"El Skeuomorphism y Frutiger Aero le daban textura humana a lo digital: gotas de agua, cristal y sombras hacían que el software pareciera tangible y vivo."';
@@ -767,15 +800,15 @@ function initSobreMiSection() {
     btn.addEventListener('click', () => {
       const phaseNum = btn.getAttribute('data-phase');
       if (!phaseNum) return;
+      const targetPane = document.getElementById(`phase-${phaseNum}`);
+      if (!targetPane) return;
 
+      closeMiniPlayers();
       phaseTabs.forEach(t => t.classList.remove('active'));
       phasePanes.forEach(p => p.classList.remove('active'));
 
       btn.classList.add('active');
-      const targetPane = document.getElementById(`phase-${phaseNum}`);
-      if (targetPane) {
-        targetPane.classList.add('active');
-      }
+      targetPane.classList.add('active');
     });
   });
 
@@ -783,45 +816,90 @@ function initSobreMiSection() {
   const playerToggles = document.querySelectorAll('.sm-yt-player-toggle');
   const playerCloses = document.querySelectorAll('.sm-cyber-tv-close');
 
+  function closeMiniPlayer(container) {
+    container.style.display = 'none';
+    const frameWrap = container.querySelector('.sm-cyber-tv-frame-wrap');
+    if (frameWrap) frameWrap.replaceChildren();
+    playerToggles.forEach(toggle => {
+      if (toggle.getAttribute('data-target') === container.id) toggle.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function closeMiniPlayers() {
+    document.querySelectorAll('.sm-cyber-tv-embed').forEach(closeMiniPlayer);
+  }
+
+  function showMiniTvHelp(frameWrap, message, videoId) {
+    const help = document.createElement('p');
+    help.className = 'sm-tv-help';
+    help.textContent = message;
+    if (videoId) {
+      const link = document.createElement('a');
+      link.href = `https://www.youtube.com/watch?v=${videoId}`;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'Abrir en YouTube ↗';
+      help.textContent += ' ';
+      help.appendChild(link);
+    }
+    frameWrap.appendChild(help);
+  }
+
   playerToggles.forEach(btn => {
+    const targetId = btn.getAttribute('data-target');
+    const container = document.getElementById(targetId);
+    if (!container) return;
+    btn.setAttribute('aria-controls', targetId);
+    btn.setAttribute('aria-expanded', 'false');
+    container.setAttribute('role', 'region');
+    container.setAttribute('aria-label', 'Mini TV');
+
     btn.addEventListener('click', () => {
       const videoId = btn.getAttribute('data-video');
-      const targetId = btn.getAttribute('data-target');
-      const container = document.getElementById(targetId);
-      if (!container) return;
-
       const isHidden = container.style.display === 'none' || !container.style.display;
-      if (isHidden) {
-        // Cerrar otros reproductores abiertos
-        document.querySelectorAll('.sm-cyber-tv-embed').forEach(c => {
-          c.style.display = 'none';
-          const f = c.querySelector('.sm-cyber-tv-frame-wrap');
-          if (f) f.innerHTML = '';
-        });
-
-        const frameWrap = container.querySelector('.sm-cyber-tv-frame-wrap');
-        if (frameWrap && !frameWrap.querySelector('iframe')) {
-          frameWrap.innerHTML = `<iframe width="100%" height="240" src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-        }
-        container.style.display = 'block';
-        playRetroChime(640);
-      } else {
-        container.style.display = 'none';
-        const frameWrap = container.querySelector('.sm-cyber-tv-frame-wrap');
-        if (frameWrap) frameWrap.innerHTML = '';
+      if (!isHidden) {
+        closeMiniPlayer(container);
+        return;
       }
+
+      closeMiniPlayers();
+      const frameWrap = container.querySelector('.sm-cyber-tv-frame-wrap');
+      if (!frameWrap) return;
+      container.style.display = 'block';
+      btn.setAttribute('aria-expanded', 'true');
+
+      if (!/^[A-Za-z0-9_-]{11}$/.test(videoId || '')) {
+        showMiniTvHelp(frameWrap, 'Este vídeo no está disponible. Revisa su enlace.');
+        return;
+      }
+
+      if (location.protocol !== 'http:' && location.protocol !== 'https:') {
+        // file:// cannot provide the HTTP Referer required by YouTube (error 153).
+        showMiniTvHelp(frameWrap, 'Abre la página desde un servidor local para usar la Mini TV.', videoId);
+      } else {
+        const iframe = document.createElement('iframe');
+        iframe.width = '100%';
+        iframe.height = '240';
+        iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}`;
+        iframe.title = 'Reproductor de YouTube';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.allow = 'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+        iframe.allowFullscreen = true;
+        // Start inside YouTube's controls, never automatically behind the reading viewport.
+        frameWrap.appendChild(iframe);
+        showMiniTvHelp(frameWrap, 'Si la Mini TV no carga, abre el vídeo en YouTube.', videoId);
+      }
+      playRetroChime(640);
     });
   });
 
   playerCloses.forEach(btn => {
+    const targetId = btn.getAttribute('data-target');
+    btn.setAttribute('aria-controls', targetId);
+    btn.setAttribute('aria-label', 'Cerrar Mini TV');
     btn.addEventListener('click', () => {
-      const targetId = btn.getAttribute('data-target');
       const container = document.getElementById(targetId);
-      if (container) {
-        container.style.display = 'none';
-        const frameWrap = container.querySelector('.sm-cyber-tv-frame-wrap');
-        if (frameWrap) frameWrap.innerHTML = '';
-      }
+      if (container) closeMiniPlayer(container);
     });
   });
 
@@ -1029,11 +1107,7 @@ function initSobreMiSection() {
     vocalArchive.addEventListener('toggle', () => {
       if (vocalArchive.open) return;
       stopTunerTone();
-      vocalArchive.querySelectorAll('.sm-cyber-tv-embed').forEach(container => {
-        container.style.display = 'none';
-        const frame = container.querySelector('.sm-cyber-tv-frame-wrap');
-        if (frame) frame.replaceChildren();
-      });
+      closeMiniPlayers();
     });
   }
 

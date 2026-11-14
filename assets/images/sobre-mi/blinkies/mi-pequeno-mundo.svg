@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="150" height="20" viewBox="0 0 150 20" role="img" aria-labelledby="title">
+  <title id="title">MI PEQUENO MUNDO</title>
+  <rect width="150" height="20" fill="#0b1112"/>
+  <path d="M1 18V1h148" fill="none" stroke="#8fa5a3"/>
+  <path d="M149 1v18H1" fill="none" stroke="#354747"/>
+  <rect x="3" y="3" width="144" height="14" fill="#1c2a2b"/>
+  <path d="M4 4h142M4 15h142" stroke="#617f7c" stroke-dasharray="1 3"/>
+  <path d="M12 5h7v2h2v6h-2v2h-7v-2h-2V7h2Z" fill="#a4b9cb" shape-rendering="crispEdges"/>
+  <path d="M12 7h4v3h3v3h-3v2h-3v-5h-3V8h2" fill="#6e9c89" shape-rendering="crispEdges"/>
+  <text x="27" y="13" fill="#e1eeea" font-family="Consolas, 'Courier New', monospace" font-size="9" font-weight="bold">MI PEQUENO MUNDO</text>
+  <path d="M139 7h2v2h-2m-3 4h2v2h-2" fill="#bfaf8d"/>
+</svg>
