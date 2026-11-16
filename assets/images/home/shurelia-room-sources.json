@@ -1,0 +1,56 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "basename": "DS _ DSi - Castlevania_ Order of Ecclesia - Backgrounds - Library.png",
+    "sha256": "e92fe2738aeb51cb1d1e3fd0f1ee0ac470b0f95d5616ad1b2a877af63cc054c0",
+    "width": 4512,
+    "height": 8064,
+    "byteLength": 2267112,
+    "game": "Castlevania: Order of Ecclesia (Nintendo DS)",
+    "attribution": "KONAMI; supplied source sheet requests credit to KONAMI.",
+    "licensingNote": "User-supplied source attribution/provenance only; this manifest is not a license grant."
+  },
+  "extraction": {
+    "operation": "Pillow Image.crop followed by lossless RGBA PNG encoding with optimize=True.",
+    "coordinateConvention": "Zero-based [left, top, right, bottom), right and bottom exclusive.",
+    "resized": false,
+    "recolored": false,
+    "chromaReplaced": false,
+    "originalModified": false,
+    "reproducePython": "Image.open(source).crop(tuple(crop['box'])).save(crop['file'], format='PNG', optimize=True)"
+  },
+  "crops": {
+    "books": {
+      "file": "shurelia-room-books.png",
+      "box": [
+        1980,
+        496,
+        2132,
+        736
+      ],
+      "width": 152,
+      "height": 240,
+      "byteLength": 11972,
+      "sha256": "262881d87000e10f50f312b9ee58bcfc852eab47141837667e618297aff64269",
+      "rgbaSha256": "9ca06452c2ca1d854dd717afd0adbe4baeb7fee85958f460078acf118227cacd",
+      "content": "Dense warm wood twin-bookcase interior; no green doorway, empty architecture, sheet margin or generated pixels.",
+      "displayRecommendation": "Use centered background-position and cover in the existing 260 by 236.16 logical-pixel room. At 260px width the native 152px crop is displayed at approximately 1.71x; cover trims vertically. Keep image-rendering: pixelated."
+    },
+    "counter": {
+      "file": "shurelia-room-counter.png",
+      "box": [
+        1840,
+        1152,
+        2256,
+        1166
+      ],
+      "width": 416,
+      "height": 14,
+      "byteLength": 936,
+      "sha256": "73c7b2c57653a091bf322ed8a51a3eb4733f976a05ce8cbd38d668979fbe17a1",
+      "rgbaSha256": "84db67a6b56d9efbcda4762aacc94c93b1005b8ee4ddaeff929f9b9068ae1830",
+      "content": "Horizontal wooden floor/platform lip; original pixels reused as a foreground ledge.",
+      "displayRecommendation": "Use at 14 logical-pixel height with background-size: auto 100% and repeat-x across the existing corner width. No extra layout height is required."
+    }
+  }
+}

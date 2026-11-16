@@ -2275,7 +2275,7 @@
   --sm-shadow: #090c10;
   --sm-emo-line: #95616f;
   color-scheme: dark;
-  --sm-player-height: 96px;
+  --sm-player-height: 84px;
   --primary: var(--sm-night-border);
   --primary-dark: var(--sm-night-raised);
   --accent: var(--sm-signal);
@@ -4462,8 +4462,8 @@
   min-width: 1024px;
   display: grid;
   grid-template-rows: 14px minmax(0, 1fr);
-  gap: 4px;
-  padding: 3px 6px 5px;
+  gap: 3px;
+  padding: 2px 6px 3px;
   border: 3px solid;
   border-color: var(--sm-edge) var(--sm-shadow) var(--sm-shadow) var(--sm-edge);
   background: var(--sm-chrome-light);
@@ -4506,7 +4506,7 @@
 
 #section-sobre-mi .sm-winamp-body {
   display: grid;
-  grid-template-columns: 140px minmax(180px, 1fr) minmax(180px, 1.7fr) 164px 124px;
+  grid-template-columns: 122.5px minmax(180px, 1fr) minmax(180px, 1.7fr) 164px 124px;
   gap: 12px;
   align-items: center;
   min-width: 0;
@@ -4514,8 +4514,8 @@
 }
 
 #section-sobre-mi .sm-winamp-cover {
-  width: 140px;
-  height: 64px;
+  width: 122.5px;
+  height: 56px;
   /* Show just the illustration from the supplied reference, not painted controls. */
   background: var(--sm-surface) url('assets/images/sobre-mi/player-cover-source.jpg') 5.3061% 31.4721% / 300% 275.8929% no-repeat;
   box-shadow: 0 0 0 2px var(--sm-edge), 1px 1px 0 3px var(--sm-night);
@@ -4523,7 +4523,7 @@
 
 #section-sobre-mi #np-info {
   min-width: 0;
-  height: 59px;
+  height: 54px;
   padding: 6px 8px;
   gap: 5px;
   border: 2px solid;

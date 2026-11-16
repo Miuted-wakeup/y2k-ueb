@@ -1,0 +1,67 @@
+/* HOME's clock and fortune fit above Shurelia; other sections keep their own rails. */
+#sidebar-right.home-compact-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-right: 0;
+  container: home-rail / size;
+  /* Auto is only a safety net for short windows, never a hidden clipped action. */
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+#sidebar-right.home-compact-rail > .panel { flex: 0 0 auto; margin-bottom: 0; }
+#sidebar-right.home-compact-rail .panel-titlebar { height: 18px; padding: 2px 6px; }
+#sidebar-right.home-compact-rail .panel-title { font-size: 7px; letter-spacing: .3px; }
+#sidebar-right.home-compact-rail .panel-btn { width: 14px; height: 14px; line-height: 12px; }
+#home-status-panel .home-status-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: linear-gradient(110deg, #141c16, #111 60%);
+}
+#home-status-panel .home-clock-readout { min-width: 0; text-align: center; }
+#home-status-panel #clock-time { font-size: 28px; line-height: 1; white-space: nowrap; text-shadow: 0 0 7px #00ff41, 0 0 13px #00ff4180; }
+#home-status-panel #clock-date { font-size: 10px; line-height: 1.1; margin-top: 2px; white-space: nowrap; }
+#home-status-panel .home-visitor-readout { text-align: center; padding-left: 6px; border-left: 1px dashed #573030; }
+#home-status-panel .home-status-label { display: block; color: #c7b2b2; font: 6.5px/1.3 var(--font-pixel); letter-spacing: .3px; }
+#home-status-panel #visitor-counter { margin: 3px 0 0; gap: 1px; }
+#home-status-panel .digit { width: 10px; height: 17px; font-size: 16px; line-height: 1; }
+#sidebar-right.home-compact-rail #home-omikuji-panel .home-fortune-body { padding: 4px; text-align: center; }
+#sidebar-right.home-compact-rail #omikuji-box { width: 100%; padding: 4px 6px; gap: 3px; }
+#sidebar-right.home-compact-rail #omikuji-result-badge { max-width: 100%; padding: 1px 6px; font-size: 7px; line-height: 1.3; }
+#sidebar-right.home-compact-rail #omikuji-result-text { width: 100%; max-width: 100%; margin: 0; font-size: 10px; line-height: 1.3; overflow-wrap: anywhere; }
+#sidebar-right.home-compact-rail #omikuji-result-lucky { width: 100%; font-size: 9px; line-height: 1.25; overflow-wrap: anywhere; }
+#sidebar-right.home-compact-rail #omikuji-btn { max-width: 100%; min-height: 26px; margin-top: 1px; padding: 5px 6px; font-size: 7px; line-height: 1.4; }
+#sidebar-right.home-compact-rail #omikuji-btn:focus-visible { outline: 2px solid #fff1b8; outline-offset: 2px; }
+#home-guestbook-note {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 2px 3px;
+  border: 1px solid #813a2e;
+  color: #dec2ab;
+  background: repeating-linear-gradient(135deg, #28100d 0 6px, #170e0d 6px 12px);
+  font: 8px/1.3 Verdana, sans-serif;
+  text-align: center;
+}
+#home-guestbook-note strong { font-size: 8px; letter-spacing: .2px; }
+#home-sidebar-overflow-hint { display: none; }
+@container home-rail (max-height: 225px) {
+  #home-sidebar-overflow-hint {
+    display: block;
+    flex: 0 0 auto;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 2px 4px;
+    border: 1px solid #a94141;
+    color: #fff1db;
+    background: #620c0c;
+    font: bold 8px/1.3 Verdana, sans-serif;
+    text-align: center;
+  }
+}

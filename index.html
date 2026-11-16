@@ -15,9 +15,17 @@
     rel="stylesheet" />
 
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="player-skins.css" />
+  <link rel="stylesheet" href="home-companion.css" />
+  <link rel="stylesheet" href="home-sidebar.css" />
+  <noscript><style>
+    body.has-home-companion, body.has-home-companion #site-header, body.has-home-companion #site-nav,
+    body.has-home-companion #main-wrapper, body.has-home-companion #site-footer,
+    body.has-home-companion .panel, body.has-home-companion img { opacity: 1 !important; }
+  </style></noscript>
 </head>
 
-<body>
+<body class="has-themed-player has-home-companion">
 
   <!-- HEADER -->
   <header id="site-header">
@@ -342,41 +350,33 @@
         </div>
       </main>
 
-      <aside id="sidebar-right">
-        <!-- RELOJ -->
-        <div class="panel">
+      <aside id="sidebar-right" class="home-compact-rail" aria-label="Reloj y fortuna">
+        <span id="home-sidebar-overflow-hint" role="note">VENTANA BAJA · DESPLAZA ↓</span>
+        <!-- Compact status: decorative counter, not live analytics. -->
+        <div class="panel" id="home-status-panel">
           <div class="panel-titlebar">
-            <span class="panel-title">✦ RELOJ</span>
+            <span class="panel-title">✦ RELOJ · VISITAS</span>
             <div class="panel-controls">
               <span class="panel-btn">─</span>
               <span class="panel-btn">✕</span>
             </div>
           </div>
-          <div class="panel-body" style="text-align:center">
-            <div id="clock-time">00:00:00</div>
-            <div id="clock-date"></div>
-          </div>
-        </div>
-
-        <!-- VISITANTES -->
-        <div class="panel">
-          <div class="panel-titlebar">
-            <span class="panel-title">✦ VISITANTES</span>
-            <div class="panel-controls">
-              <span class="panel-btn">─</span>
-              <span class="panel-btn">✕</span>
+          <div class="panel-body home-status-body">
+            <div class="home-clock-readout">
+              <div id="clock-time">00:00:00</div>
+              <div id="clock-date"></div>
             </div>
-          </div>
-          <div class="panel-body" style="text-align:center">
-            <div id="visitor-counter">
-              <span class="digit">0</span>
-              <span class="digit">0</span>
-              <span class="digit">4</span>
-              <span class="digit">8</span>
-              <span class="digit">2</span>
-              <span class="digit">7</span>
+            <div class="home-visitor-readout" title="Contador decorativo: aún no cuenta visitas reales.">
+              <span class="home-status-label">VISITAS</span>
+              <div id="visitor-counter" role="img" aria-label="Contador decorativo: 004827">
+                <span class="digit" aria-hidden="true">0</span>
+                <span class="digit" aria-hidden="true">0</span>
+                <span class="digit" aria-hidden="true">4</span>
+                <span class="digit" aria-hidden="true">8</span>
+                <span class="digit" aria-hidden="true">2</span>
+                <span class="digit" aria-hidden="true">7</span>
+              </div>
             </div>
-            <div style="font-size:9px;color:var(--text-dim); margin-top:4px">visitantes desde 2025</div>
           </div>
         </div>
 
@@ -389,7 +389,7 @@
               <span class="panel-btn">✕</span>
             </div>
           </div>
-          <div class="panel-body" style="text-align:center;padding:8px;">
+          <div class="panel-body home-fortune-body">
             <div id="omikuji-box">
               <div id="omikuji-result-badge">今日の運勢</div>
               <div id="omikuji-result-text">Haz clic para descubrir tu fortuna de hoy ✦</div>
@@ -401,31 +401,8 @@
           </div>
         </div>
 
-        <!-- LIBRO DE VISITAS -->
-        <div class="panel">
-          <div class="panel-titlebar">
-            <span class="panel-title">✦ LIBRO DE VISITAS</span>
-            <div class="panel-controls">
-              <span class="panel-btn">─</span>
-              <span class="panel-btn">✕</span>
-            </div>
-          </div>
-          <div class="panel-body" style="position:relative">
-            <div class="guest-entry">
-              <span class="guest-name">★ yuki_chan</span>
-              <span class="guest-msg">sugoi!! love your site (≧▽≦)</span>
-            </div>
-            <div class="guest-entry">
-              <span class="guest-name">★ neo_shibuya</span>
-              <span class="guest-msg">visiting from the webring~ ✦</span>
-            </div>
-            <div id="coming-soon-stamp">PRÓXIMAMENTE</div>
-          </div>
-        </div>
+        <span id="home-guestbook-note" role="note" title="El libro de visitas todavía no está disponible."><strong>LIBRO DE VISITAS</strong><span>EN CONSTRUCCIÓN</span></span>
 
-        <div id="character-wrap">
-          <img src="assets/images/home/character.png" id="character-img" alt="">
-        </div>
       </aside>
     </div>
   </div>
@@ -457,6 +434,19 @@
     </div>
   </footer>
 
+  <section id="home-companion" class="home-companion" aria-label="Shurelia">
+    <div class="hc-room" aria-hidden="true"></div>
+    <div class="hc-dialogue" hidden>
+      <span class="hc-name">SHURELIA</span>
+      <p class="hc-plain" aria-live="off">Hola, viajero. Puedes quedarte un rato.</p>
+      <div class="hc-glyphs" aria-hidden="true"></div>
+    </div>
+    <div class="hc-character" role="img" aria-label="Shurelia en su pequeño rincón de biblioteca">
+      <span class="hc-portrait" aria-hidden="true"><span class="hc-body"></span><span class="hc-face"></span></span>
+    </div>
+    <div class="hc-counter" aria-hidden="true"></div>
+  </section>
+
   <!-- ANIMATION ELEMENTS -->
   <img id="runner" src="assets/gifs/home/kirby-walk.gif" alt="kirby" style="height:32px;width:auto">
 
@@ -469,11 +459,15 @@
   <div class="float-sprite" style="left:82%;animation-delay:2.5s">★</div>
   <div class="float-sprite" style="left:92%;animation-delay:0.5s">♥</div>
 
-  <div id="now-playing-bar">
+  <div id="now-playing-bar" data-player-skin="home" role="region" aria-label="Reproductor de HOME">
     <img id="np-kirby" src="assets/gifs/home/kirby-hang.gif" alt="kirby">
+    <div class="np-device" aria-hidden="true">
+      <span class="np-device-art"><i></i><i></i></span>
+      <span class="np-device-name">PORTAL</span>
+    </div>
     <div id="np-left">
-      <span id="np-label">♪ ESCUCHANDO</span>
-      <div id="np-equalizer">
+      <span id="np-label" aria-live="polite">EN ESPERA</span>
+      <div id="np-equalizer" aria-hidden="true">
         <span class="eq-bar"></span>
         <span class="eq-bar"></span>
         <span class="eq-bar"></span>
@@ -482,22 +476,24 @@
       </div>
     </div>
     <div id="np-info">
+      <span class="np-track-caption">MUTED RADIO // MP3</span>
       <span id="np-title">cargando...</span>
       <span id="np-artist"></span>
     </div>
     <div id="np-seek-wrap">
+      <span class="np-timeline-caption">PERSONAL SOUND SYSTEM</span>
       <span class="np-time" id="np-current-time">0:00</span>
-      <input type="range" id="np-progress" min="0" max="100" value="0">
+      <input type="range" id="np-progress" min="0" max="100" value="0" aria-label="Posición de la canción">
       <span class="np-time" id="np-duration">0:00</span>
     </div>
     <div id="np-controls">
-      <span class="np-btn" id="np-prev">◀◀</span>
-      <span class="np-btn" id="np-play">▶</span>
-      <span class="np-btn" id="np-next">▶▶</span>
+      <button type="button" class="np-btn" id="np-prev" aria-label="Canción anterior" title="Anterior">◀◀</button>
+      <button type="button" class="np-btn" id="np-play" aria-label="Reproducir" title="Reproducir">▶</button>
+      <button type="button" class="np-btn" id="np-next" aria-label="Canción siguiente" title="Siguiente">▶▶</button>
     </div>
     <div id="np-volume-wrap">
-      <span id="vol-icon">VOL</span>
-      <input type="range" id="np-volume" min="0" max="1" step="0.1" value="0.5">
+      <label id="vol-icon" for="np-volume">VOL <output id="np-volume-value" for="np-volume">50%</output></label>
+      <input type="range" id="np-volume" min="0" max="1" step="0.1" value="0.5" aria-label="Volumen">
     </div>
     <audio id="audio-player"></audio>
   </div>
@@ -523,6 +519,11 @@
   </div>
 
   <script src="scripts.js"></script>
+  <script src="player-skins.js"></script>
+  <script src="home-companion-art.js"></script>
+  <script src="home-companion-messages.js"></script>
+  <script src="home-companion-speech.js"></script>
+  <script src="home-companion.js"></script>
 </body>
 
 </html>

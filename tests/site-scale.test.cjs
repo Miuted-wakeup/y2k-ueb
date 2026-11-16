@@ -16,13 +16,20 @@ const chrome = process.env.CHROME_PATH || [
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
 ].find(fs.existsSync);
 assert.ok(chrome, 'Set CHROME_PATH to a Chrome/Edge executable');
-const mime = { '.html':'text/html', '.css':'text/css', '.js':'text/javascript', '.gif':'image/gif', '.png':'image/png', '.jpg':'image/jpeg', '.svg':'image/svg+xml' };
+const mime = { '.html':'text/html', '.css':'text/css', '.js':'text/javascript', '.gif':'image/gif', '.png':'image/png', '.jpg':'image/jpeg', '.svg':'image/svg+xml', '.mp3':'audio/mpeg', '.mp4':'video/mp4' };
 const server = http.createServer((req, res) => {
   const file = path.resolve(root, '.' + decodeURIComponent(new URL(req.url, 'http://localhost').pathname));
   if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
   fs.readFile(file, (error, data) => {
-    res.writeHead(error ? 404 : 200, { 'Content-Type':mime[path.extname(file)] || 'application/octet-stream' });
-    res.end(error ? 'Not found' : data);
+    if (error) { res.writeHead(404).end('Not found'); return; }
+    const headers = { 'Content-Type':mime[path.extname(file)] || 'application/octet-stream', 'Accept-Ranges':'bytes' };
+    const range = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range || '');
+    if (range) {
+      const start=Number(range[1]), end=Math.min(range[2]?Number(range[2]):data.length-1,data.length-1);
+      if (start>end) { res.writeHead(416,{'Content-Range':`bytes */${data.length}`}).end();return; }
+      res.writeHead(206,{...headers,'Content-Length':end-start+1,'Content-Range':`bytes ${start}-${end}/${data.length}`});
+      res.end(data.subarray(start,end+1));
+    } else { res.writeHead(200,{...headers,'Content-Length':data.length});res.end(data); }
   });
 });
 
@@ -54,6 +61,17 @@ const server = http.createServer((req, res) => {
       assert.ok(!result.exceptionDetails, JSON.stringify(result.exceptionDetails));
       return result.result.value;
     };
+    const waitFor = async (expression,message) => {
+      for (let i=0;i<100;i++) { if (await evaluate(expression)) return; await pause(100); }
+      assert.fail(message);
+    };
+    const enter = async selector => {
+      await evaluate(`document.querySelector(${JSON.stringify(selector)}).focus()`);
+      await cdp('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+      await cdp('Input.dispatchKeyEvent',{type:'char',text:'\r'});
+      await cdp('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13});
+    };
+    const skinFingerprints = new Set();
     await cdp('Page.enable'); await cdp('Runtime.enable'); await cdp('Network.enable');
     await cdp('Network.setBlockedURLs', { urls:['*://*.youtube.com/*', '*://youtube.com/*', '*://*.youtube-nocookie.com/*', '*://youtube-nocookie.com/*'] });
     const viewport = async (width, height) => {
@@ -69,6 +87,10 @@ const server = http.createServer((req, res) => {
           if (await evaluate(`document.readyState === 'complete' && location.pathname === '/${page}.html'`)) break;
         }
         await pause(1500);
+        if (page === 'index') {
+          await evaluate("document.querySelector('#home-entry-silent').click()");
+          await waitFor("!document.querySelector('#home-entry')", 'Explicit silent HOME entry before shared-control checks');
+        }
         const state = await evaluate(`(() => {
           const box = el => { const r = el.getBoundingClientRect(); return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}; };
           const reachable = el => { const r = el.getBoundingClientRect(); const hit = document.elementFromPoint(r.x+r.width/2,r.y+r.height/2); return el === hit || el.contains(hit); };
@@ -86,12 +108,66 @@ const server = http.createServer((req, res) => {
         }
         near(state.body.height, height, `${page}: use the real viewport height`);
         near(state.player.bottom, height, `${page}: anchored player`);
-        near(state.player.height, (page==='sobre-mi'?96:48)*state.scale, `${page}: preserve the player's logical size`);
+        near(state.player.height, (page==='sobre-mi'?84:63)*state.scale, `${page}: reserve the player's intentional logical size`);
         assert.equal(state.overflow, false, `${page}: no inaccessible horizontal overflow`);
         assert.ok(state.main.bottom<=state.player.top+2, `${page}: content must end above the player`);
         assert.ok(state.dock.top>=0 && state.dock.bottom<=state.player.top+1, `${page}: dock must remain above the player`);
         assert.ok(state.controls.length>=5 && state.controls.every(c=>c.reachable), `${page}: player controls reachable ${JSON.stringify(state.controls)}`);
         assert.ok(state.socials.every(c=>c.reachable), `${page}: social links reachable ${JSON.stringify(state.socials)}`);
+        if (page!=='sobre-mi') {
+          const themed = await evaluate(`(() => {
+            const p=document.querySelector('#now-playing-bar');const s=getComputedStyle(p);
+            return { skin:p.dataset.playerSkin,buttons:[...p.querySelectorAll('#np-prev,#np-play,#np-next')].map(b=>[b.tagName,b.type,!!b.getAttribute('aria-label')]),fingerprint:[s.backgroundImage,s.borderRadius,s.gridTemplateAreas,getComputedStyle(p.querySelector('#np-play')).borderRadius],overflow:p.scrollWidth>p.clientWidth+1,info:p.querySelector('#np-info').getBoundingClientRect().toJSON(),title:p.querySelector('#np-title').getBoundingClientRect().toJSON() };
+          })()`);
+          assert.equal(themed.skin,page==='index'?'home':page);
+          assert.deepEqual(themed.buttons,[['BUTTON','button',true],['BUTTON','button',true],['BUTTON','button',true]],'Use real accessible transport buttons, not styled noninteractive spans');
+          assert.equal(themed.overflow,false,'Hardware modules must not overflow the bar');
+          assert.ok(themed.title.x>=themed.info.x && themed.title.right<=themed.info.right+1,'Long track names must stay within the display');
+          assert.deepEqual(await evaluate(`(() => {
+            const bar=document.querySelector('#now-playing-bar').getBoundingClientRect();
+            const info=document.querySelector('#np-info').getBoundingClientRect();
+            return [...document.querySelectorAll('#now-playing-bar button,#now-playing-bar input,.np-device,.np-timeline-caption,.np-track-caption,#np-title,#np-artist')].filter(el=>{
+              const r=el.getBoundingClientRect();const parent=el.matches('.np-track-caption,#np-title,#np-artist')?info:bar;
+              return r.left<parent.left-1 || r.right>parent.right+1 || r.top<parent.top-1 || r.bottom>parent.bottom+1;
+            }).map(el=>el.id||el.className);
+          })()`),[],'Compacting every skin must preserve full captions, artists, displays and controls');
+          if (width===1768) {
+            skinFingerprints.add(JSON.stringify(themed.fingerprint));
+            const clip=await evaluate(`(() => {const r=document.querySelector('#now-playing-bar').getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,scale:1};})()`);
+            const crop=await cdp('Page.captureScreenshot',{format:'png',clip});
+            fs.writeFileSync(path.join(output,`player-${page}.png`),Buffer.from(crop.data,'base64'));
+            await waitFor(`Number.isFinite(document.querySelector('#audio-player').duration) && document.querySelector('#audio-player').duration>1`,'The real local audio must expose duration');
+            await enter('#np-play');
+            await waitFor(`!document.querySelector('#audio-player').paused && document.querySelector('#now-playing-bar').classList.contains('np-playing')`,'Native keyboard play must start real audio and its visual status');
+            const start=await evaluate(`document.querySelector('#audio-player').currentTime`);
+            await pause(250);
+            assert.ok(await evaluate(`document.querySelector('#audio-player').currentTime>${start}+.05`),'Audio playback must advance');
+            assert.equal(await evaluate(`document.querySelector('#np-play').getAttribute('aria-label')`),'Pausar');
+            await enter('#np-play');
+            await waitFor(`document.querySelector('#audio-player').paused && !document.querySelector('#now-playing-bar').classList.contains('np-playing')`,'Pause must stop the audio and decorative equalizer state');
+            await evaluate(`const range=document.querySelector('#np-progress');range.value=40;range.dispatchEvent(new Event('input',{bubbles:true}));`);
+            await waitFor(`Math.abs(document.querySelector('#audio-player').currentTime/document.querySelector('#audio-player').duration-.4)<.02`,'Seeking must still control the original audio element');
+            await evaluate(`const v=document.querySelector('#np-volume');v.value=.3;v.dispatchEvent(new Event('input',{bubbles:true}));`);
+            assert.deepEqual(await evaluate(`[document.querySelector('#audio-player').volume,document.querySelector('#np-volume-value').textContent,localStorage.getItem('npVolume')]`),[.3,'30%','0.3']);
+            const [index,length]=await evaluate('[npIndex,playlist.length]');
+            await enter('#np-next'); assert.equal(await evaluate('npIndex'),(index+1)%length,'Next must use the shared playlist');
+            await enter('#np-prev'); assert.equal(await evaluate('npIndex'),index,'Previous must return to the same track');
+            await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+            assert.equal(await evaluate(`getComputedStyle(document.querySelector('#np-equalizer .eq-bar')).animationName`),'none','Reduced motion must keep the meter still');
+            await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
+          }
+        } else {
+          assert.equal(await evaluate(`!!document.querySelector('[data-player-skin],link[href="player-skins.css"],script[src="player-skins.js"]')`),false,'Sobre mí must never load or receive the new skins');
+          assert.deepEqual(await evaluate(`(() => {
+            const bar=document.querySelector('#now-playing-bar').getBoundingClientRect();
+            const info=document.querySelector('#np-info').getBoundingClientRect();
+            return [...document.querySelectorAll('#now-playing-bar button,#now-playing-bar input,.sm-winamp-cover,#np-title,#np-artist')].filter(el=>{
+              const r=el.getBoundingClientRect();const parent=el.matches('#np-title,#np-artist')?info:bar;
+              return r.left<parent.left-1 || r.right>parent.right+1 || r.top<parent.top-1 || r.bottom>parent.bottom+1;
+            }).map(el=>el.id||el.className);
+          })()`),[],'Compacting About must not clip controls, its cover, title or artist');
+          assert.ok(Math.abs(await evaluate(`(() => {const r=document.querySelector('.sm-winamp-cover').getBoundingClientRect();return r.width/r.height;})()`)-140/64)<.01,'Keep the original cover aspect ratio');
+        }
         if (page==='sobre-mi') {
           assert.equal(state.thought,'desvelandome como siempre');
           assert.equal(state.banners.length,2);
@@ -112,6 +188,7 @@ const server = http.createServer((req, res) => {
         console.log(`PASS ${page} ${width}x${height} @ ${Math.round(state.scale*100)}%`);
       }
     }
+    assert.equal(skinFingerprints.size,6,'Each section must have a different chassis/layout, not just another label');
     // Resize the same live document: scaling must not restart audio or change its selection.
     await evaluate(`window.__scaleAudio=document.querySelector('#audio-player');window.__scaleIndex=npIndex;window.__scaleAudio.currentTime=12;`);
     await viewport(1768,1016);

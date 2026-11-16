@@ -1,0 +1,6 @@
+{
+  "framework": null,
+  "buildCommand": "node tools/build-static.cjs",
+  "outputDirectory": "dist",
+  "cleanUrls": false
+}

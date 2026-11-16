@@ -590,7 +590,7 @@ const server = http.createServer((req, res) => {
         await assertSpookyDecorationLayout(width);
         await assertPixelPetLayout(width);
         assert.equal(await evaluate(`(() => { const side = document.querySelector('#sm-sidebar').getBoundingClientRect(); const frame = document.querySelector('#sm-layout').getBoundingClientRect(); return side.width / frame.width >= .24 && side.width / frame.width <= .26; })()`), true, 'Keep the 25/75 layout');
-        assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 96);
+        assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 84);
         assert.equal(await evaluate(`document.querySelector('#main-wrapper').getBoundingClientRect().bottom <= document.querySelector('#now-playing-bar').getBoundingClientRect().top + 1`), true, 'Keep player clearance');
         assert.deepEqual(await evaluate(`Array.from(document.querySelectorAll('#main-wrapper .panel')).filter(el => el.getClientRects().length && el.scrollWidth > el.clientWidth + 2).map(el => el.id)`), [], 'Darkening must not change content geometry');
         await screenshot(`sobre-mi-dark-${width}`);
@@ -599,7 +599,7 @@ const server = http.createServer((req, res) => {
       await screenshot('sobre-mi-dark-archive');
       await navigate('japan');
       assert.equal(await evaluate(`getComputedStyle(document.body).getPropertyValue('--sm-paper').trim()`), '', 'The new palette must remain About-only');
-      assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 48, 'Keep the other player skins intact');
+      assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 63, 'JAPAN uses its compact MiniDisc skin; About keeps its separate compact Winamp contract');
       assert.deepEqual(errors, [], 'No uncaught browser errors');
       console.log('PASS: dark theme, 1024–1920px geometry, shared entrance and other-section isolation');
       return;
@@ -643,7 +643,7 @@ const server = http.createServer((req, res) => {
     assert.equal(await evaluate(`document.querySelector('#np-play').getAttribute('aria-label')`), 'Reproducir');
     await navigate('japan');
     assert.equal(await evaluate(`!!document.querySelector('.sm-winamp-titlebar')`), false, 'Other sections must not receive the About skin');
-    assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 48);
+    assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 63, 'The independently styled JAPAN player is 63 logical pixels');
     assert.deepEqual(await evaluate(`[npIndex, document.querySelector('#audio-player').volume, document.querySelector('#audio-player').paused, document.querySelector('#audio-player').currentTime]`), [playerIndex, .3, true, 0], 'Player state must survive navigation to another section');
     await navigate('sobre-mi');
     assert.equal(await evaluate(`document.querySelector('#sm-np-volume-value').textContent`), '30%');
@@ -763,7 +763,7 @@ const server = http.createServer((req, res) => {
         return { frame: r('#sm-layout'), sidebar: r('#sm-sidebar'), main: r('.sm-portal-main'), banner: r('#sm-banner'), poster: r('.sm-cover-poster'), interests: r('#sm-interests'), links: r('#sm-links'), blog: r('.sm-blog-column'), favorites: r('#sm-treasures'), about: r('.sm-profile-row'), interestCells: [...document.querySelectorAll('.sm-interests-grid > section')].map(el => ({ x: Math.round(el.getBoundingClientRect().x), y: Math.round(el.getBoundingClientRect().y) })), tiles: [...document.querySelectorAll('.sm-favorite')].map(el => ({ x: Math.round(el.getBoundingClientRect().x), y: Math.round(el.getBoundingClientRect().y) })) };
       })()`);
       const near = (a, b) => Math.abs(a - b) < 2;
-      assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 96);
+      assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 84);
       assert.equal(await evaluate(`document.querySelector('#main-wrapper').getBoundingClientRect().bottom <= document.querySelector('#now-playing-bar').getBoundingClientRect().top + 1`), true, 'Reserve content space above the taller player');
       assert.deepEqual(await evaluate(`(() => { const bar = document.querySelector('#now-playing-bar').getBoundingClientRect(); return [...document.querySelectorAll('#now-playing-bar button, #now-playing-bar input, .sm-winamp-cover')].filter(el => { const r = el.getBoundingClientRect(); return r.left < bar.left || r.right > bar.right || r.top < bar.top || r.bottom > bar.bottom; }).map(el => el.id || el.className); })()`), [], `Player controls and cover must fit at ${width}px`);
       assert.ok(geometry.sidebar.width / geometry.frame.width >= .24 && geometry.sidebar.width / geometry.frame.width <= .26, `Reference sidebar must occupy about 25% at ${width}px`);

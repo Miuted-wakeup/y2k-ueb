@@ -1,0 +1,32 @@
+/* The parent stays at physical viewport scale; each section owns its original zoom. */
+html.site-audio-host { zoom: 1 !important; width: 100% !important; height: 100% !important; overflow: hidden !important; }
+body.site-audio-host-body { display: block !important; margin: 0 !important; padding: 0 !important; width: 100vw !important; height: 100vh !important; opacity: 1 !important; transition: none !important; overflow: hidden !important; background: #101014 !important; }
+.site-audio-frame { position: fixed; inset: 0; display: block; width: 100%; height: 100%; border: 0; background: #101014; }
+#site-audio-entry { --sa-accent: #ed1532; width: min(810px,calc(100vw - 32px)); box-shadow: 0 0 0 3px #260a16,8px 9px 0 #0007,0 0 38px #dc004540; font-family: Verdana,sans-serif; }
+#site-audio-entry::backdrop { background: #05030bd4; }
+.sa-titlebar { display: flex; justify-content: space-between; gap: 16px; padding: 9px 12px; color: #fff; background: linear-gradient(color-mix(in srgb,var(--sa-accent),white 15%),color-mix(in srgb,var(--sa-accent),black 40%)); border-bottom: 2px solid #7c5264; font: bold 11px/1.4 Verdana,sans-serif; letter-spacing: 1px; }
+.sa-content { position: relative; padding: 30px 36px; background: linear-gradient(130deg,#170e18,#090b14); }
+.sa-kicker { margin: 0 0 16px; text-align: center; color: #c8aebb; font: 10px/1.5 Verdana,sans-serif; letter-spacing: 3px; }
+#site-audio-title { margin: 0 0 24px; color: var(--sa-accent); text-align: center; text-shadow: 0 0 7px var(--sa-accent),0 0 25px color-mix(in srgb,var(--sa-accent),transparent 50%); font: bold 32px/1.5 'Press Start 2P',monospace; letter-spacing: 1px; }
+#site-audio-description { margin: 0 0 17px; color: #e2ced8; font: 14px/1.7 Verdana,sans-serif; }
+.sa-route { margin-bottom: 24px; padding: 9px 12px; border: 1px dashed #9b6683; color: #f4d6e7; font: bold 11px/1.5 Verdana,sans-serif; letter-spacing: 2px; }
+.sa-welcome-art { display: none; }
+#site-audio-entry[data-section="home"] .sa-content { padding-right: 275px; }
+#site-audio-entry[data-section="home"] #site-audio-title { text-align: left; font-size: 26px; }
+#site-audio-entry[data-section="home"] .sa-welcome-art { display: block; position: absolute; right: 28px; bottom: 34px; width: 218px; height: 292px; border: 2px solid #68412c; overflow: hidden; background: #1c110d url('assets/images/home/shurelia-room-books.png') center/cover; image-rendering: pixelated; }
+.sa-body { position: absolute; left: 50%; bottom: 0; width: 256px; height: 328px; background: url('assets/images/home/shurelia-atlas.png') 0 -184px; transform: translateX(-50%) scale(.88); transform-origin: bottom; image-rendering: pixelated; }
+.sa-face { position: absolute; left: calc(50% - 40.48px); top: 70.24px; width: 64px; height: 56px; background: url('assets/images/home/shurelia-atlas.png') 0 0; transform: scale(.88); transform-origin: top left; image-rendering: pixelated; }
+.sa-counter { position: absolute; inset: auto 0 0; height: 13px; background: url('assets/images/home/shurelia-room-counter.png') bottom/auto 100%; image-rendering: pixelated; }
+#site-audio-activate { display: block; width: 100%; min-height: 52px; padding: 12px 16px; background: linear-gradient(color-mix(in srgb,var(--sa-accent),white 5%),color-mix(in srgb,var(--sa-accent),black 45%) 51%,color-mix(in srgb,var(--sa-accent),black 65%) 52%,color-mix(in srgb,var(--sa-accent),black 30%)); color: #fff; border: 2px outset #d6abbc; box-shadow: 0 0 17px #eb004f40; font: bold 16px/1.5 Verdana,sans-serif; letter-spacing: 1px; cursor: pointer; }
+#site-audio-activate:hover { filter: brightness(1.15); }
+#site-audio-silent { display: block; margin: 15px auto 0; min-height: 40px; padding: 7px 12px; color: #ebd3e1; background: #241522; border: 1px solid #8d667c; font: 12px/1.5 Verdana,sans-serif; cursor: pointer; }
+#site-audio-entry button:focus-visible { outline: 3px solid #ffe190; outline-offset: 4px; }
+#site-audio-entry button:disabled { cursor: wait; }
+#site-audio-status { min-height: 34px; margin: 17px 0 0; color: #dcbecb; font: 11px/1.6 Verdana,sans-serif; text-align: center; }
+.sa-footer { padding: 10px 14px; border-top: 1px solid #684152; color: #bda7b2; background: #130e16; text-align: center; font: 9px/1.5 Verdana,sans-serif; letter-spacing: 2px; }
+#site-audio-entry[data-phase="revealing"] { animation: sa-reveal 600ms ease-in both; pointer-events: none; }
+@keyframes sa-reveal { 0% { clip-path: inset(0); opacity: 1; } 45% { clip-path: inset(10% 2%); } 100% { clip-path: inset(50% 0); opacity: 0; } }
+.site-audio-error { position: fixed; inset: 30% 20%; padding: 30px; color: #fff; background: #321323; z-index: 1000; }
+@media (max-width: 750px) { #site-audio-title { font-size: 24px; } #site-audio-entry[data-section="home"] .sa-content { padding-right: 30px; } #site-audio-entry[data-section="home"] .sa-welcome-art { display: none; } }
+@media (max-height: 650px) { .sa-content { padding-top: 18px; padding-bottom: 18px; } #site-audio-title { margin-bottom: 14px; } .sa-kicker { margin-bottom: 8px; } }
+@media (prefers-reduced-motion: reduce) { #site-audio-entry[data-phase="revealing"] { animation: none; } }

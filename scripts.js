@@ -1,4 +1,41 @@
-window.addEventListener('load', () => {
+// The parent is presentation-free; owned child documents wait for canonical state.
+(function (host) {
+  'use strict';
+  if (host.SiteAudioShell?.isHost) return;
+  const client = host.SiteAudioClient?.isFrame ? host.SiteAudioClient : null;
+  let initialized = false;
+  function execute() {
+    if (initialized) return;
+    initialized = true;
+    const onReady = (event, callback) => {
+      const passed = event === 'load' ? document.readyState === 'complete' : document.readyState !== 'loading';
+      if (passed) Promise.resolve().then(callback);
+      else (event === 'load' ? host : document).addEventListener(event, callback, { once: true });
+    };
+    const getPlayer = () => client ? client.getPlayer() : document.getElementById('audio-player');
+    const handleAudioFailure = failure => { if (failure?.name === 'NotAllowedError') client?.requestActivation(); };
+    const sendAudio = command => client.command(command).catch(handleAudioFailure);
+    const renderHostedPlayer = () => {
+      const state = client.state().music;
+      npIndex = state.index; isPlaying = state.playing; startFrom = state.currentTime; npVolume = state.volume;
+      const set = (id, value) => { const element = document.getElementById(id); if (element) element.textContent = value; };
+      set('np-title', state.title); set('np-artist', state.artist); set('np-current-time', formatTime(state.currentTime)); set('np-duration', formatTime(state.duration));
+      const play = document.getElementById('np-play'); if (play) play.textContent = state.playing ? '⏸' : '▶';
+      const volume = document.getElementById('np-volume'); if (volume) volume.value = state.volume;
+      const progress = document.getElementById('np-progress'); if (progress) progress.value = state.duration ? state.currentTime / state.duration * 100 : 0;
+    };
+    const initHostedPlayer = () => {
+      const player = getPlayer();
+      const bind = (id, event, callback) => document.getElementById(id)?.addEventListener(event, callback);
+      bind('np-play', 'click', () => player.paused ? player.play().catch(handleAudioFailure) : player.pause());
+      bind('np-next', 'click', () => sendAudio({type:'music',action:'next'}));
+      bind('np-prev', 'click', () => sendAudio({type:'music',action:'prev'}));
+      bind('np-volume', 'input', event => { player.volume = event.target.value; });
+      bind('np-progress', 'input', event => { if (Number.isFinite(player.duration)) player.currentTime = Number(event.target.value) / 100 * player.duration; });
+      client.subscribe(renderHostedPlayer);
+      renderHostedPlayer();
+    };
+onReady('load', () => {
   // Layer 1 - Body fade in (Background + immediate elements)
   document.body.style.transition = 'opacity 0.8s ease';
   document.body.style.opacity = '1';
@@ -114,7 +151,7 @@ function updateClock() {
 }
 
 // Initial call
-document.addEventListener('DOMContentLoaded', () => {
+onReady('DOMContentLoaded', () => {
   updateDaily();
   updateClock();
   setInterval(updateClock, 1000);
@@ -125,6 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
   createFallingElements();
   initTechSection();
   initSobreMiSection();
+  client?.pageReady();
 });
 
 /* ============================================================
@@ -236,15 +274,16 @@ const playlist = [
   { title: "aishite aishite aishite", artist: "kikuo", src: "assets/music/aishite.mp3" }
 ];
 
-let npIndex = parseInt(localStorage.getItem('npIndex') || Math.floor(Math.random() * playlist.length));
-let isPlaying = localStorage.getItem('isPlaying') === 'true'; // default false
-let startFrom = parseFloat(localStorage.getItem('npTime') || 0);
-let npVolume = parseFloat(localStorage.getItem('npVolume') || 0.5);
+let npIndex = client ? client.state().music.index : parseInt(localStorage.getItem('npIndex') || Math.floor(Math.random() * playlist.length));
+let isPlaying = client ? client.state().music.playing : localStorage.getItem('isPlaying') === 'true'; // default false
+let startFrom = client ? client.state().music.currentTime : parseFloat(localStorage.getItem('npTime') || 0);
+let npVolume = client ? client.state().music.volume : parseFloat(localStorage.getItem('npVolume') || 0.5);
 
 function updateNP() {
+  if (client) { renderHostedPlayer(); return; }
   const titleEl = document.getElementById('np-title');
   const artistEl = document.getElementById('np-artist');
-  const audio = document.getElementById('audio-player');
+  const audio = getPlayer();
   const playBtn = document.getElementById('np-play');
 
   if (titleEl) titleEl.textContent = playlist[npIndex].title;
@@ -275,10 +314,11 @@ function updateNP() {
 
 
 function initNowPlaying() {
+  if (client) { initHostedPlayer(); return; }
   const nextBtn = document.getElementById('np-next');
   const prevBtn = document.getElementById('np-prev');
   const playBtn = document.getElementById('np-play');
-  const audio = document.getElementById('audio-player');
+  const audio = getPlayer();
 
   if (playBtn && audio) {
     playBtn.addEventListener('click', () => {
@@ -362,14 +402,14 @@ function initNowPlaying() {
 }
 
 /* Favorite Song Logic (Japan Section) */
-const favAudio = new Audio('assets/music/vivarium.mp3');
+const favAudio = client ? client.getFavorite() : new Audio('assets/music/vivarium.mp3');
 const favBtn = document.getElementById('fav-play-btn');
 const favEq = document.getElementById('fav-eq');
 
 if (favBtn) {
   const favVol = document.getElementById('fav-volume');
   if (favVol) {
-    favAudio.volume = favVol.value;
+    if (!client) favAudio.volume = favVol.value; else favVol.value = favAudio.volume;
     favVol.addEventListener('input', () => {
       favAudio.volume = favVol.value;
     });
@@ -406,8 +446,18 @@ if (favBtn) {
     });
   }
 
+  const paintFavorite = () => {
+    favBtn.textContent = favAudio.paused ? '▶ PLAY' : '■ STOP';
+    if (favEq) favEq.style.display = favAudio.paused ? 'none' : 'flex';
+  };
+  if (client) { ['play','pause','ended','emptied'].forEach(event => favAudio.addEventListener(event, paintFavorite)); paintFavorite(); }
   favBtn.addEventListener('click', () => {
-    const audio = document.getElementById('audio-player');
+    if (client) {
+      if (favAudio.paused) favAudio.play().catch(handleAudioFailure);
+      else sendAudio({type:'favorite',action:'stop'});
+      return;
+    }
+    const audio = getPlayer();
     if (favAudio.paused) {
       if (audio) audio.pause();
       favAudio.play();
@@ -423,7 +473,8 @@ if (favBtn) {
   });
 
   favAudio.addEventListener('ended', () => {
-    const audio = document.getElementById('audio-player');
+    if (client) { paintFavorite(); return; }
+    const audio = getPlayer();
     favBtn.textContent = '▶ PLAY';
     favEq.style.display = 'none';
     if (audio) audio.play();
@@ -514,6 +565,7 @@ if (wahSlider && face) {
   wahSlider.addEventListener('input', (e) => {
     const val = e.target.value;
     // Cambiar el filtro si está sonando
+    if (client) sendAudio({type:'synth',action:'filter',filter:Number(val)});
     if (currentFilter) {
       currentFilter.frequency.value = val;
     }
@@ -536,6 +588,9 @@ document.querySelectorAll('.synth-key').forEach(btn => {
 });
 
 function startNote(freq) {
+  if (client) {
+    sendAudio({type:'synth',action:'start',frequency:Number(freq),wave:synthType,filter:Number(wahSlider?.value || 3000)});
+  } else {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   stopNote(); // Detener cualquier nota previa
 
@@ -569,6 +624,7 @@ function startNote(freq) {
   gainNode.connect(audioCtx.destination);
 
   currentOsc.start();
+  }
 
   // Animación alocada
   if (face) {
@@ -578,6 +634,7 @@ function startNote(freq) {
 }
 
 function stopNote() {
+  if (client) sendAudio({type:'synth',action:'stop'});
   if (currentOsc) {
     try { currentOsc.stop(); } catch (e) { }
     currentOsc = null;
@@ -761,7 +818,7 @@ function initSobreMiSection() {
 
   // About-only skin: keep the shared audio, playlist and navigation persistence.
   const player = document.getElementById('now-playing-bar');
-  const playerAudio = document.getElementById('audio-player');
+  const playerAudio = getPlayer();
   const playerPlay = document.getElementById('np-play');
   const playerStop = document.getElementById('sm-np-stop');
   if (player && playerAudio && playerPlay && playerStop) {
@@ -778,6 +835,7 @@ function initSobreMiSection() {
       playerAudio.addEventListener(event, syncPlayerSkin);
     });
     playerStop.addEventListener('click', () => {
+      if (client) { sendAudio({type:'music',action:'stop'}); return; }
       playerAudio.pause();
       playerAudio.currentTime = 0;
       isPlaying = false;
@@ -1018,6 +1076,7 @@ function initSobreMiSection() {
   }
 
   function stopTunerTone() {
+    if (client) sendAudio({type:'tuner',action:'stop'});
     if (stopTimeoutId) {
       clearTimeout(stopTimeoutId);
       stopTimeoutId = null;
@@ -1053,6 +1112,13 @@ function initSobreMiSection() {
   }
 
   function playTunerTone(freq, noteName) {
+    if (client) {
+      stopTunerTone();
+      sendAudio({type:'tuner',action:'start',frequency:Number(freq)});
+      if (tunerFreqDisplay) tunerFreqDisplay.textContent = `${parseFloat(freq).toFixed(1)} Hz (${noteName})`;
+      if (tunerWave) tunerWave.classList.add('sounding');
+      return;
+    }
     const ctx = ensureAudioContext();
     stopTunerTone();
 
@@ -1192,6 +1258,7 @@ function initSobreMiSection() {
 
   // Helper para chimes retro (utiliza el AudioContext compartido)
   function playRetroChime(freq = 520) {
+    if (client) { sendAudio({type:'chime',frequency:Number(freq)}); return; }
     try {
       const ctx = ensureAudioContext();
       const osc = ctx.createOscillator();
@@ -1208,3 +1275,22 @@ function initSobreMiSection() {
     } catch (e) {}
   }
 }
+
+    // Preserve classic identifiers for existing inline code and local inspection.
+    Object.assign(host, { updateDaily, updateClock, updateSiteScale, initRunner, initPanelControls,
+      formatTime, updateNP, initNowPlaying, createFallingElements, startNote, stopNote, initOmikuji, initTechSection, initSobreMiSection });
+    Object.defineProperties(host, {
+      playlist: { configurable:true, get:()=>playlist }, favAudio: { configurable:true, get:()=>favAudio },
+      npIndex: { configurable:true, get:()=>npIndex, set:value=>{ npIndex=value; if(client)sendAudio({type:'music',action:'select',value}); } },
+      isPlaying: { configurable:true, get:()=>isPlaying, set:value=>{ isPlaying=value; if(client)sendAudio({type:'music',action:value?'play':'pause'}); } },
+      startFrom: { configurable:true, get:()=>startFrom, set:value=>{ startFrom=value; if(client)sendAudio({type:'music',action:'seek',value}); } },
+      npVolume: { configurable:true, get:()=>npVolume, set:value=>{ npVolume=value; if(client)sendAudio({type:'music',action:'volume',value}); } }
+    });
+  }
+  if (client) client.ready.then(execute, () => {
+    execute();
+    const note=document.createElement('p');note.id='site-audio-connection-error';note.setAttribute('role','alert');
+    note.textContent='Conexión de audio no disponible. Recarga esta sección.';document.body.appendChild(note);
+  });
+  else execute();
+})(window);
