@@ -36,6 +36,15 @@ function fixture(config = {}) {
   return { engine, media, contexts, nodes, values, setTime(value) { clock = value; } };
 }
 
+test('an explicit later activation can re-enable effects after silent entry, never a probe or synthetic intent',async()=>{
+  const f=fixture();f.engine.continueSilent();
+  assert.equal(await f.engine.probe(),false);assert.equal(f.engine.snapshot().permission,'silent');
+  assert.equal(await f.engine.unlock({type:'click',isTrusted:false}),false);assert.equal(f.engine.snapshot().permission,'silent');
+  assert.equal(await f.engine.unlock(trusted),true);assert.equal(f.engine.snapshot().permission,'active');
+  assert.equal(f.engine.snapshot().music.paused,true,'Re-enabling effects does not start music');
+  await f.engine.destroy();
+});
+
 test('S2/S5: stable initial snapshots, one pair of native media, lazy no-note allowed/blocked probe', async () => {
   const f = fixture({ contextState: 'running' });
   const s = f.engine.snapshot(); assert.equal(s.permission, 'blocked'); assert.equal(f.contexts.length, 0);

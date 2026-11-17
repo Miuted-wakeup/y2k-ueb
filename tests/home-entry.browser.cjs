@@ -1,3 +1,5 @@
+// Legacy standalone fallback only: the new persistent host is deliberately unavailable.
+// Production global validation is covered in persistent-audio.browser.cjs.
 // HOME welcome consent/readiness, native dialog and actual Web Audio evidence.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),http=require('node:http');
 const {spawn}=require('node:child_process');
@@ -41,7 +43,7 @@ const probe=`(() => {
     const finished=()=>until('!document.getElementById("home-entry")&&document.querySelector("#home-companion").homeCompanion.snapshot().ready','Reveal releases readiness');
     const screenshot=async name=>{const r=await cdp('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,name),Buffer.from(r.data,'base64'));};
     await cdp('Page.enable');await cdp('Runtime.enable');await cdp('Network.enable');await cdp('Page.addScriptToEvaluateOnNewDocument',{source:probe});
-    const external=['*://fonts.googleapis.com/*','*://fonts.gstatic.com/*','*://*.youtube.com/*','*://*.youtube-nocookie.com/*'];await cdp('Network.setBlockedURLs',{urls:external});
+    const external=['*site-audio-shell.js*','*://fonts.googleapis.com/*','*://fonts.gstatic.com/*','*://*.youtube.com/*','*://*.youtube-nocookie.com/*'];await cdp('Network.setBlockedURLs',{urls:external});
     for(const [width,height] of [[1920,1080],[1768,1016],[1440,900],[1024,900]]){
       await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});await navigate('?geometry='+width);await pause(width===1768?2300:100);
       let s=await state();assert.equal(s.dialog.open,true);assert.equal(s.focus,'home-entry-start');assert.equal(s.snapshot.index,-1);assert.equal(s.snapshot.ready,false);assert.equal(s.frame,'0');assert.equal(s.contexts,0);assert.equal(s.bodyInert,false);

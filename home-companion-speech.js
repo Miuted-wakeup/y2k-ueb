@@ -11,6 +11,8 @@
   const activationTypes = new Set(['click', 'pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchend', 'keydown']);
 
   function createSpeechSound(options = {}) {
+    const peakGain = typeof options.gain === 'number' && Number.isFinite(options.gain)
+      && options.gain >= 0 && options.gain <= .35 ? options.gain : SPEECH_GAIN;
     const bound = typeof options.contextProvider === 'function' && typeof options.authorizedProvider === 'function';
     const AudioContextCtor = Object.hasOwn(options, 'AudioContextCtor') ? options.AudioContextCtor : host.AudioContext || host.webkitAudioContext;
     const supported = bound || typeof AudioContextCtor === 'function';
@@ -116,7 +118,7 @@
         filter.frequency.setValueAtTime(2200, start);
         filter.Q.setValueAtTime(.6, start);
         gain.gain.setValueAtTime(0, start);
-        gain.gain.linearRampToValueAtTime(SPEECH_GAIN * Math.min(1, volume), start + .004);
+        gain.gain.linearRampToValueAtTime(peakGain * Math.min(1, volume), start + .004);
         gain.gain.linearRampToValueAtTime(0, start + duration);
         oscillator.connect(filter); filter.connect(gain); gain.connect(context.destination);
         oscillator.onended = () => dispose(note, false);

@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=1024" />
   <meta name="description" content="Y2K Japanese internet portal — personal blog" />
   <title>y2k-blog</title>
@@ -23,6 +24,13 @@
     body.has-home-companion #main-wrapper, body.has-home-companion #site-footer,
     body.has-home-companion .panel, body.has-home-companion img { opacity: 1 !important; }
   </style></noscript>
+  <!-- Persistent audio host: each direct section validates its own destination. -->
+  <link rel="stylesheet" href="site-audio-shell.css" />
+  <script src="site-audio-core.js"></script>
+  <script src="home-companion-speech.js"></script>
+  <script src="site-audio-engine.js"></script>
+  <script src="site-audio-client.js"></script>
+  <script src="site-audio-shell.js"></script>
 </head>
 
 <body class="has-themed-player has-home-companion">
@@ -71,9 +79,9 @@
             </div>
           </div>
           <div class="panel-body" style="text-align:center">
-            <div id="avatar-ring">
+            <button type="button" id="avatar-ring" class="hc-reactive-button" data-hc-reaction="avatar" aria-label="Preguntar a Shurelia por el avatar" disabled>
               <img src="assets/images/home/avatar.jpg" id="avatar-img" alt="avatar">
-            </div>
+            </button>
             <div id="profile-name">☆ MUTED ☆</div>
             <div id="profile-sub">◇ bienvenido a mi mundo ◇</div>
             <div id="profile-status">
@@ -114,7 +122,7 @@
             </div>
           </div>
           <div class="panel-body" style="display:flex;gap:10px;justify-content:center;align-items:center;padding:10px;">
-            <img src="assets/gifs/home/kirby-walk.gif" style="height:46px;width:auto;image-rendering:pixelated;" alt="kirby walk">
+            <button type="button" class="hc-reactive-button hc-mascot-button" data-hc-reaction="mascots" aria-label="Preguntar a Shurelia por Kirby" disabled><img src="assets/gifs/home/kirby-walk.gif" style="height:46px;width:auto;image-rendering:pixelated;" alt="kirby walk"></button>
             <img src="assets/gifs/home/kirby-hang.gif" style="height:46px;width:auto;image-rendering:pixelated;" alt="kirby hang">
           </div>
         </div>
@@ -130,7 +138,7 @@
           </div>
           <div class="panel-body" style="padding:6px;">
             <div class="home-badges-grid">
-              <span class="badge-88x31">MADE W/ NOTEPAD</span>
+              <button type="button" class="badge-88x31 hc-reactive-button" data-hc-reaction="badges" aria-label="Preguntar a Shurelia por la web hecha a mano" disabled>MADE W/ NOTEPAD</button>
               <span class="badge-88x31 pink">NETSCAPE NOW</span>
               <span class="badge-88x31 pink">VOCALOID 01</span>
               <span class="badge-88x31">HTML5 VALID</span>
@@ -363,20 +371,20 @@
           </div>
           <div class="panel-body home-status-body">
             <div class="home-clock-readout">
-              <div id="clock-time">00:00:00</div>
+              <button type="button" id="clock-time" class="hc-reactive-button" data-hc-reaction="clock" aria-label="Preguntar a Shurelia por el reloj" disabled>00:00:00</button>
               <div id="clock-date"></div>
             </div>
-            <div class="home-visitor-readout" title="Contador decorativo: aún no cuenta visitas reales.">
+            <button type="button" class="home-visitor-readout hc-reactive-button" data-hc-reaction="visits" aria-label="Preguntar a Shurelia por el contador decorativo" disabled>
               <span class="home-status-label">VISITAS</span>
-              <div id="visitor-counter" role="img" aria-label="Contador decorativo: 004827">
+              <span id="visitor-counter" role="img" aria-label="Contador decorativo: 004827">
                 <span class="digit" aria-hidden="true">0</span>
                 <span class="digit" aria-hidden="true">0</span>
                 <span class="digit" aria-hidden="true">4</span>
                 <span class="digit" aria-hidden="true">8</span>
                 <span class="digit" aria-hidden="true">2</span>
                 <span class="digit" aria-hidden="true">7</span>
-              </div>
-            </div>
+              </span>
+            </button>
           </div>
         </div>
 
@@ -396,12 +404,12 @@
               <div id="omikuji-result-lucky" style="display:none;">
                 <span>★ Ítem de suerte: </span><strong id="omikuji-item">-</strong>
               </div>
-              <button type="button" id="omikuji-btn">おみくじを引く (Sacar Fortuna)</button>
+              <button type="button" id="omikuji-btn" data-hc-reaction="fortune">おみくじを引く (Sacar Fortuna)</button>
             </div>
           </div>
         </div>
 
-        <span id="home-guestbook-note" role="note" title="El libro de visitas todavía no está disponible."><strong>LIBRO DE VISITAS</strong><span>EN CONSTRUCCIÓN</span></span>
+        <button type="button" id="home-guestbook-note" class="hc-reactive-button" data-hc-reaction="guestbook" aria-label="Preguntar a Shurelia por el libro de visitas en construcción" disabled><strong>LIBRO DE VISITAS</strong><span>EN CONSTRUCCIÓN</span></button>
 
       </aside>
     </div>
@@ -440,9 +448,10 @@
       <span class="hc-name">SHURELIA</span>
       <p class="hc-plain" aria-live="off">Hola, viajero. Puedes quedarte un rato.</p>
       <div class="hc-glyphs" aria-hidden="true"></div>
+      <a class="hc-message-link" target="_blank" rel="noopener noreferrer" hidden>Ver el vídeo ▶</a>
     </div>
-    <div class="hc-character" role="img" aria-label="Shurelia en su pequeño rincón de biblioteca">
-      <span class="hc-portrait" aria-hidden="true"><span class="hc-body"></span><span class="hc-face"></span></span>
+    <div class="hc-character">
+      <button class="hc-portrait" type="button" aria-label="Hablar con Shurelia" disabled><span class="hc-body" aria-hidden="true"></span><span class="hc-face" aria-hidden="true"></span></button>
     </div>
     <div class="hc-counter" aria-hidden="true"></div>
   </section>
@@ -522,7 +531,7 @@
   <script src="player-skins.js"></script>
   <script src="home-companion-art.js"></script>
   <script src="home-companion-messages.js"></script>
-  <script src="home-companion-speech.js"></script>
+  <script src="home-companion-reactions.js"></script>
   <script src="home-companion.js"></script>
 </body>
 

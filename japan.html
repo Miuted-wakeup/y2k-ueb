@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=1024" />
   <meta name="description" content="Y2K Japanese internet portal — Japan section" />
   <title>y2k-blog | 日本 JAPÓN</title>
@@ -17,6 +18,16 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="sections.css" />
   <link rel="stylesheet" href="player-skins.css" />
+  <!-- Persistent audio host: each direct section validates its own destination. -->
+  <link rel="stylesheet" href="site-audio-shell.css" />
+  <script src="site-audio-core.js"></script>
+  <script src="home-companion-speech.js"></script>
+  <script src="site-audio-engine.js"></script>
+  <script src="site-audio-client.js"></script>
+  <script src="site-audio-shell.js"></script>
+  <noscript><style>
+    body, #site-header, #site-nav, #main-wrapper, .panel, #site-footer, .sm-late-reveal { opacity: 1 !important; }
+  </style></noscript>
 </head>
 
 <body id="section-japan" class="has-themed-player">

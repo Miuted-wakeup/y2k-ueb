@@ -13,6 +13,186 @@
   const trusted = event => event?.isTrusted === true && activationTypes.has(event.type)
     && (event.type !== 'keydown' || ['Enter', ' ', 'Spacebar'].includes(event.key));
 
+  // Optional native media, separate from the main playlist and its saved state.
+  // Native Audio also works during file:// development without fetch/CORS decoding.
+  function createAmbience(options) {
+    const win = options.window, rules = new Map(), indices = new Map(), bags = new Map(), positions = new Map(), cleanups = [];
+    const root = new URL('assets/music/ambient/', options.baseURL);
+    for (const [section, rule] of Object.entries(options.config || {})) {
+      if (!/^[a-z][a-z-]{0,31}$/.test(section) || !Array.isArray(rule?.tracks)) continue;
+      const tracks = [...new Set(rule.tracks.slice(0, 32).flatMap(src => {
+        try {
+          if (typeof src !== 'string' || src.length > 2048) return [];
+          const url = new URL(src, options.baseURL);
+          return url.protocol === root.protocol && url.origin === root.origin && url.pathname.startsWith(root.pathname)
+            && !url.username && !url.password && /\.(mp3|ogg|oga|wav|m4a|aac|flac|opus)$/i.test(url.pathname) ? [url.href] : [];
+        } catch (_) { return []; }
+      }))];
+      rules.set(section, { tracks, volume: finite(rule.volume) && rule.volume >= 0 && rule.volume <= 1 ? rule.volume : .10 });
+    }
+    let media = null, section = null, entered = false, pageActive = true, destroyed = false;
+    let loadedSection = null, source = '', pendingSeek = null, generation = 0, starting = false, priming = false;
+    let failure = null, fadeTimer = null, duckTimer = null, loadTimer = null, ducked = false, targetVolume = 0;
+    const clearTimer = id => { if (id !== null) win.clearTimeout(id); };
+    function listen(target, name, fn) {
+      target?.addEventListener?.(name, fn); cleanups.push(() => target?.removeEventListener?.(name, fn));
+    }
+    const currentRule = () => rules.get(section);
+    const visible = () => pageActive && !win.document?.hidden;
+    const eligible = () => !destroyed && entered && visible() && options.allowed()
+      && !options.foreground() && options.master() > 0 && !!currentRule()?.tracks.length;
+    function randomIndex(length) {
+      const value = options.random();
+      return Math.floor((finite(value) ? Math.max(0, Math.min(.999999999, value)) : .5) * length);
+    }
+    function nextTrack(nextSection) {
+      const count = rules.get(nextSection)?.tracks.length || 0;
+      if (!count) return null;
+      let bag = bags.get(nextSection);
+      if (!bag?.length) {
+        bag = Array.from({ length: count }, (_, index) => index);
+        for (let i = count - 1; i > 0; i--) {
+          const j = randomIndex(i + 1); [bag[i], bag[j]] = [bag[j], bag[i]];
+        }
+        // Each URL plays once per round; the next round cannot immediately
+        // repeat its predecessor either. Pause/navigation never draw again.
+        if (count > 1 && bag[0] === indices.get(nextSection)) {
+          const other = 1 + randomIndex(count - 1); [bag[0], bag[other]] = [bag[other], bag[0]];
+        }
+        bags.set(nextSection, bag);
+      }
+      const index = bag.shift(); indices.set(nextSection, index); return index;
+    }
+    function pause(reset = false) {
+      if (!media) return;
+      if (source) positions.set(source, reset ? 0 : Number.isFinite(media.currentTime) ? media.currentTime : 0);
+      generation++; starting = false; priming = false;
+      clearTimer(loadTimer); loadTimer = null; clearTimer(fadeTimer); fadeTimer = null; targetVolume = 0;
+      media.muted = true; media.volume = 0; media.pause();
+      if (reset) { try { media.currentTime = 0; } catch (_) {} }
+    }
+    function seek() {
+      if (pendingSeek === null || !media) return;
+      try { media.currentTime = pendingSeek; pendingSeek = null; } catch (_) { /* Apply again after metadata. */ }
+    }
+    function prepare(nextSection) {
+      const rule = rules.get(nextSection);
+      if (!rule?.tracks.length) return false;
+      const index = indices.has(nextSection) ? indices.get(nextSection) : nextTrack(nextSection);
+      const nextSource = rule.tracks[index];
+      if (!media) {
+        media = options.makeMedia();
+        if (!media) return false;
+        media.preload = 'metadata'; media.muted = true; media.volume = 0;
+        listen(media, 'loadedmetadata', seek);
+        listen(media, 'error', () => { if (!destroyed) { pause(); failure = 'MediaError'; } });
+        listen(media, 'ended', () => {
+          if (destroyed || !media.ended) return;
+          const previousSection = loadedSection, previousRule = rules.get(previousSection);
+          pause(true);
+          if (!previousRule?.tracks.length) return;
+          nextTrack(previousSection);
+          source = ''; prepare(previousSection); sync();
+        });
+      }
+      if (nextSource !== source) {
+        pause(); source = nextSource; loadedSection = nextSection; failure = null;
+        pendingSeek = positions.get(source) || 0; media.src = source; seek();
+      }
+      loadedSection = nextSection;
+      media.loop = rule.tracks.length === 1;
+      return true;
+    }
+    function fadeTo(target) {
+      if (!media || target === targetVolume && (fadeTimer !== null || Math.abs(media.volume - target) < .001)) return;
+      clearTimer(fadeTimer); fadeTimer = null; targetVolume = target;
+      const initial = media.volume, begin = Date.now(), duration = target < initial ? 70 : 450;
+      const tick = () => {
+        fadeTimer = null;
+        if (destroyed || !media || media.paused) return;
+        const progress = Math.min(1, (Date.now() - begin) / duration);
+        media.volume = Math.max(0, Math.min(1, initial + (target - initial) * progress));
+        if (progress < 1) fadeTimer = win.setTimeout(tick, 30);
+      };
+      tick();
+    }
+    function start(prime = false) {
+      if (!media || starting || !media.paused || failure) return;
+      const turn = ++generation;
+      starting = true; priming = prime; media.volume = 0; targetVolume = 0;
+      if (media.volume !== 0) { pause(); failure = 'VolumeControlUnavailable'; return; }
+      media.muted = prime;
+      let result;
+      try { result = media.play(); }
+      catch (reason) { pause(); failure = reason?.name || 'MediaError'; return; }
+      loadTimer = win.setTimeout(() => {
+        if (turn !== generation || destroyed) return;
+        pause(); failure = 'TimeoutError';
+      }, 8000);
+      Promise.resolve(result).then(() => {
+        if (destroyed || turn !== generation) return;
+        clearTimer(loadTimer); loadTimer = null;
+        starting = false; priming = false;
+        // Priming is never audible under the entry movie or another section.
+        if (prime && !eligible()) { pause(true); return; }
+        sync();
+      }, reason => {
+        if (destroyed || turn !== generation) return;
+        pause(); failure = reason?.name || 'MediaError';
+      });
+    }
+    function sync() {
+      if (!eligible()) {
+        // A trusted play request may finish silently during the entry movie.
+        if (priming && !destroyed && !entered && visible() && options.canPrime() && options.master() > 0) return;
+        if (media && (starting || !media.paused || media.volume > 0)) pause();
+        return;
+      }
+      if (!prepare(section) || failure) return;
+      if (media.paused && !starting) start();
+      if (!media.paused && !starting) {
+        if (media.muted) { media.volume = 0; targetVolume = 0; media.muted = false; }
+        fadeTo(currentRule().volume * options.master() * (ducked ? .30 : 1));
+      }
+    }
+    function setRoute(nextSection, ready) {
+      if (destroyed) return;
+      if (section !== nextSection) {
+        pause(); section = nextSection; failure = null;
+        clearTimer(duckTimer); duckTimer = null; ducked = false;
+      }
+      entered = ready === true;
+      // Configure the real source before ENTRAR without autoplaying it.
+      if (currentRule()?.tracks.length) prepare(section);
+      sync();
+    }
+    function prime() {
+      if (destroyed || !visible() || options.master() <= 0) return;
+      const candidate = currentRule()?.tracks.length ? section : [...rules].find(([, rule]) => rule.tracks.length)?.[0];
+      if (!candidate || !prepare(candidate)) return;
+      failure = null; start(true);
+    }
+    function duck() {
+      if (section !== 'home' || destroyed) return;
+      ducked = true; clearTimer(duckTimer); sync();
+      duckTimer = win.setTimeout(() => { duckTimer = null; ducked = false; sync(); }, 260);
+    }
+    listen(win.document, 'visibilitychange', sync);
+    listen(win, 'pagehide', () => { pageActive = false; pause(); });
+    listen(win, 'pageshow', () => { pageActive = true; }); // Controller revalidates before resuming.
+    return Object.freeze({ setRoute, prime, sync, pause, duck,
+      snapshot: () => ({ section, configured: !!currentRule()?.tracks.length, count: currentRule()?.tracks.length || 0,
+        index: indices.get(section) || 0, playing: !!media && !media.paused && media.volume > 0,
+        volume: media?.volume || 0, error: failure }),
+      getMedia: () => media,
+      destroy() {
+        if (destroyed) return;
+        destroyed = true; pause(); clearTimer(duckTimer); cleanups.forEach(fn => fn());
+        media?.removeAttribute?.('src');
+      }
+    });
+  }
+
   function createEngine(options = {}) {
     const win = options.window || host;
     const SpeechAPI = options.SpeechAPI || win.HomeCompanionSpeech;
@@ -49,6 +229,11 @@
     const nativeContext = () => owner?.getNativeContext() || null;
     const contextRunning = () => nativeContext()?.state === 'running';
     const fxAllowed = () => !destroyed && !silentFX && permission === 'active' && contextRunning();
+    let activeSection = null;
+    const ambience = createAmbience({ window: win, makeMedia, baseURL, config: options.ambience, random,
+      allowed: fxAllowed, canPrime: () => !destroyed && !silentFX,
+      master: () => !music || music.muted ? 0 : music.volume,
+      foreground: () => desiredPlaying || !!music && !music.paused || favoriteLease !== null || !!favorite && !favorite.paused });
     const duration = media => finite(media?.duration) && media.duration >= 0 ? media.duration : null;
     const mediaState = (media, extra = {}) => ({ ...extra, src: media?.src || extra.src || '', paused: media?.paused !== false,
       playing: media?.paused === false && !media.ended, ended: !!media?.ended,
@@ -64,6 +249,7 @@
         speech: { supported: !!ownerState?.supported, unlocked: fxAllowed(), contextState: ownerState?.contextState || 'unsupported', activeNotes, blipsPlayed } };
     }
     function emit() {
+      ambience.sync();
       revision++;
       const state = snapshot();
       for (const callback of [...subscribers]) { try { callback(state); } catch (_) {} }
@@ -101,6 +287,7 @@
     if (music) { music.src = playlist[index].src; applySeek(); }
     function playMusic() {
       if (!music) return Promise.reject(error('NotSupportedError', 'Native media unavailable'));
+      ambience.pause();
       const turn = ++musicTurn;
       let result;
       try { result = music.play(); } catch (reason) { classifyFailure(reason); return Promise.reject(reason); }
@@ -127,6 +314,7 @@
     }
     function playFavorite(lease) {
       if (!favorite) return Promise.reject(error('NotSupportedError', 'Native media unavailable'));
+      ambience.pause();
       if (favoriteLease === null) favoriteResume = desiredPlaying;
       favoriteLease = lease; musicTurn++; music?.pause();
       const turn = ++favoriteTurn;
@@ -153,11 +341,16 @@
     }
     function unlock(event) {
       if (destroyed || !trusted(event)) return Promise.resolve(false);
+      // A new explicit activation supersedes silence; navigation/probes never do.
+      silentFX = false;
       const turn = ++activationTurn;
       if (!supported) { permission = 'unsupported'; emit(); return Promise.resolve(false); }
       // Both calls occur before the first await, in the actual parent's gesture.
       const native = owner.unlock(event); observeContext();
       const playback = desiredPlaying && favoriteLease === null ? playMusic() : Promise.resolve(true);
+      // Prime this one persistent element from the same native click, but keep
+      // it muted until entry/foreground checks pass, even when music was resumed.
+      ambience.prime();
       return Promise.all([native, playback]).then(([allowed]) => {
         if (destroyed || turn !== activationTurn) return false;
         permission = allowed && contextRunning() ? (silentFX ? 'silent' : 'active') : 'blocked';
@@ -283,7 +476,7 @@
       const c = validate(command, lease);
       if (c.type === 'music') {
         if (c.action === 'play' || (c.action === 'toggle' && music?.paused)) {
-          stopFavorite(false); desiredPlaying = true; write('isPlaying', true); return playMusic();
+          desiredPlaying = true; write('isPlaying', true); stopFavorite(false); return playMusic();
         }
         if (c.action === 'pause' || c.action === 'toggle' || c.action === 'stop') { pauseMusic(c.action === 'stop'); return true; }
         if (['next', 'prev', 'select'].includes(c.action)) {
@@ -315,10 +508,13 @@
         if (!voice) {
           if (state.voices.size >= 16) throw new RangeError('Too many document voices');
           voice = SpeechAPI.createBoundSpeechSound({ getContext: nativeContext, isAuthorized: fxAllowed,
+            gain: activeSection === 'home' && c.voiceId === 'shurelia' ? .20 : undefined,
             requirePlaying: false, now: options.now, getPlayerState: () => ({ playing: !!music && !music.paused, volume: music?.volume || 0, muted: !music || music.muted }) });
           state.voices.set(c.voiceId, voice);
         }
-        const played = voice.playGlyph(c); if (played) blipsPlayed++; emit(); return played;
+        const played = voice.playGlyph(c);
+        if (played) { blipsPlayed++; if (activeSection === 'home' && c.voiceId === 'shurelia') ambience.duck(); }
+        emit(); return played;
       }
       if (c.type === 'chime') return tone('chime', c, state);
       if (c.action === 'stop') { disposeTone(state[c.type]); state[c.type] = null; emit(); return true; }
@@ -337,6 +533,7 @@
     function destroy() {
       if (destroyed) return Promise.resolve();
       destroyed = true; activationTurn++; musicTurn++; favoriteTurn++; desiredPlaying = false;
+      ambience.destroy();
       for (const lease of [...leases.keys()]) releaseLease(lease);
       music?.pause(); favorite?.pause(); cleanups.forEach(fn => fn()); subscribers.clear();
       return owner?.destroy() || Promise.resolve();
@@ -357,8 +554,10 @@
     });
     listen(favorite, 'ended', () => { if (!destroyed && favoriteLease !== null) stopFavorite(true); });
     return Object.freeze({ snapshot, probe, unlock, continueSilent, execute, releaseLease, destroy,
+      setAmbience(section, entered) { activeSection = section; ambience.setRoute(section, entered); },
+      getAmbienceState: ambience.snapshot,
       subscribe(fn) { if (typeof fn !== 'function') throw new TypeError('Subscriber required'); subscribers.add(fn); return () => subscribers.delete(fn); },
-      getNativeContext: nativeContext, getNativeMedia: () => ({ music, favorite }) });
+      getNativeContext: nativeContext, getNativeMedia: () => ({ music, favorite, ambience: ambience.getMedia() }) });
   }
   return Object.freeze({ createEngine });
 });

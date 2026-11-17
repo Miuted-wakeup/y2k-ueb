@@ -25,19 +25,23 @@
     Array.from(characters).forEach((character, column) => cells.set(character, { column, row, character }));
   });
 
+  // Inverted Spanish marks use the same original cell rotated, not a missing-glyph ?.
+  const inverted = new Map([['¿', '?'], ['¡', '!']]);
+
   function normalizeText(text) {
     const normalized = String(text ?? '')
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase()
-      .replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
-      .replace(/[–—]/g, '-').replace(/…/g, '...')
-      .replace(/¡/g, '!').replace(/¿/g, '?').replace(/\s/g, ' ');
-    return Array.from(normalized, character => character === ' ' || cells.has(character) ? character : '?').join('');
+      .replace(/[‘’‹›]/g, "'").replace(/[“”«»]/g, '"')
+      .replace(/[–—_]/g, '-').replace(/…/g, '...')
+      .replace(/\s/g, ' ');
+    return Array.from(normalized, character => character === ' ' || cells.has(character) || inverted.has(character) ? character : '?').join('');
   }
 
   function glyphFor(char) {
     const character = Array.from(normalizeText(char))[0];
     if (!character || character === ' ') return null;
-    return { ...cells.get(character) };
+    const base = inverted.get(character);
+    return { ...cells.get(base || character), character, ...(base ? { rotate: 180 } : {}) };
   }
 
   function renderText(container, text) {
@@ -57,6 +61,7 @@
         const glyph = doc.createElement('span');
         glyph.className = 'hc-glyph';
         glyph.dataset.glyph = cell.character;
+        if (cell.rotate) glyph.style.transform = 'rotate(' + cell.rotate + 'deg)';
         glyph.style.backgroundPosition = `${-cell.column * cellSize}px ${-cell.row * cellSize}px`;
         word.appendChild(glyph);
         glyphs.push(glyph);

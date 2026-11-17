@@ -40,7 +40,7 @@
     const ready = new Promise((resolve,reject) => { resolveReady=resolve; rejectReady=reject; });
     // Attach a handler immediately; consumers still receive the original rejection.
     ready.catch(() => {});
-    const origin = info ? new URL(info.publicURL).origin : '';
+    const origin = info ? Core.messageOrigin(info.publicURL) : '';
     const targetOrigin = origin === 'null' ? '*' : origin;
     function send(kind, extra = {}) {
       if (!isFrame || destroyed) return false;
@@ -113,7 +113,7 @@
         const route=Core.resolveRoute(m.href,info.publicURL);
         if(!route)return;
         const url=new URL(m.href,info.publicURL);
-        if(url.origin!==origin||!/^[a-f0-9]{32}$/.test(url.searchParams.get(Core.FRAME_PARAM)||'')||! /^[1-9]\d*$/.test(url.searchParams.get(Core.EPOCH_PARAM)||''))return;
+        if(Core.messageOrigin(url.href)!==origin||!/^[a-f0-9]{32}$/.test(url.searchParams.get(Core.FRAME_PARAM)||'')||! /^[1-9]\d*$/.test(url.searchParams.get(Core.EPOCH_PARAM)||''))return;
         win.location.replace(url.href);
       }
     }

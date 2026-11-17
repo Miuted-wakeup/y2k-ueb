@@ -1,0 +1,155 @@
+/* A temporary program inside the existing right-hand NAVI pane, never a page overlay. */
+.terminal-navi.terminal-navi--visiting {
+  padding: 0;
+  overflow: hidden;
+}
+.terminal-navi--visiting > [hidden] { display: none !important; }
+.tech-terminal-guest {
+  display: grid;
+  grid-template-areas: "toolbar" "scene" "dialogue" "caption";
+  grid-template-rows: 26px 164px minmax(0, 1fr) 16px;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 7px;
+  margin: 0;
+  overflow: hidden;
+  color: var(--terminal-text, #e2faff);
+  font: 11px/1.5 Consolas, 'Courier New', monospace;
+}
+.tech-terminal-guest .tg-toolbar {
+  grid-area: toolbar;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  border-bottom: 1px solid var(--terminal-line, #32707a);
+}
+.tech-terminal-guest .hc-name {
+  margin-right: auto;
+  color: var(--terminal-cyan, #78f8ed);
+  font: bold 10px/1.5 Consolas, monospace;
+  letter-spacing: 1px;
+}
+.tech-terminal-guest .tg-duration { color: #b0d4d7; font-size: 10px; }
+.tech-terminal-guest .tg-dismiss {
+  width: 28px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--terminal-line, #32707a);
+  color: inherit;
+  background: #0b3640;
+  font: 20px/1 Consolas, monospace;
+  cursor: pointer;
+}
+.tech-terminal-guest .tg-stage {
+  grid-area: scene;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #8c6240;
+  box-shadow: inset 0 0 0 1px #21170f;
+  isolation: isolate;
+}
+.tech-terminal-guest .tg-room {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #15100d url('assets/images/tech/companion/shurelia-room-books.png') center / auto 100% repeat-x;
+  image-rendering: pixelated;
+}
+.tech-terminal-guest .hc-character { position: absolute; inset: 0; z-index: 1; }
+.tech-terminal-guest .hc-portrait {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  display: block;
+  width: 256px;
+  height: 328px;
+  transform: translateX(-50%) scale(.5);
+  transform-origin: top center;
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.tech-terminal-guest .hc-portrait:disabled { cursor: default; pointer-events: none; }
+.tech-terminal-guest .hc-body,
+.tech-terminal-guest .hc-face {
+  display: block;
+  position: absolute;
+  background: url('assets/images/tech/companion/shurelia-atlas.png') no-repeat;
+  image-rendering: pixelated;
+}
+.tech-terminal-guest .hc-body { inset: 0; background-position: 0 -184px; }
+.tech-terminal-guest .hc-face { left: 82px; top: 76px; width: 64px; height: 56px; background-position: 0 0; }
+.tech-terminal-guest .tg-counter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 10px;
+  background: #52351e url('assets/images/tech/companion/shurelia-room-counter.png') left bottom / auto 100% repeat-x;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+.tech-terminal-guest .hc-dialogue {
+  grid-area: dialogue;
+  position: relative;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+  border: 1px solid var(--terminal-line, #32707a);
+  background: #071a25;
+  text-align: left;
+  scrollbar-color: var(--terminal-line, #32707a) #071a25;
+}
+.tech-terminal-guest .hc-dialogue[hidden],
+.tech-terminal-guest .hc-message-link[hidden] { display: none !important; }
+.tech-terminal-guest .hc-plain { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.tech-terminal-guest .hc-glyphs { font: 12px/16px monospace; }
+.tech-terminal-guest .hc-word { display: inline-flex; max-width: 100%; flex-wrap: wrap; vertical-align: top; }
+.tech-terminal-guest .hc-fallback-char { display: inline-block; flex: 0 0 auto; font: 12px/16px Verdana, sans-serif; }
+.tech-terminal-guest .hc-glyph {
+  display: inline-block;
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  background: url('assets/images/tech/companion/dialogue-font.png') no-repeat;
+  background-size: 96px 96px;
+  image-rendering: pixelated;
+}
+.tech-terminal-guest .hc-message-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 28px;
+  margin-top: 8px;
+  padding: 5px;
+  border: 1px outset #96d2e5;
+  background: #0d364c;
+  color: #e1f8ff;
+  font: 11px/1.5 Verdana, sans-serif;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+}
+.tech-terminal-guest .tg-caption {
+  grid-area: caption;
+  color: #b0d4d7;
+  text-align: center;
+  font: 10px/16px Consolas, monospace;
+}
+.tech-terminal-guest :is(button, a):hover { filter: brightness(1.15); }
+.tech-terminal-guest :is(button, a, .hc-dialogue):focus-visible { outline: 2px dashed #fff2a6; outline-offset: -3px; }
+.tech-terminal-guest .hc-portrait:focus-visible { outline-width: 4px; outline-offset: -5px; }
+@media (prefers-reduced-motion: reduce) {
+  .tech-terminal-guest *, .tech-terminal-guest *::after { animation: none !important; transition: none !important; }
+}

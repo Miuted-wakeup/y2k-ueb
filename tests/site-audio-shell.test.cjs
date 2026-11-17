@@ -18,7 +18,7 @@ function fixture({allowed=false,href='https://example.test/blog/tech.html?view=r
   const controller=load().createController({window:win,Core,engine,token:()=>String(++sequence).padStart(32,'0'),
     createFrame(route,token,epoch){const frame={route,token,epoch,sent:[],removed:false,contentWindow:{postMessage(data,origin){frame.sent.push({data,origin});}},remove(){this.removed=true;}};frames.push(frame);return frame;},
     onPhase:s=>phases.push(s)});
-  const message=(kind,extra={},frame=frames.at(-1))=>({source:frame.contentWindow,origin:new URL(href).origin,data:{channel:Core.PROTOCOL,kind,token:frame.token,epoch:frame.epoch,...extra}});
+  const message=(kind,extra={},frame=frames.at(-1))=>({source:frame.contentWindow,origin:Core.messageOrigin(href),data:{channel:Core.PROTOCOL,kind,token:frame.token,epoch:frame.epoch,...extra}});
   return {controller,engine,win,frames,phases,commands,releases,history,message,listeners,
     unlockEvent:()=>unlockEvent,destroyed:()=>destroyed,advance(delay){for(const[id,t]of[...timers])if(t.delay===delay){timers.delete(id);t.fn();}}};
 }
@@ -56,4 +56,16 @@ test('silent continuation and final destroy invalidate late unlocks and future m
   const f=fixture();f.controller.start();await flush();let resolve;f.engine.unlock=()=>new Promise(r=>resolve=r);
   f.controller.activate({isTrusted:true});f.controller.silence();f.advance(600);assert.equal(f.controller.snapshot().entered,true);resolve(true);await flush();assert.equal(f.controller.snapshot().phase,'complete');
   f.controller.destroy();f.controller.destroy();assert.equal(f.destroyed(),1);assert.equal(f.controller.receive(f.message('hello')),false);
+});
+
+test('long-lived settled command traffic remains usable and evicted replays never execute twice',async()=>{
+  const f=fixture({allowed:true});f.controller.start();await flush();f.controller.receive(f.message('hello'));
+  for(let n=1;n<=600;n++){
+    assert.equal(f.controller.receive(f.message('command',{id:'c'+n,command:{type:'music',action:'volume',value:.5}})),true);
+    await flush();
+  }
+  assert.equal(f.commands.length,600);
+  assert.equal(f.controller.receive(f.message('command',{id:'c1',command:{type:'music',action:'next'}})),false);
+  assert.equal(f.controller.receive(f.message('command',{id:'c600',command:{type:'music',action:'next'}})),true);
+  await flush();assert.equal(f.commands.length,600);f.controller.destroy();
 });

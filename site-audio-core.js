@@ -23,9 +23,19 @@
     { title: 'TouhouMAD - Nitori Get Down!', artist: '小野崎人', src: 'assets/music/nitori.mp3' },
     { title: 'aishite aishite aishite', artist: 'kikuo', src: 'assets/music/aishite.mp3' }
   ].map(Object.freeze));
+  // Explicit ambient allowlist. Empty tracks intentionally produce no ambience.
+  const AMBIENCE = Object.freeze({
+    home: Object.freeze({ volume: 0.10, tracks: Object.freeze(['assets/music/ambient/home/crystal-settings.mp3']) })
+  });
   const kinds = new Set(['hello', 'state', 'command', 'ack', 'navigate', 'replace', 'page-ready', 'page-leaving', 'request-activation']);
   const validToken = token => typeof token === 'string' && /^[a-f0-9]{32}$/i.test(token);
   const validEpoch = epoch => Number.isSafeInteger(epoch) && epoch > 0 && epoch <= 2147483647;
+
+  function messageOrigin(href) {
+    const url = new URL(href);
+    // Chromium URL.origin says file://, but MessageEvent.origin is opaque "null".
+    return url.protocol === 'file:' ? 'null' : url.origin;
+  }
 
   function publicURL(href) {
     try {
@@ -103,6 +113,6 @@
       data.channel === PROTOCOL && kinds.has(data.kind) && data.token === token && data.epoch === epoch &&
       validToken(token) && validEpoch(epoch);
   }
-  return Object.freeze({ PROTOCOL, FRAME_PARAM, EPOCH_PARAM, SECTIONS, PLAYLIST,
-    publicURL, resolveRoute, initialRoute, frameURL, frameInfo, historyURL, validEnvelope, validToken, validEpoch });
+  return Object.freeze({ PROTOCOL, FRAME_PARAM, EPOCH_PARAM, SECTIONS, PLAYLIST, AMBIENCE,
+    publicURL, resolveRoute, initialRoute, frameURL, frameInfo, historyURL, messageOrigin, validEnvelope, validToken, validEpoch });
 });

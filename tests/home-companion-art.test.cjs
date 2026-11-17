@@ -88,10 +88,12 @@ test('S2: actual atlas cells, including punctuation and non-ASCII symbol slots',
 
 test('S4: readable uppercase/base-letter normalization has explicit missing-glyph fallback', () => {
   const art = load();
-  assert.equal(art.normalizeText('¡Qué ilusión! ¿Niñez? Canción, pingüino… ☃'), '!QUE ILUSION! ?NINEZ? CANCION, PINGUINO... ?');
+  assert.equal(art.normalizeText('¡Qué ilusión! ¿Niñez? Canción, pingüino… ☃'), '¡QUE ILUSION! ¿NINEZ? CANCION, PINGUINO... ?');
   assert.equal(art.normalizeText('“Hola” — don’t\n🙃'), '"HOLA" - DON\'T ?');
   assert.deepEqual(art.glyphFor('ñ'), { character: 'N', column: 5, row: 5 });
   assert.equal(art.normalizeText(null), '');
+  assert.equal(art.normalizeText('final_final_ahora_si'), 'FINAL-FINAL-AHORA-SI');
+  assert.equal(art.normalizeText('«hola, estuve aquí» y ‹una canción más›'), '"HOLA, ESTUVE AQUI" Y \'UNA CANCION MAS\'');
 });
 
 function fixture() {
@@ -114,7 +116,8 @@ test('S4: render words as wrappable groups, preserve real spaces and return all 
   const glyphs = art.renderText(container, '¡Hola,  tú!');
   assert.deepEqual(container.children.map(node => node.className || node.textContent), ['hc-word', '  ', 'hc-word']);
   assert.equal(container.children[1].nodeType, 3);
-  assert.equal(glyphs.map(glyph => glyph.dataset.glyph).join(''), '!HOLA,TU!');
+  assert.equal(glyphs.map(glyph => glyph.dataset.glyph).join(''), '¡HOLA,TU!');
+  assert.equal(glyphs[0].style.transform, 'rotate(180deg)');
   assert.ok(glyphs.every(glyph => glyph.className === 'hc-glyph' && glyph.tagName === 'SPAN'));
   assert.equal(glyphs[0].style.backgroundPosition, '0px 0px');
   assert.equal(glyphs[1].style.backgroundPosition, '-84px -48px');
@@ -135,4 +138,26 @@ test('S4: angle brackets never create markup; UMD also exposes the browser API',
   vm.runInContext(fs.readFileSync(path.join(root, 'home-companion-art.js'), 'utf8'), context);
   assert.equal(context.HomeCompanionArt.normalizeText('á'), 'A');
   assert.equal(typeof context.HomeCompanionArt.renderText, 'function');
+});
+
+test('all editable catalogue messages avoid unsupported-glyph question marks',()=>{
+  const art=load(),messages=[...require('../home-companion-messages.js'),...Object.values(require('../home-companion-reactions.js')).flat()];
+  for(const message of messages){
+    const expected=(message.text.match(/\?/g)||[]).length;
+    assert.equal((art.normalizeText(message.text).match(/\?/g)||[]).length,expected,message.text);
+  }
+  const container=fixture(),message=messages.find(m=>m.text.includes('libros de visitas'));
+  const visual=art.renderText(container,message.text).map(glyph=>glyph.dataset.glyph).join('');
+  assert.equal((visual.match(/"/g)||[]).length,2);assert.equal(visual.includes('?'),false);
+});
+
+test('Spanish opening punctuation keeps its meaning using rotated original atlas cells',()=>{
+ const art=load(),container=fixture();
+ assert.deepEqual(art.glyphFor('¿'),{column:6,row:3,character:'¿',rotate:180});
+ assert.deepEqual(art.glyphFor('¡'),{column:0,row:0,character:'¡',rotate:180});
+ const glyphs=art.renderText(container,'¿Hola? ¡Sí!');
+ assert.equal(glyphs.map(g=>g.dataset.glyph).join(''),'¿HOLA?¡SI!');
+ assert.equal(glyphs[0].style.transform,'rotate(180deg)');
+ assert.equal(glyphs[6].style.transform,'rotate(180deg)');
+ assert.ok(glyphs.filter(g=>g.dataset.glyph==='?'||g.dataset.glyph==='!').every(g=>!g.style.transform));
 });

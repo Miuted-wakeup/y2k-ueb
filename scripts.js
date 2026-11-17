@@ -753,60 +753,9 @@ function initTechSection() {
     });
   }
 
-  // 3. Interactive Tech Terminal (CLI)
-  const termInput = document.getElementById('terminal-cli-input');
-  const termOutput = document.getElementById('terminal-cli-output');
-  if (termInput && termOutput) {
-    function runCliCommand(rawCmd) {
-      const cmd = rawCmd.trim().toLowerCase();
-      let response = '';
-
-      switch (cmd) {
-        case 'help':
-          response = 'Comandos disponibles:\n- specs: Ver especificaciones de la máquina\n- neofetch: Banner del sistema estilo Frutiger\n- quote: Cita sobre el Skeuomorphism\n- ping: Probar latencia a Tokyo/Akihabara\n- matrix: Matrix cyan stream\n- clear: Limpiar terminal';
-          break;
-        case 'specs':
-          response = '╔════════════════════════════════════════╗\n║ RIG SPECS · VISTA ULTIMATE 64-BIT     ║\n║ CPU: Intel Core 2 Duo E8400 @ 3.00GHz  ║\n║ RAM: 4.00 GB Corsair Dominator DDR2   ║\n║ GPU: NVIDIA GeForce 8800 GTX 768MB     ║\n║ DISPLAY: SyncMaster 226BW 1680x1050 2ms║\n║ AUDIO: Creative Sound Blaster X-Fi     ║\n║ OS: Windows Vista Ultimate SP2 (Aero)  ║\n╚════════════════════════════════════════╝';
-          break;
-        case 'neofetch':
-          response = '  .----.      muted@frutiger-rig\n /  ..  \\     ────────────────\n|  /  \\  |    OS: Windows Vista Aero 64-bit\n|  \\__/  |    Host: Custom 2007 Workstation\n \\      /     Kernel: NT 6.0.6002\n  `----`      Uptime: 247 days, 13 hours\n              Shell: Vista Command Prompt 1.0\n              Resolution: 1440x900 @ 75Hz\n              Theme: Aero Glass Pure Gloss';
-          break;
-        case 'quote':
-          response = '"El Skeuomorphism y Frutiger Aero le daban textura humana a lo digital: gotas de agua, cristal y sombras hacían que el software pareciera tangible y vivo."';
-          break;
-        case 'ping':
-          response = 'PING akihabara.tokyo.jp [192.0.2.105] with 32 bytes of data:\nReply from 192.0.2.105: bytes=32 time=42ms TTL=118\nReply from 192.0.2.105: bytes=32 time=41ms TTL=118\nReply from 192.0.2.105: bytes=32 time=43ms TTL=118\nPing statistics: 0% packet loss. Connection: 100Mbps Aero Fiber.';
-          break;
-        case 'matrix':
-          response = '01000110 01110010 01110101 01110100 01101001 01100111 01100101 01110010\n[AERO FLUID DYNAMICS ACTIVE] 🫧 💧 ✧ 🫧 💧 ✧\n[OPTIMISMO DIGITAL RESTAURADO AL 100%]';
-          break;
-        case 'clear':
-          termOutput.textContent = '';
-          return;
-        default:
-          response = `Comando '${rawCmd}' no reconocido. Escribe 'help' para ver la lista de comandos.`;
-      }
-
-      termOutput.textContent += `\n> ${rawCmd}\n${response}\n`;
-      termOutput.scrollTop = termOutput.scrollHeight;
-    }
-
-    termInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const val = termInput.value;
-        if (val.trim() !== '') {
-          runCliCommand(val);
-          termInput.value = '';
-        }
-      }
-    });
-
-    document.querySelectorAll('.term-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const cmd = btn.getAttribute('data-cmd');
-        if (cmd) runCliCommand(cmd);
-      });
-    });
+  // 3. Tech-only local programs; other sections never mount this runtime.
+  if (document.body.id === 'section-tech') {
+    window.TechTerminal?.mount(document.querySelector('.tech-terminal'), window);
   }
 }
 

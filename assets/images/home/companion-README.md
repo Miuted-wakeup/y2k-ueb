@@ -27,10 +27,12 @@ for this composition. Do not display the entire sheet as one character.
 and the same API through CommonJS for local tests:
 
 - `normalizeText(text)`: uppercase/base-letter visual text; Spanish accents
-  become their base letters. Curly quotes, long dashes, ellipses and Spanish
-  opening punctuation use their closest available glyphs. Unsupported symbols
+  become their base letters. Curly/guillemet quotes, long dashes, underscores and ellipses use their closest
+  available glyphs. Spanish `¿`/`¡` retain their identity and use the original
+  `?`/`!` cell rotated180degrees, never an extra upright question mark. Unsupported symbols
   become `?`, never silently disappear.
-- `glyphFor(character)`: `{ column, row, character }` for a normalized glyph;
+- `glyphFor(character)`: `{ column, row, character, rotate? }` for a normalized glyph;
+  inverted Spanish marks use `rotate:180` and the original upright cell;
   a space or empty input returns `null`.
 - `renderText(container, text)`: replaces previous content, returns all glyph
   spans in reading order, groups words in `.hc-word` spans and inserts spaces
@@ -66,8 +68,11 @@ very low windows retain an explicitly labelled reachable fallback. The original
 main clearance already supplies an 8px gap. Left and center scrolling are unchanged.
 No other section loads these scripts/styles. The old `character.png` is retained.
 
-- Dialogue remains automatic after HOME's separate welcome entry; the character
-  has no buttons/click action or extra tab stops. The entry offers a real trusted
+- Dialogue remains automatic after HOME's separate welcome entry, and the portrait
+  itself is now a native button: click, Enter or Space requests dialogue. While
+  typing, the first press completes that line without replaying glyph sounds;
+  the next press requests another non-consecutive phrase. No extra action bar
+  or scene/scroll footprint is added. The entry offers a real trusted
   sound activation and an explicit silent choice. See `home-entry-README.md`.
 - Greeting starts after entry finishes plus 2 seconds when the portrait is visible. Text types at
   70ms per glyph with its original speaking expressions, then remains readable
@@ -83,7 +88,8 @@ No other section loads these scripts/styles. The old `character.png` is retained
   wait, never a backlog of hidden comments.
 - The bubble is content-sized, to the LEFT of the head. It can briefly overlap
   adjacent content, as requested, and is not included in the scroll reservation.
-  It has no pointer interception and no unsolicited live-reader announcements.
+  Only the portrait and an optional visible message link accept pointer input.
+  Automatic messages stay silent to live readers; requested lines use polite announcements.
 - Reduced motion keeps gradual text but a static emotional face, with the same
   reading/hidden intervals. Sequential text does not move the scene or bubble.
 - Missing bitmap font uses gradual normal-font glyphs with the same reserved
@@ -98,10 +104,22 @@ Each entry has the message `text` and its expression `mood`:
 
 ```js
 { mood: 'sleepy', text: 'Una canción más antes de dormir.' },
+{ mood: 'curious', text: 'Una curiosidad para ti.',
+  link: { url: 'https://youtu.be/XFg5rAAG4Tk?si=vt005pZsPHFUd0bs', label: 'Ver el vídeo' } },
 ```
 
 Keep the quotes and comma between entries. Accents and punctuation are welcome;
 equivalent real text retains them even when the atlas uses base-letter glyphs.
+The optional `link` accepts an absolute HTTPS URL without credentials and a
+plain-text label (up to64characters). Never insert HTML. It becomes clickable
+only when typing finishes; no iframe, autoplay, timed popup or automatic network
+request is created. Focus/hover holds that line until the user leaves the link.
+Links open a new tab with `noopener noreferrer`; invalid URLs are omitted.
+The catalogue has36lines, with friendly teasing, two references to the supplied
+Geddan/Haruhi video and four classic YouTube references. No unverified elapsed-year
+claim is included. Every text is tested through the actual atlas mapping; the
+semantic Spanish text remains unmodified.
+
 Choose `warm`, `playful`, `sleepy`, `curious`, `serious`, or `calm`.
 Unknown mood names fall back to `calm`; empty/invalid entries are skipped, and an
 empty collection uses a safe greeting. Short messages work best for this corner.
@@ -138,7 +156,8 @@ recordings, generated media, services, dependencies or browser storage.
 - HOME speech is independent of the song's Play/Pause state: after the first
   trusted primary entry, it can be heard while the music is paused. Mute and
   zero volume still silence it immediately; the existing player's volume controls
-  both layers. No extra character button or automatic song playback is added.
+  both layers. The portrait interaction does not override silent entry, mute,
+  volume or native consent, and never starts the song automatically.
   Choosing silent entry destroys character sound for that visit, including a
   pending native resume, without changing the music/player's state.
 - Spaces/punctuation are silent. At most one 45–53ms blip per two printable
@@ -206,3 +225,59 @@ volume with the song paused, silence before activation, and live mute/zero-volum
 gates. Use `--audio-only` for that focused integration probe.
 `node tests/home-sidebar.browser.cjs` checks every fortune across five desktop
 sizes, plus short-window fallback and original panel controls.
+
+## Verified classic YouTube references
+
+- [Keyboard Cat / Charlie Schmidt](https://www.youtube.com/watch?v=J---aiyznGQ):
+  the [creator website](https://www.charlieschmidt.com/) confirms filming in1984.
+- [Chocolate Rain / Tay Zonday](https://www.youtube.com/watch?v=EwTZ2xpQwpA).
+- [Charlie the Unicorn / FilmCow](https://www.youtube.com/watch?v=CsGYh8AacgY):
+  the [creator's original Newgrounds post](https://www.newgrounds.com/portal/view/280260)
+  predates the official YouTube upload; the dialogue does not mix their dates.
+- [Rick Astley's official video](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
+
+References were checked against creator pages/YouTube metadata, not actual
+playback or regional availability. They are opt-in links, never embedded media.
+
+## Complete catalogue rendering check
+
+Run `node tests/home-companion-catalogue.browser.cjs` after editing messages.
+It renders every configured line using the actual atlas at1768,1440and1024px
+in both HTTP and real file mode, checking semantic text, literal versus opening
+question marks, glyph rotations, bounds, assigned expression and opt-in links.
+No manual screenshot sample is treated as a replacement for the whole catalogue.
+
+## HOME object reactions
+
+`home-companion-reactions.js` is a separate editable topic-to-message-array
+catalogue. These14lines do not dilute the36automatic/portrait-click messages.
+HOME loads it before `home-companion.js`; other director consumers need not load it.
+
+Seven explicit controls use `data-hc-reaction`: the avatar, clock, first Kirby,
+MADE W/ NOTEPAD badge, decorative visitor count, fortune button and guestbook
+construction badge. Newly interactive objects are native keyboard-accessible
+buttons; original styles, image sizes, IDs and scrolling panes are retained.
+There are no hover tooltips or new action bars. Without script they stay disabled.
+
+- Object activation requests its topic immediately, replacing current typing,
+  with the assigned face and existing paced glyph/voice effects.
+- Global400ms and per-topic6s cooldowns discard rapid repeats; there is no queue.
+  Repeated topics alternate variants when more than one is available.
+- A focused/hovered message link is never replaced. Entry, visibility, native
+  consent, explicit silence, master mute and volume remain authoritative.
+- Fortune still runs its original500ms draw. Shurelia comments on the action,
+  never reads an old result or claims a prediction before the actual draw ends.
+- Visitor-count replies explicitly say it is decorative. Guestbook replies say
+  it remains under construction; no fake working book or analytics is implied.
+- Navigation links are not intercepted or delayed to force a reaction. Playback
+  controls keep their existing meaning and do not launch dialogue on every input.
+- After a contextual line, normal automatic comments resume. The last normal
+  message index remains separate from `snapshot().context`.
+
+`createDirector({ reactions, now, ... })` accepts optional injectable reaction
+data/clock. `react(topic)` returns whether a line was accepted. Existing callers
+without reactions retain their normal behaviour; TECH's separately owned visitor
+never installs HOME's delegated bindings.
+
+Checks: `node tests/home-reactions.browser.cjs`,
+`node tests/home-sidebar.browser.cjs`, and focused companion/atlas unit tests.

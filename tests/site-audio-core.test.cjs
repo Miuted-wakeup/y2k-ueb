@@ -56,3 +56,12 @@ test('protocol envelopes need own capability fields and a known kind', () => {
     assert.equal(c.validEnvelope(bad, token, 1), false);
   }
 });
+
+test('file messaging uses opaque null even when Chromium URL.origin reports file://', () => {
+  const NativeURL=global.URL;
+  global.URL=class extends NativeURL { get origin(){return this.protocol==='file:'?'file://':super.origin;} };
+  try {
+    assert.equal(core().messageOrigin('file:///C:/web/tech.html'),'null');
+    assert.equal(core().messageOrigin('https://example.test/blog/tech.html'),'https://example.test');
+  } finally { global.URL=NativeURL; }
+});

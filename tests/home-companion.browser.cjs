@@ -6,6 +6,7 @@ const os = require('node:os');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
+const { contextSelector } = require('./site-audio-browser-utils.cjs');
 const { EMOTIONS, NEUTRAL_FRAME } = require('../home-companion.js');
 const audioOnly = process.argv.includes('--audio-only');
 const root = path.resolve(__dirname, '..');
@@ -40,23 +41,24 @@ const server = http.createServer((req, res) => {
     ws = new WebSocket(target.webSocketDebuggerUrl);
     await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
     let serial=0; const pending=new Map(), errors=[];
+    let selector;
     ws.onmessage = event => {
-      const message=JSON.parse(event.data);
+      const message=JSON.parse(event.data);selector?.event(message);
       if (message.method==='Runtime.exceptionThrown') errors.push(message.params.exceptionDetails.text);
       const request=pending.get(message.id);
       if (request) { pending.delete(message.id); message.error?request.reject(message.error):request.resolve(message.result); }
     };
     const cdp = (method,params={})=>new Promise((resolve,reject)=>{pending.set(++serial,{resolve,reject});ws.send(JSON.stringify({id:serial,method,params}));});
-    const evaluate = async expression => {
-      const result=await cdp('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
-      assert.ok(!result.exceptionDetails,JSON.stringify(result.exceptionDetails));return result.result.value;
-    };
+    selector=contextSelector(cdp);
+    const host=expression=>selector.run(expression,true);
+    const evaluate=expression=>selector.run(expression.replaceAll("document.querySelector('#audio-player')", "window.SiteAudioClient.getPlayer()"));
     const waitFor = async (expression,label) => {
       for(let i=0;i<200;i++){if(await evaluate(expression))return;await pause(80);}assert.fail(label);
     };
     const navigate = async (url, entryMode = 'silent') => {
       await cdp('Page.navigate',{url});
-      await waitFor("document.readyState==='complete' && location.href===" + JSON.stringify(url),'Load the local page');
+      await selector.wait("document.readyState==='complete' && location.href===" + JSON.stringify(url),true,'Load the local page');
+      await selector.enter(entryMode);
       if (await evaluate("!!document.querySelector('#home-entry')")) {
         if (entryMode === 'sound') await click('#home-entry-start');
         else await evaluate("document.querySelector('#home-entry-silent').click()");
@@ -75,7 +77,7 @@ const server = http.createServer((req, res) => {
         layers:['.hc-room','.hc-character','.hc-counter','.hc-dialogue'].map(s=>Number(getComputedStyle(r.querySelector(s)).zIndex)),
         position:getComputedStyle(r).position,scale:Number(getComputedStyle(document.documentElement).zoom),
         snapshot:r.homeCompanion.snapshot(),frame:r.querySelector('.hc-face').dataset.frame,
-        controls:r.querySelectorAll('button,input,a,[tabindex]').length,scroll:side.scrollTop,maxScroll:side.scrollHeight-side.clientHeight,
+        controls:r.querySelectorAll('button,input,[role=button]').length,scroll:side.scrollTop,maxScroll:side.scrollHeight-side.clientHeight,
         center:box(document.querySelector('#center-feed')),left:box(document.querySelector('#sidebar-left')),
         centerScroll:document.querySelector('#center-feed').scrollTop,leftScroll:document.querySelector('#sidebar-left').scrollTop,
         glyphs:r.querySelectorAll('.hc-glyph,.hc-fallback-char').length,
@@ -83,7 +85,7 @@ const server = http.createServer((req, res) => {
     })()`);
     const near=(a,b,label)=>assert.ok(Math.abs(a-b)<2,label+': '+a+' vs '+b);
     const geometry=s=>{
-      assert.equal(s.position,'fixed');assert.equal(s.controls,0);
+      assert.equal(s.position,'fixed');assert.equal(s.controls,1,'Portrait itself is the only permanent control');
       if(!s.snapshot.bubbleVisible) {
         assert.equal(Number(s.frame),NEUTRAL_FRAME,'Idle/hidden bubble always restores neutral');
         assert.equal(s.snapshot.expression,'neutral');
@@ -145,7 +147,9 @@ const server = http.createServer((req, res) => {
       assert.equal(await evaluate(`Promise.all(['shurelia-room-books.png','shurelia-room-counter.png'].map(file=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image.naturalWidth>0);image.onerror=()=>resolve(false);image.src='assets/images/home/'+file;}))).then(results=>results.every(Boolean))`),true,'Both lossless source scene crops load');
       const idle=await state();
       assert.equal(Number(idle.frame),NEUTRAL_FRAME,'Before the first greeting she must be neutral, not smiling');
-      assert.equal(await evaluate('window.__speechContexts.length'),width===1768?1:0,'Only the trusted primary entry creates a sound context');
+      assert.equal(await host('window.__speechContexts.length'),1,'The host probes exactly one actual context; no child context');
+      assert.equal(await evaluate('window.__speechContexts.length'),0,'Child voices never allocate a context');
+      if(width!==1768)assert.equal(await host('window.__speechContexts[0].context.state'),'suspended','Silent entry never starts audio');
       if(width===1768){
         const a=idle.actor;
         const shot=await cdp('Page.captureScreenshot',{format:'png',clip:{x:a.x,y:a.y,width:a.width,height:a.height,scale:1}});
@@ -159,7 +163,7 @@ const server = http.createServer((req, res) => {
         const poses=new Set();let peak=0;const revealed=[];
         for(let i=0;i<30;i++){
           const s=await state();poses.add(s.frame);revealed.push(s.snapshot.revealed);
-          peak=Math.max(peak,await evaluate('(() => {const p=window.__speechContexts[0];if(!p)return 0;const a=new Float32Array(p.analyser.fftSize);p.analyser.getFloatTimeDomainData(a);return Math.max(...a.map(Math.abs));})()'));
+          peak=Math.max(peak,await host('(() => {const p=window.__speechContexts[0];if(!p)return 0;const a=new Float32Array(p.analyser.fftSize);p.analyser.getFloatTimeDomainData(a);return Math.max(...a.map(Math.abs));})()'));
           await pause(30);
         }
         assert.ok(poses.size>=2,'Original talking faces alternate');
@@ -204,14 +208,17 @@ const server = http.createServer((req, res) => {
         assert.equal(await evaluate("document.querySelector('#audio-player').paused"),true);
         assert.equal(await evaluate("document.querySelector('#home-companion').homeCompanion.sound.playGlyph({character:'A',index:200,mood:'warm'})"),true,'HOME speech can be heard even when the song is paused');
         await evaluate("document.querySelector('#home-companion').homeCompanion.sound.stop();document.querySelector('#audio-player').muted=true");
+        await waitFor("window.SiteAudioClient.getPlayer().muted",'Mute native ACK');
         assert.equal(await evaluate("document.querySelector('#home-companion').homeCompanion.sound.playGlyph({character:'A',index:202,mood:'warm'})"),false,'Mute always silences speech, including paused music');
         await evaluate("document.querySelector('#audio-player').muted=false");
         await click('#np-play');await waitFor("!document.querySelector('#audio-player').paused",'Native music resumes');
         await evaluate("const a=document.querySelector('#audio-player');a.volume=0");
+        await waitFor("window.SiteAudioClient.getPlayer().volume===0",'Zero volume native ACK');
         assert.equal(await evaluate("document.querySelector('#home-companion').homeCompanion.sound.playGlyph({character:'A',index:202,mood:'warm'})"),false,'Zero player volume silences speech');
         await evaluate("document.querySelector('#audio-player').volume=.5");
+        await waitFor("window.SiteAudioClient.getPlayer().volume===.5",'Volume restoration native ACK');
         await click('#np-play');await waitFor("document.querySelector('#audio-player').paused",'Music pause still works independently');
-        assert.equal(await evaluate('window.__speechContexts.length'),1,'Repeated interactions reuse one speech context');
+        assert.equal(await host('window.__speechContexts.length'),1,'Repeated interactions reuse one speech context');
       }
       console.log('PASS anchored HOME '+width+'x'+height);
       if(audioOnly){console.log('PASS audio-only native policy/level checks. Evidence: '+output);return;}
@@ -257,7 +264,7 @@ const server = http.createServer((req, res) => {
     await navigate(origin+'/index.html?no-js');
     assert.equal(await evaluate("getComputedStyle(document.body).opacity"),'1','No-JS HOME stays visible without an entry lock');
     assert.equal(await evaluate("document.querySelector('.hc-dialogue').hidden"),true);
-    assert.equal(await evaluate("document.querySelector('#home-companion').querySelectorAll('button').length"),0);
+    assert.equal(await evaluate("document.querySelector('#home-companion button').disabled"),true,'No-JS portrait remains a noninteractive fallback');
     assert.equal(await evaluate("getComputedStyle(document.querySelector('.hc-face')).backgroundPosition"),'0px 0px','No-JS default is also neutral');
     await cdp('Emulation.setScriptExecutionDisabled',{value:false});
     assert.deepEqual(errors,[],'No uncaught browser errors');

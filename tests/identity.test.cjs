@@ -40,7 +40,7 @@ test('placeholder social labels use the confirmed name, not invented accounts', 
   const badges = [...canto.matchAll(/class="cy-social-badge[^\"]*">([^<]+)</g)].map(match => match[1]);
   assert.deepEqual(badges, ['Muted', 'Muted', 'Spotify', 'Muted']);
   assert.match(read('tech.html'), /Muted · MSN/);
-  assert.match(read('scripts.js'), /muted@frutiger-rig/);
+  assert.match(read('tech-terminal.js'), /muted@navi/);
 });
 
 test('unrelated words containing the former letter sequence stay intact', () => {

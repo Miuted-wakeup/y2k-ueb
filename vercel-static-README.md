@@ -50,8 +50,11 @@ does not convert the site into an SPA or add a catch-all rewrite.
 
 ## Vercel configuration — no deployment performed
 
-For a future deployment, select the repository's `principal` directory as the
-project root, Framework Preset **Other**, build command
+For the current Git repository, leave Vercel **Root Directory** at the repository
+root (`.`): that is the local `principal` folder containing `index.html` and
+`vercel.json`, not a nested `principal/` path. Only choose `principal` as a
+subdirectory if importing a different outer repository that actually contains it.
+Use Framework Preset **Other**, build command
 `node tools/build-static.cjs`, and output directory `dist`. The local `vercel.json`
 sets these static settings and `cleanUrls:false`; existing links retain `.html`.
 No external destinations or SPA rewrites are configured. Vercel documents the

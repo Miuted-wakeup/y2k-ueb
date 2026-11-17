@@ -17,6 +17,8 @@
   const error = (name, message) => Object.assign(new Error(message), { name });
   const plain = value => !!value && typeof value === 'object' && !Array.isArray(value);
   const bounded = value => { try { return JSON.stringify(value).length <= 4096; } catch (_) { return false; } };
+  const ENTRY_INTRO = { file: 'assets/gifs/entry/portal-intro.gif', cycleMs: 3010, holdMs: 500, loadTimeoutMs: 8000 };
+  const REVEAL_MS = 600;
 
   function createController(options) {
     const win = options.window, Core = options.Core || defaultCore, engine = options.engine;
@@ -31,7 +33,7 @@
     });
     let token = makeToken(), epoch = 1, frame = null, connected = false, pageReady = false;
     let entered = false, phase = 'checking', started = false, destroyed = false, frozen = false;
-    let attempt = 0, timer = null, highestId = 0;
+    let attempt = 0, timer = null, highestId = 0, introCleanup = null;
     const receipts = new Map(), cleanups = [];
     const allowed = () => {
       const state = engine.snapshot();
@@ -39,9 +41,18 @@
     };
     const state = () => ({ ...engine.snapshot(), entered: entered && allowed(), publicURL: route.href, section: route.section });
     const snapshot = () => ({ route: { ...route }, token, epoch, entered: entered && allowed(), phase, connected, pageReady });
-    const notify = () => { if (!destroyed && !frozen && !win.document?.hidden) onPhase(snapshot()); };
-    const cancel = () => { if (timer !== null) clearTimer(timer); timer = null; };
-    const origin = () => new URL(route.fileHref).origin;
+    const notify = () => {
+      if (!destroyed && !frozen && !win.document?.hidden) {
+        engine.setAmbience?.(route.section, entered && allowed());
+        onPhase(snapshot());
+      }
+    };
+    const cancel = () => {
+      if (timer !== null) clearTimer(timer); timer = null;
+      const cleanup = introCleanup; introCleanup = null;
+      try { cleanup?.(); } catch (_) { /* Cosmetic cleanup cannot retain the gate. */ }
+    };
+    const origin = () => Core.messageOrigin(route.fileHref);
     function post(kind, extra = {}, tuple = { token, epoch }) {
       if (destroyed || !frame?.contentWindow) return;
       try { frame.contentWindow.postMessage({ channel: Core.PROTOCOL, kind, ...tuple, ...extra }, origin() === 'null' ? '*' : origin()); }
@@ -56,13 +67,26 @@
       if (destroyed || turn !== attempt) return;
       cancel(); attempt++; entered = false; phase = 'failed'; notify(); publish();
     }
-    function reveal() {
+    function finishReveal() {
       cancel(); attempt++; phase = 'revealing'; entered = false; notify(); publish();
       timer = setTimer(() => {
         timer = null;
         if (destroyed || phase !== 'revealing') return;
         entered = allowed(); phase = entered ? 'complete' : 'waiting'; notify(); publish();
-      }, 600);
+      }, REVEAL_MS);
+    }
+    function reveal(withIntro = true) {
+      if (!withIntro || typeof options.beforeReveal !== 'function') { finishReveal(); return; }
+      cancel(); const turn = ++attempt;
+      phase = 'intro'; entered = false; notify(); publish();
+      try {
+        const cleanup = options.beforeReveal(() => {
+          if (destroyed || turn !== attempt || phase !== 'intro') return;
+          if (allowed()) finishReveal(); else failed(turn);
+        });
+        if (turn === attempt && phase === 'intro') introCleanup = typeof cleanup === 'function' ? cleanup : null;
+        else if (typeof cleanup === 'function') cleanup();
+      } catch (_) { if (!destroyed && turn === attempt) finishReveal(); }
     }
     function checkPermission() {
       if (destroyed || frozen || win.document?.hidden) return;
@@ -125,7 +149,7 @@
       if (data.kind === 'navigate') return typeof data.href === 'string' && data.href.length <= 4096 && navigate(data.href);
       if (data.kind === 'request-activation') {
         if (allowed() && engine.snapshot().permission === 'active') { publish(); return true; }
-        if (!['unlocking', 'revealing'].includes(phase)) { cancel(); attempt++; entered = false; phase = 'waiting'; notify(); publish(); }
+        if (!['unlocking', 'intro', 'revealing'].includes(phase)) { cancel(); attempt++; entered = false; phase = 'waiting'; notify(); publish(); }
         return true;
       }
       if (data.kind !== 'command' || !/^c[1-9]\d{0,12}$/.test(data.id) || !plain(data.command) || !bounded(data.command)) return false;
@@ -183,7 +207,12 @@
         timer = setTimer(() => failed(turn), 2500);
         Promise.resolve(result).then(ok => { if (!destroyed && turn === attempt) ok && allowed() ? reveal() : failed(turn); }, () => failed(turn));
       },
-      silence() { if (!destroyed && !['complete', 'revealing'].includes(phase)) { engine.continueSilent(); reveal(); } },
+      silence() {
+        if (!destroyed && !['complete', 'revealing'].includes(phase)) {
+          const skipIntro = phase === 'intro';
+          engine.continueSilent(); reveal(!skipIntro);
+        }
+      },
       destroy() {
         if (destroyed) return;
         destroyed = true; cancel(); attempt++; unsubscribe(); cleanups.forEach(fn => fn());
@@ -195,34 +224,100 @@
 
   function mountBrowserHost(win, shell) {
     const doc = win.document, Core = defaultCore;
-    let controller, dialog = null, previousFocus = null;
+    let controller, dialog = null, previousFocus = null, revealCover = null, introSerial = 0;
     const setText = (id, text) => { const node = doc.getElementById(id); if (node) node.textContent = text; };
-    function closeGate() {
-      if (!dialog) return;
-      const old = dialog; dialog = null;
-      try { if (old.open) old.close(); } catch (_) {}
-      old.remove();
-      if (previousFocus?.isConnected) previousFocus.focus?.({ preventScroll: true });
-      controller?.getFrame()?.focus?.({ preventScroll: true });
+    function closeGate(restoreFocus = true) {
+      if (dialog) {
+        const old = dialog; dialog = null;
+        try { if (old.open) old.close(); } catch (_) {}
+        old.remove();
+      }
+      if (restoreFocus) {
+        if (previousFocus?.isConnected) previousFocus.focus?.({ preventScroll: true });
+        controller?.getFrame()?.focus?.({ preventScroll: true });
+      }
+    }
+    function clearReveal() {
+      revealCover?.remove(); revealCover = null;
+      controller?.getFrame()?.removeAttribute('tabindex');
+    }
+    function openCurtains() {
+      if (!revealCover) {
+        revealCover = doc.createElement('div'); revealCover.id = 'site-audio-reveal';
+        revealCover.setAttribute('aria-hidden', 'true');
+        revealCover.style.setProperty('--sa-reveal-ms', REVEAL_MS + 'ms');
+        revealCover.innerHTML = '<div class="sa-curtain-top"></div><div class="sa-curtain-bottom"></div>';
+        doc.documentElement.appendChild(revealCover);
+      }
+      // Release native modality BEFORE the zoomed section gets its first layout.
+      // The non-modal cover blocks pointer input; entered stays false until the split ends.
+      closeGate(false);
+      const frame = controller?.getFrame();
+      if (frame) { frame.setAttribute('tabindex', '-1'); frame.style.display = 'block'; }
+    }
+    function playEntryIntro(done) {
+      const slot = dialog?.querySelector('#site-audio-intro');
+      if (!slot) { done(); return; }
+      let stopped = false, timer = null, paint = null;
+      const img = doc.createElement('img');
+      img.alt = ''; img.width = 600; img.height = 450; img.draggable = false;
+      const clearTimer = () => { if (timer !== null) win.clearTimeout(timer); timer = null; };
+      const hold = () => {
+        if (stopped) return;
+        clearTimer(); img.onload = img.onerror = null; img.remove(); slot.replaceChildren();
+        if (dialog) dialog.dataset.intro = 'hold';
+        timer = win.setTimeout(() => { timer = null; if (!stopped) done(); }, ENTRY_INTRO.holdMs);
+      };
+      img.onload = () => {
+        if (stopped) return;
+        clearTimer(); slot.replaceChildren(img);
+        if (dialog) dialog.dataset.intro = 'playing';
+        paint = win.requestAnimationFrame(() => {
+          paint = null;
+          if (!stopped) timer = win.setTimeout(hold, ENTRY_INTRO.cycleMs);
+        });
+      };
+      img.onerror = hold;
+      const url = new URL(ENTRY_INTRO.file, Core.publicURL(win.location.href));
+      // A new image URL starts a fresh native GIF timeline, including file:// development.
+      url.searchParams.set('entrance', Date.now() + '-' + (++introSerial));
+      timer = win.setTimeout(hold, ENTRY_INTRO.loadTimeoutMs);
+      img.src = url.href;
+      return () => {
+        stopped = true; clearTimer();
+        if (paint !== null) win.cancelAnimationFrame(paint);
+        img.onload = img.onerror = null; img.removeAttribute('src'); img.remove(); slot.replaceChildren();
+        if (dialog) delete dialog.dataset.intro;
+      };
     }
     function phaseUI(state) {
+      const sectionFrame = controller?.getFrame();
       const entry = Core.SECTIONS.find(item => item.section === state.route.section);
       doc.title = entry.label + ' · mi espacio';
-      if (state.phase === 'complete') { closeGate(); return; }
+      if (state.phase === 'revealing') { openCurtains(); return; }
+      clearReveal();
+      if (state.phase === 'complete') {
+        closeGate(false);
+        if (sectionFrame) sectionFrame.style.display = 'block';
+        closeGate(); return;
+      }
+      if (sectionFrame) sectionFrame.style.display = 'none';
       if (state.phase === 'checking' && !dialog) return;
       if (!dialog) {
         previousFocus = doc.activeElement;
         dialog = doc.createElement('dialog'); dialog.id = 'site-audio-entry';
         dialog.setAttribute('aria-labelledby', 'site-audio-title'); dialog.setAttribute('aria-describedby', 'site-audio-description');
-        Object.assign(dialog.style, { color: '#fff2e9', background: '#171018', padding: '0', border: '2px solid #aaa',
-          maxWidth: 'calc(100vw - 32px)', maxHeight: 'calc(100vh - 32px)', overflow: 'auto' });
-        dialog.innerHTML = `<div class="sa-titlebar"><span>★ MUTED'S DIGITAL SANCTUARY</span><span aria-hidden="true">─ □ ×</span></div>
-          <div class="sa-content"><p class="sa-kicker">PERSONAL WEB / Y2K MODE</p><h1 id="site-audio-title">★ mi espacio ★</h1>
-          <p id="site-audio-description"></p><div class="sa-route" id="site-audio-destination"></div>
-          <div class="sa-welcome-art" aria-hidden="true"><span class="sa-body"></span><span class="sa-face"></span><span class="sa-counter"></span></div>
-          <button id="site-audio-activate" type="button">ENTRAR · activar audio ▶</button>
-          <button id="site-audio-silent" type="button">Entrar sin efectos</button><p id="site-audio-status" role="status" aria-live="polite"></p></div>
-          <footer class="sa-footer">HTML HECHO A MANO · NO ALGORITHMS</footer>`;
+        Object.assign(dialog.style, { color: '#ded3e6', backgroundColor: '#150e14', padding: '0', border: '0',
+          maxWidth: 'none', maxHeight: 'none', overflow: 'hidden' });
+        dialog.innerHTML = `<h1 id="site-audio-title" class="sa-screen-reader">mi espacio</h1>
+          <p id="site-audio-description" class="sa-screen-reader"></p>
+          <span id="site-audio-destination" class="sa-screen-reader"></span>
+          <div id="site-audio-intro" class="sa-intro-stage" aria-hidden="true"></div>
+          <div class="sa-entry-controls">
+            <button id="site-audio-activate" type="button" aria-label="Entrar y activar el audio"><span id="site-audio-activate-label">ENTRAR</span></button>
+            <button id="site-audio-silent" type="button">sin sonido</button>
+            <p id="site-audio-status" role="status" aria-live="polite"></p>
+          </div>`;
         dialog.querySelector('#site-audio-activate').addEventListener('click', event => controller.activate(event));
         dialog.querySelector('#site-audio-silent').addEventListener('click', () => controller.silence());
         dialog.addEventListener('cancel', event => { event.preventDefault(); controller.silence(); });
@@ -231,34 +326,33 @@
         dialog.querySelector('#site-audio-activate').focus({ preventScroll: true });
       }
       dialog.dataset.phase = state.phase; dialog.dataset.section = state.route.section;
-      dialog.style.setProperty('--sa-accent', entry.accent);
-      setText('site-audio-destination', 'DESTINO · ' + entry.label);
-      setText('site-audio-description', state.route.section === 'home'
-        ? 'Entra, ponte cómodo y deja que Shurelia te dé la bienvenida. La música solo continuará si ya la habías puesto.'
-        : 'El navegador necesita tu clic para habilitar el audio. Después seguirás en ' + entry.label + ', sin pasar por HOME.');
-      setText('site-audio-status', state.phase === 'unlocking' ? 'Activando audio… También puedes entrar sin efectos.'
-        : state.phase === 'revealing' ? 'Bienvenido a mi espacio.' : state.phase === 'failed'
-          ? 'No se pudo activar todavía. Reintenta o continúa sin efectos.' : 'Tú eliges cómo entrar.');
+      // The requested destination stays accessible without adding visible instructions.
+      setText('site-audio-destination', entry.label);
+      setText('site-audio-description', 'Entrar en ' + entry.label + ' y activar el audio. También puedes entrar sin sonido.');
+      setText('site-audio-status', state.phase === 'failed' ? 'No se pudo activar el audio. Reintenta o entra sin sonido.' : '');
       const primary = dialog.querySelector('#site-audio-activate'), silent = dialog.querySelector('#site-audio-silent');
-      primary.disabled = ['checking', 'unlocking', 'revealing'].includes(state.phase);
-      silent.disabled = state.phase === 'revealing';
-      if (state.phase === 'failed') primary.textContent = 'REINTENTAR AUDIO';
+      dialog.setAttribute('aria-busy', String(['unlocking', 'intro'].includes(state.phase)));
+      primary.disabled = ['checking', 'unlocking', 'intro', 'revealing'].includes(state.phase);
+      silent.disabled = ['intro', 'revealing'].includes(state.phase);
+      setText('site-audio-activate-label', state.phase === 'failed' ? 'REINTENTAR' : state.phase === 'unlocking' ? '…' : 'ENTRAR');
+      primary.setAttribute('aria-label', state.phase === 'failed' ? 'Reintentar la activación del audio' : 'Entrar y activar el audio');
     }
     try {
       const engine = win.SiteAudioEngine.createEngine({ window: win, SpeechAPI: win.HomeCompanionSpeech,
-        playlist: Core.PLAYLIST, baseURL: Core.publicURL(win.location.href) });
+        playlist: Core.PLAYLIST, ambience: Core.AMBIENCE, baseURL: Core.publicURL(win.location.href) });
       const root = doc.documentElement;
       root.classList.add('site-audio-host'); doc.body.className = 'site-audio-host-body'; doc.body.id = '';
       doc.body.replaceChildren();
-      controller = createController({ window: win, Core, engine,
+      controller = createController({ window: win, Core, engine, beforeReveal: playEntryIntro,
         createFrame(route, token, epoch, src) {
           const frame = doc.createElement('iframe'); frame.className = 'site-audio-frame'; frame.id = 'site-audio-frame';
+          frame.style.display = 'none';
           frame.title = 'Sección ' + Core.SECTIONS.find(item => item.section === route.section).label;
           frame.referrerPolicy = 'no-referrer'; frame.setAttribute('allow', 'autoplay');
           frame.src = src; doc.body.appendChild(frame); return frame;
         }, onPhase: phaseUI,
         onError(reason) {
-          closeGate(); const box = doc.createElement('p'); box.className = 'site-audio-error';
+          clearReveal(); closeGate(); const box = doc.createElement('p'); box.className = 'site-audio-error';
           box.textContent = 'No se pudo abrir la sección. Recarga la página para reintentar. ' + (reason?.message || ''); doc.body.appendChild(box);
         },
         onUnexpectedLeave() { /* Never stream new state to an unauthenticated destination. */ }
@@ -266,7 +360,7 @@
       shell.engine = engine; shell.controller = controller; shell.snapshot = () => controller.snapshot();
       shell.navigate = href => controller.navigate(href); controller.start();
     } catch (reason) {
-      closeGate(); shell.isHost = false;
+      clearReveal(); closeGate(); shell.isHost = false;
       doc.body.style.setProperty('opacity', '1', 'important');
       doc.querySelectorAll('.panel,#site-header,#site-nav,#main-wrapper').forEach(node => node.style.setProperty('opacity', '1', 'important'));
       const note = doc.createElement('p'); note.textContent = 'Audio compartido no disponible. Recarga para reintentar.'; note.setAttribute('role', 'alert'); doc.body.prepend(note);

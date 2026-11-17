@@ -41,6 +41,11 @@ body.has-home-companion #sidebar-right {
   z-index: 2;
 }
 .hc-portrait { display: block; position: absolute; left: 50%; top: 0; width: 256px; height: 328px; transform: translateX(-50%) scale(var(--hc-portrait-scale)); transform-origin: top center; }
+/* The portrait itself is the control: no extra action bar or larger footprint. */
+button.hc-portrait { appearance: none; border: 0; margin: 0; padding: 0; background: transparent; color: inherit; pointer-events: auto; cursor: pointer; touch-action: manipulation; }
+button.hc-portrait:hover { filter: brightness(1.06); }
+button.hc-portrait:focus-visible { outline: 2px dashed #f3c9ac; outline-offset: 2px; }
+button.hc-portrait:disabled { pointer-events: none; cursor: default; }
 .hc-body, .hc-face { display: block; position: absolute; background: url('assets/images/home/shurelia-atlas.png') no-repeat; image-rendering: pixelated; }
 .hc-body { inset: 0; background-position: 0 -184px; }
 .hc-face { left: 82px; top: 76px; width: 64px; height: 56px; background-position: 0 0; }
@@ -60,6 +65,10 @@ body.has-home-companion #sidebar-right {
   box-shadow: inset 0 0 0 2px #603c3d, 3px 3px 0 #0009;
   z-index: 3;
 }
+.hc-message-link { display: block; width: fit-content; max-width: 100%; min-height: 28px; margin-top: 8px; padding: 5px 8px; border: 1px outset #c8aaa1; color: #fff1c7; background: #45282d; font: 11px/1.5 Verdana,sans-serif; overflow-wrap: anywhere; text-decoration: underline; pointer-events: auto; }
+.hc-message-link[hidden] { display: none !important; }
+.hc-message-link:hover { background: #654047; }
+.hc-message-link:focus-visible { outline: 2px dashed #ffe49c; outline-offset: 3px; }
 .hc-dialogue[hidden] { display: none !important; }
 .hc-dialogue::after { content: ''; position: absolute; right: -9px; top: 50%; margin-top: -6px; width: 12px; height: 12px; background: #1b161a; border-right: 2px solid #d3bcb2; border-top: 2px solid #d3bcb2; transform: rotate(45deg); }
 .hc-name { display: block; margin-bottom: 6px; color: #e3b9ae; font: bold 8px/1.4 Verdana, sans-serif; letter-spacing: 2px; }
@@ -114,3 +123,10 @@ body.has-home-companion #sidebar-right {
 @keyframes he-crt-reveal { 0% { clip-path: inset(0); opacity: 1; } 45% { clip-path: inset(10% 2%); opacity: 1; } 100% { clip-path: inset(50% 0); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { #home-entry[data-phase="revealing"] { animation: none; } }
 @media (max-height: 650px) { .he-heading { padding: 12px; } .he-stage { padding: 14px 20px; } .he-host { height: 232px; } .he-host-face { top: 40.48px; } }
+
+/* Existing IDs/classes keep their original appearance over these zero-specificity resets. */
+:where(button.hc-reactive-button) { appearance: none; border: 0; padding: 0; margin: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-align: inherit; cursor: pointer; }
+.hc-reactive-button:focus-visible { outline: 2px dashed #ffe49c; outline-offset: 3px; }
+#clock-time.hc-reactive-button { display: block; width: 100%; }
+.hc-mascot-button { display: inline-flex; align-items: center; vertical-align: middle; }
+.hc-reactive-button:disabled { cursor: default; }

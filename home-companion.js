@@ -1,4 +1,4 @@
-// HOME only. Local automatic dialogue; never controls the site's music playback.
+// HOME only. Local automatic and requested dialogue; never controls the site's music playback.
 (function (host) {
   'use strict';
   const NEUTRAL_FRAME = 0;
@@ -18,25 +18,53 @@
   };
   const MESSAGES = typeof module !== 'undefined' && module.exports
     ? require('./home-companion-messages.js') : host.HOME_COMPANION_MESSAGES;
+  const REACTIONS = typeof module !== 'undefined' && module.exports
+    ? require('./home-companion-reactions.js') : host.HOME_COMPANION_REACTIONS;
   const fallback = { text: 'Hola, viajero. Puedes quedarte un rato.', mood: 'warm' };
-  function validMessages(input) {
+  function normalizeMessageLink(input) {
+    if (!input || typeof input.url !== 'string' || input.url.length > 2048) return null;
+    try {
+      const url = new URL(input.url);
+      if (url.protocol !== 'https:' || url.username || url.password) return null;
+      const label = typeof input.label === 'string' ? input.label.trim().slice(0, 64) : 'Ver el vídeo';
+      return { url: url.href, label: label || 'Ver el vídeo' };
+    } catch (_) { return null; }
+  }
+  function validMessages(input, useFallback = true) {
     const result = (Array.isArray(input) ? input : []).filter(m => m && typeof m.text === 'string' && m.text.trim())
-      .map(m => ({ text: m.text, mood: Object.hasOwn(EMOTIONS, m.mood) ? m.mood : 'calm' }));
-    return result.length ? result : [fallback];
+      .map(m => {
+        const message = { text: m.text, mood: Object.hasOwn(EMOTIONS, m.mood) ? m.mood : 'calm' };
+        const link = normalizeMessageLink(m.link);
+        if (link) message.link = link;
+        return message;
+      });
+    return result.length ? result : useFallback ? [fallback] : [];
   }
 
   function createDirector(options = {}) {
     const messages = validMessages(options.messages === undefined ? MESSAGES : options.messages);
-    const { random = Math.random, setTimer = setTimeout, clearTimer = clearTimeout,
+    const reactionData = options.reactions === undefined ? REACTIONS : options.reactions;
+    const reactions = Object.create(null), reactionHistory = new Map();
+    if (reactionData && typeof reactionData === 'object' && !Array.isArray(reactionData)) {
+      for (const [key, values] of Object.entries(reactionData)) {
+        if (/^[a-z][a-z0-9_-]{0,47}$/.test(key)) {
+          const entries = validMessages(values, false);
+          if (entries.length) reactions[key] = entries;
+        }
+      }
+    }
+    let lastReactionAt = -Infinity;
+    const { random = Math.random, now = Date.now, setTimer = setTimeout, clearTimer = clearTimeout,
       onMessage = () => 0, onProgress = () => {}, onFrame = () => {}, onState = () => {}, onGlyph = () => {} } = options;
     let reducedMotion = !!options.reducedMotion;
-    let visible = false, pageVisible = true, destroyed = false, ready = options.ready !== false;
-    let index = -1, revealed = 0, length = 0, phase = 'waiting', timer = null, characters = [];
+    let visible = false, pageVisible = true, destroyed = false, ready = options.ready !== false, readingHeld = false;
+    let index = -1, revealed = 0, length = 0, phase = 'waiting', timer = null, characters = [], currentMessage = null, context = null;
     const active = () => ready && visible && pageVisible && !destroyed;
     const snapshot = () => ({ index, revealed, length, phase, typing: phase === 'typing',
-      bubbleVisible: active() && phase !== 'waiting', reducedMotion, ready, visible: active(),
-      expression: active() && phase !== 'waiting' ? messages[index].mood : 'neutral',
-      mood: index < 0 ? 'warm' : messages[index].mood, message: index < 0 ? null : { ...messages[index] } });
+      bubbleVisible: active() && phase !== 'waiting', reducedMotion, ready, readingHeld, visible: active(),
+      context: phase === 'waiting' ? null : context,
+      expression: active() && phase !== 'waiting' ? currentMessage.mood : 'neutral',
+      mood: currentMessage?.mood || 'warm', message: currentMessage ? { ...currentMessage, ...(currentMessage.link ? { link: { ...currentMessage.link } } : {}) } : null });
     const state = () => onState(snapshot());
     const cancel = () => { if (timer !== null) clearTimer(timer); timer = null; };
     const face = (talking = false) => {
@@ -47,19 +75,20 @@
       const emotion = EMOTIONS[current.expression];
       onFrame(talking && !reducedMotion ? emotion.talk[Math.floor(revealed / 4) % 2] : emotion.rest);
     };
+    function nextIndex() {
+      const step = 1 + Math.floor(Math.max(0, Math.min(.99999, random())) * (messages.length - 1));
+      return index < 0 ? 0 : (index + step) % messages.length;
+    }
     function wait() {
       cancel(); phase = 'waiting'; face(); state();
       if (!active()) return;
-      const delay = index < 0 ? 2000 : 48000 + Math.floor(random() * 34000);
-      timer = setTimer(() => {
-        const step = 1 + Math.floor(Math.max(0, Math.min(.99999, random())) * (messages.length - 1));
-        speak(index < 0 ? 0 : (index + step) % messages.length);
-      }, delay);
+      const delay = currentMessage === null ? 2000 : 48000 + Math.floor(random() * 34000);
+      timer = setTimer(() => speak(nextIndex()), delay);
     }
     function read() {
       cancel(); phase = 'reading'; revealed = length;
       onProgress(revealed); face(); state();
-      if (active()) timer = setTimer(wait, Math.max(4200, Math.min(12000, messages[index].text.length * 65)));
+      if (active() && !readingHeld) timer = setTimer(wait, Math.max(4200, Math.min(12000, currentMessage.text.length * 65)));
     }
     function tick() {
       if (!active() || phase !== 'typing') return;
@@ -70,14 +99,18 @@
       timer = setTimer(() => {
         const character = characters[revealed] || '';
         revealed++; onProgress(revealed); face(/[A-Z0-9]/i.test(character));
-        onGlyph({ character, index: revealed - 1, mood: messages[index].mood }); state();
+        onGlyph({ character, index: revealed - 1, mood: currentMessage.mood }); state();
         if (revealed >= length) read(); else tick();
       }, delay);
     }
-    function speak(nextIndex) {
-      cancel(); index = nextIndex; revealed = 0; phase = 'typing';
-      characters = Array.from(displayText(messages[index].text).replace(/\s/g, ''));
-      length = onMessage(messages[index]); onProgress(0);
+    function speak(selectedIndex, manual = false) {
+      index = selectedIndex; context = null;
+      startMessage(messages[index], manual);
+    }
+    function startMessage(message, manual) {
+      cancel(); currentMessage = message; revealed = 0; phase = 'typing';
+      characters = Array.from(displayText(message.text).replace(/\s/g, ''));
+      length = onMessage(message, { manual }); onProgress(0);
       if (!length) read(); else { face(); state(); tick(); }
     }
     function reconcile() {
@@ -90,11 +123,34 @@
     }
     return {
       snapshot,
+      interact() {
+        if (!active()) return false;
+        if (phase === 'typing') read(); // First click finishes the line; no replayed glyph sound.
+        else speak(nextIndex(), true);
+        return true;
+      },
+      react(topic) {
+        if (!active() || readingHeld || typeof topic !== 'string' || !Object.hasOwn(reactions, topic)) return false;
+        const at = now(), previous = reactionHistory.get(topic);
+        if (!Number.isFinite(at) || at - lastReactionAt < 400 || previous && at - previous.at < 6000) return false;
+        const pool = reactions[topic];
+        const choice = previous && pool.length > 1
+          ? (previous.index + 1 + Math.floor(Math.max(0, Math.min(.99999, random())) * (pool.length - 1))) % pool.length
+          : Math.floor(Math.max(0, Math.min(.99999, random())) * pool.length);
+        lastReactionAt = at; reactionHistory.set(topic, { at, index: choice }); context = topic;
+        startMessage(pool[choice], true);
+        return true;
+      },
+      setReadingHeld(value) {
+        if (destroyed || readingHeld === !!value) return;
+        readingHeld = !!value;
+        if (phase === 'reading') reconcile();
+      },
       setReady(value) { if (ready !== !!value) { ready = !!value; reconcile(); } },
       setVisible(value) { if (visible !== !!value) { visible = !!value; reconcile(); } },
       setPageVisible(value) { if (pageVisible !== !!value) { pageVisible = !!value; reconcile(); } },
       setReducedMotion(value) { reducedMotion = !!value; reconcile(); },
-      destroy() { destroyed = true; cancel(); phase = 'waiting'; face(); state(); }
+      destroy() { destroyed = true; readingHeld = false; cancel(); phase = 'waiting'; face(); state(); }
     };
   }
 
@@ -242,6 +298,7 @@
     const sidebar = doc.getElementById('sidebar-right');
     const plain = root.querySelector('.hc-plain'), visual = root.querySelector('.hc-glyphs');
     const portrait = root.querySelector('.hc-face'), bubble = root.querySelector('.hc-dialogue');
+    const interactButton = root.querySelector('.hc-portrait'), messageLink = root.querySelector('.hc-message-link');
     const reduced = win.matchMedia('(prefers-reduced-motion: reduce)');
     const bridge = win.SiteAudioClient?.isFrame ? win.SiteAudioClient : null;
     const player = bridge ? bridge.getPlayer() : doc.getElementById('audio-player');
@@ -257,10 +314,19 @@
       cleanups.push(() => target?.removeEventListener(type, callback, options));
     };
     root.classList.add('hc-script-ready');
+    const reactionButtons = [...(doc.querySelectorAll?.('.hc-reactive-button') || [])];
     const paint = count => glyphs.forEach((glyph, i) => { glyph.style.visibility = i < count ? 'visible' : 'hidden'; });
     const director = createDirector({ reducedMotion: reduced.matches, ready: false,
       setTimer: win.setTimeout.bind(win), clearTimer: win.clearTimeout.bind(win),
-      onMessage(message) {
+      now: () => win.performance?.now() ?? Date.now(),
+      onMessage(message, { manual }) {
+        speech?.stop();
+        plain.setAttribute('aria-live', manual ? 'polite' : 'off');
+        if (messageLink) {
+          messageLink.hidden = !message.link;
+          if (message.link) { messageLink.href = message.link.url; messageLink.textContent = message.link.label + ' ▶'; }
+          else messageLink.removeAttribute('href');
+        }
         plain.textContent = message.text;
         glyphs = fontReady ? art.renderText(visual, message.text) : renderFallbackText(visual, displayText(message.text));
         return glyphs.length;
@@ -276,6 +342,15 @@
         root.dataset.expression = s.expression;
         root.dataset.visible = s.visible; root.dataset.phase = s.phase;
         bubble.hidden = !s.bubbleVisible;
+        if (interactButton) interactButton.disabled = !s.visible;
+        for (const button of reactionButtons) if (button.disabled !== !s.visible) button.disabled = !s.visible;
+        if (messageLink) {
+          const canFollow = s.bubbleVisible && s.phase === 'reading' && !!s.message?.link;
+          messageLink.style.visibility = canFollow ? 'visible' : 'hidden';
+          messageLink.tabIndex = canFollow ? 0 : -1;
+          messageLink.inert = !canFollow;
+          messageLink.setAttribute('aria-hidden', String(!canFollow));
+        }
         if (!s.bubbleVisible) speech?.stop();
       }
     });
@@ -286,6 +361,24 @@
       speech?.unlock(event).catch(() => {});
     };
     const stopSound = () => speech?.stop();
+    listen(interactButton, 'click', () => {
+      if (!director.snapshot().visible) return;
+      stopSound(); plain.setAttribute('aria-live', 'polite');
+      director.interact();
+    });
+    listen(doc, 'click', event => {
+      if (event.defaultPrevented || event.button !== undefined && event.button !== 0) return;
+      const control = event.target?.closest?.('[data-hc-reaction]');
+      if (control && doc.body?.contains(control)) director.react(control.dataset.hcReaction);
+      // Never preventDefault, stopPropagation, or delay an existing page action.
+    });
+    // A focused/hovered video link must not disappear while someone is using it.
+    let linkHovered = false, linkFocused = false;
+    const holdReading = () => director.setReadingHeld(linkHovered || linkFocused);
+    listen(messageLink, 'mouseenter', () => { linkHovered = true; holdReading(); });
+    listen(messageLink, 'mouseleave', () => { linkHovered = false; holdReading(); });
+    listen(messageLink, 'focus', () => { linkFocused = true; holdReading(); });
+    listen(messageLink, 'blur', () => { linkFocused = false; holdReading(); });
     listen(doc, 'pointerdown', unlock, { passive: true });
     listen(doc, 'keydown', unlock);
     listen(player, 'volumechange', stopSound);
@@ -377,7 +470,7 @@
     if (doc.hidden && !bridge) suspend();
     return director;
   }
-  const api = { NEUTRAL_FRAME, GLYPH_DELAY, EMOTIONS, MESSAGES, createDirector, createEntryController, mount, renderFallbackText };
+  const api = { NEUTRAL_FRAME, GLYPH_DELAY, EMOTIONS, MESSAGES, REACTIONS, normalizeMessageLink, createDirector, createEntryController, mount, renderFallbackText };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else {
     host.HomeCompanion = api;

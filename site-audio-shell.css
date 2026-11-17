@@ -2,31 +2,73 @@
 html.site-audio-host { zoom: 1 !important; width: 100% !important; height: 100% !important; overflow: hidden !important; }
 body.site-audio-host-body { display: block !important; margin: 0 !important; padding: 0 !important; width: 100vw !important; height: 100vh !important; opacity: 1 !important; transition: none !important; overflow: hidden !important; background: #101014 !important; }
 .site-audio-frame { position: fixed; inset: 0; display: block; width: 100%; height: 100%; border: 0; background: #101014; }
-#site-audio-entry { --sa-accent: #ed1532; width: min(810px,calc(100vw - 32px)); box-shadow: 0 0 0 3px #260a16,8px 9px 0 #0007,0 0 38px #dc004540; font-family: Verdana,sans-serif; }
-#site-audio-entry::backdrop { background: #05030bd4; }
-.sa-titlebar { display: flex; justify-content: space-between; gap: 16px; padding: 9px 12px; color: #fff; background: linear-gradient(color-mix(in srgb,var(--sa-accent),white 15%),color-mix(in srgb,var(--sa-accent),black 40%)); border-bottom: 2px solid #7c5264; font: bold 11px/1.4 Verdana,sans-serif; letter-spacing: 1px; }
-.sa-content { position: relative; padding: 30px 36px; background: linear-gradient(130deg,#170e18,#090b14); }
-.sa-kicker { margin: 0 0 16px; text-align: center; color: #c8aebb; font: 10px/1.5 Verdana,sans-serif; letter-spacing: 3px; }
-#site-audio-title { margin: 0 0 24px; color: var(--sa-accent); text-align: center; text-shadow: 0 0 7px var(--sa-accent),0 0 25px color-mix(in srgb,var(--sa-accent),transparent 50%); font: bold 32px/1.5 'Press Start 2P',monospace; letter-spacing: 1px; }
-#site-audio-description { margin: 0 0 17px; color: #e2ced8; font: 14px/1.7 Verdana,sans-serif; }
-.sa-route { margin-bottom: 24px; padding: 9px 12px; border: 1px dashed #9b6683; color: #f4d6e7; font: bold 11px/1.5 Verdana,sans-serif; letter-spacing: 2px; }
-.sa-welcome-art { display: none; }
-#site-audio-entry[data-section="home"] .sa-content { padding-right: 275px; }
-#site-audio-entry[data-section="home"] #site-audio-title { text-align: left; font-size: 26px; }
-#site-audio-entry[data-section="home"] .sa-welcome-art { display: block; position: absolute; right: 28px; bottom: 34px; width: 218px; height: 292px; border: 2px solid #68412c; overflow: hidden; background: #1c110d url('assets/images/home/shurelia-room-books.png') center/cover; image-rendering: pixelated; }
-.sa-body { position: absolute; left: 50%; bottom: 0; width: 256px; height: 328px; background: url('assets/images/home/shurelia-atlas.png') 0 -184px; transform: translateX(-50%) scale(.88); transform-origin: bottom; image-rendering: pixelated; }
-.sa-face { position: absolute; left: calc(50% - 40.48px); top: 70.24px; width: 64px; height: 56px; background: url('assets/images/home/shurelia-atlas.png') 0 0; transform: scale(.88); transform-origin: top left; image-rendering: pixelated; }
-.sa-counter { position: absolute; inset: auto 0 0; height: 13px; background: url('assets/images/home/shurelia-room-counter.png') bottom/auto 100%; image-rendering: pixelated; }
-#site-audio-activate { display: block; width: 100%; min-height: 52px; padding: 12px 16px; background: linear-gradient(color-mix(in srgb,var(--sa-accent),white 5%),color-mix(in srgb,var(--sa-accent),black 45%) 51%,color-mix(in srgb,var(--sa-accent),black 65%) 52%,color-mix(in srgb,var(--sa-accent),black 30%)); color: #fff; border: 2px outset #d6abbc; box-shadow: 0 0 17px #eb004f40; font: bold 16px/1.5 Verdana,sans-serif; letter-spacing: 1px; cursor: pointer; }
-#site-audio-activate:hover { filter: brightness(1.15); }
-#site-audio-silent { display: block; margin: 15px auto 0; min-height: 40px; padding: 7px 12px; color: #ebd3e1; background: #241522; border: 1px solid #8d667c; font: 12px/1.5 Verdana,sans-serif; cursor: pointer; }
-#site-audio-entry button:focus-visible { outline: 3px solid #ffe190; outline-offset: 4px; }
-#site-audio-entry button:disabled { cursor: wait; }
-#site-audio-status { min-height: 34px; margin: 17px 0 0; color: #dcbecb; font: 11px/1.6 Verdana,sans-serif; text-align: center; }
-.sa-footer { padding: 10px 14px; border-top: 1px solid #684152; color: #bda7b2; background: #130e16; text-align: center; font: 9px/1.5 Verdana,sans-serif; letter-spacing: 2px; }
-#site-audio-entry[data-phase="revealing"] { animation: sa-reveal 600ms ease-in both; pointer-events: none; }
-@keyframes sa-reveal { 0% { clip-path: inset(0); opacity: 1; } 45% { clip-path: inset(10% 2%); } 100% { clip-path: inset(50% 0); opacity: 0; } }
+
+/* Flat color approximates the original GIF's dark, noisy outer edge. */
+#site-audio-entry {
+  position: fixed; inset: 0; margin: 0; padding: 0; border: 0;
+  box-sizing: border-box; width: 100vw; height: 100vh; height: 100dvh;
+  max-width: none; max-height: none; overflow: hidden;
+  background: #150e14; color: #ded3e6; isolation: isolate;
+  font-family: 'Courier New',monospace;
+}
+#site-audio-entry::backdrop { background: #150e14; }
+.sa-entry-controls {
+  position: absolute; z-index: 2; left: 50%; top: 50%;
+  width: 264px; max-width: calc(100vw - 32px); transform: translate(-50%,-50%);
+  text-align: center;
+}
+#site-audio-activate {
+  display: block; box-sizing: border-box; width: 100%; min-height: 74px;
+  margin: 0; padding: 18px 20px; border: 2px outset #615365; border-radius: 0;
+  color: #e3d4eb; background: #1a121c; cursor: pointer;
+  font: bold 25px/1.2 'Courier New',monospace; letter-spacing: 6px; text-align: center;
+}
+#site-audio-activate-label { display: inline-block; animation: sa-enter-pulse 1600ms ease-in-out infinite; }
+@keyframes sa-enter-pulse { 0%,100% { opacity: 1; transform: translateY(0); } 50% { opacity: .4; transform: translateY(-2px); } }
+#site-audio-activate:hover:not(:disabled) { border-color: #b0a0b7; }
+#site-audio-activate:active:not(:disabled) { border-style: inset; }
+#site-audio-activate:disabled { cursor: wait; }
+#site-audio-activate:disabled #site-audio-activate-label { animation: none; }
+#site-audio-silent {
+  display: block; margin: 12px auto 0; padding: 2px 4px; border: 0; border-radius: 0;
+  color: #938395; background: transparent; font: 12px/1.4 'Times New Roman',serif;
+  text-decoration: underline; cursor: pointer;
+}
+#site-audio-entry button:focus-visible { outline: 2px solid #d5bbeb; outline-offset: 5px; }
+#site-audio-status { margin: 12px -18px 0; color: #cab6cf; font: 12px/1.5 monospace; }
+#site-audio-status:empty { display: none; }
+.sa-screen-reader {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.sa-intro-stage { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.sa-intro-stage img {
+  display: block; width: min(600px,100vw,133.333vh); width: min(600px,100vw,133.333dvh);
+  height: auto; max-width: none; max-height: none; image-rendering: pixelated;
+  /* The source has colored texture, not a solid backdrop. Fade only its outer
+     10% into the stage; the central pixels and the original GIF stay untouched. */
+  --sa-edge-mask: linear-gradient(to right,transparent,#000 10%,#000 90%,transparent),
+                  linear-gradient(to bottom,transparent,#000 10%,#000 90%,transparent);
+  -webkit-mask-image: var(--sa-edge-mask);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--sa-edge-mask);
+  mask-composite: intersect;
+}
+#site-audio-entry[data-phase="unlocking"] .sa-entry-controls,
+#site-audio-entry[data-phase="intro"] .sa-entry-controls { visibility: hidden; }
+
+/* Native modality is released before the child lays out. The cosmetic cover
+   then parts while the controller still withholds entered=true and effects. */
+#site-audio-reveal { position: fixed; inset: 0; z-index: 2147483000; overflow: hidden; pointer-events: auto; }
+#site-audio-reveal > div { position: absolute; left: 0; right: 0; height: 50%; background: #150e14; }
+#site-audio-reveal .sa-curtain-top { top: 0; animation: sa-open-top var(--sa-reveal-ms,600ms) ease-in-out both; }
+#site-audio-reveal .sa-curtain-bottom { bottom: 0; animation: sa-open-bottom var(--sa-reveal-ms,600ms) ease-in-out both; }
+@keyframes sa-open-top { from { transform: translateY(0); } to { transform: translateY(-101%); } }
+@keyframes sa-open-bottom { from { transform: translateY(0); } to { transform: translateY(101%); } }
 .site-audio-error { position: fixed; inset: 30% 20%; padding: 30px; color: #fff; background: #321323; z-index: 1000; }
-@media (max-width: 750px) { #site-audio-title { font-size: 24px; } #site-audio-entry[data-section="home"] .sa-content { padding-right: 30px; } #site-audio-entry[data-section="home"] .sa-welcome-art { display: none; } }
-@media (max-height: 650px) { .sa-content { padding-top: 18px; padding-bottom: 18px; } #site-audio-title { margin-bottom: 14px; } .sa-kicker { margin-bottom: 8px; } }
-@media (prefers-reduced-motion: reduce) { #site-audio-entry[data-phase="revealing"] { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  #site-audio-activate-label { animation: none; }
+  #site-audio-reveal { animation: sa-reveal-fade var(--sa-reveal-ms,600ms) linear both; }
+  #site-audio-reveal > div { animation: none; }
+}
+@keyframes sa-reveal-fade { from { opacity: 1; } to { opacity: 0; } }

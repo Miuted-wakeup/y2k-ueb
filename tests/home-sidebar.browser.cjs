@@ -5,6 +5,7 @@ const path = require('node:path');
 const os = require('node:os');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
+const { contextSelector } = require('./site-audio-browser-utils.cjs');
 const root = path.resolve(__dirname, '..');
 const output = fs.mkdtempSync(path.join(os.tmpdir(), 'y2k-home-rail-'));
 const chrome = process.env.CHROME_PATH || ['C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(fs.existsSync);
@@ -33,17 +34,17 @@ const server = http.createServer((req,res) => {
     ws=new WebSocket(target.webSocketDebuggerUrl);
     await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
     let serial=0;const pending=new Map(),errors=[],metrics=[];
+    let selector;
     ws.onmessage=event=>{
       const message=JSON.parse(event.data);
+      selector?.event(message);
       if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails.text);
       const call=pending.get(message.id);
       if(call){pending.delete(message.id);message.error?call.reject(message.error):call.resolve(message.result);}
     };
     const cdp=(method,params={})=>new Promise((resolve,reject)=>{pending.set(++serial,{resolve,reject});ws.send(JSON.stringify({id:serial,method,params}));});
-    const evaluate=async expression=>{
-      const result=await cdp('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
-      assert.ok(!result.exceptionDetails,JSON.stringify(result.exceptionDetails));return result.result.value;
-    };
+    selector=contextSelector(cdp);
+    const evaluate=expression=>selector.run(expression);
     const waitFor=async(expression,label)=>{
       for(let i=0;i<150;i++){if(await evaluate(expression))return;await pause(50);}assert.fail(label);
     };
@@ -84,8 +85,10 @@ const server = http.createServer((req,res) => {
       const regular=height>=900;
       await cdp('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false});
       await cdp('Page.navigate',{url:origin+'/index.html'});
+      await selector.wait("document.readyState==='complete'&&location.href==="+JSON.stringify(origin+'/index.html'),true,'Top HOME document loads');
+      await selector.enter('silent');
       await waitFor("document.readyState==='complete'&&!!document.querySelector('#home-companion').homeCompanion",'Load local HOME');
-      await evaluate("document.querySelector('#home-entry-silent').click()");
+      if(await evaluate("!!document.querySelector('#home-entry-silent')"))await evaluate("document.querySelector('#home-entry-silent').click()");
       await waitFor("!document.querySelector('#home-entry')",'Enter HOME silently before geometry checks');
       await pause(1400);
       assert.equal(await evaluate("document.querySelectorAll('#home-status-panel').length"),1,'Clock and counter must share one compact panel');

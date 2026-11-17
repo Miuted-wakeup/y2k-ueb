@@ -9,6 +9,7 @@ const path = require('node:path');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
+const { contextSelector } = require('./site-audio-browser-utils.cjs');
 
 const root = path.resolve(__dirname, '..');
 const output = fs.mkdtempSync(path.join(os.tmpdir(), 'y2k-about-'));
@@ -58,8 +59,10 @@ const server = http.createServer((req, res) => {
     let id = 0;
     const pending = new Map();
     const errors = [];
+    let selector;
     ws.onmessage = event => {
       const message = JSON.parse(event.data);
+      selector?.event(message);
       if (message.method === 'Runtime.exceptionThrown') errors.push(message.params.exceptionDetails.text);
       const request = pending.get(message.id);
       if (request) { pending.delete(message.id); message.error ? request.reject(message.error) : request.resolve(message.result); }
@@ -67,17 +70,21 @@ const server = http.createServer((req, res) => {
     const cdp = (method, params = {}) => new Promise((resolve, reject) => {
       pending.set(++id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params }));
     });
-    const evaluate = async expression => {
-      const result = await cdp('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true, userGesture: true });
-      assert.ok(!result.exceptionDetails, JSON.stringify(result.exceptionDetails));
-      return result.result.value;
-    };
-    const waitFor = async (expression, message) => {
-      for (let i = 0; i < 100; i++) {
-        if (await evaluate(expression)) return;
-        await pause(100);
-      }
+    selector = contextSelector(cdp);
+    const evaluate = expression => selector.run(expression);
+    const host = expression => selector.run(expression, true);
+    // Native media/storage live in the host; DOM/style/component assertions stay in the child.
+    const nativePlayer = expression => host(`(() => { const audio = window.SiteAudioShell?.engine?.getNativeMedia().music || document.querySelector('#audio-player'); return (${expression}); })()`);
+    const waitForPlayer = async (expression, message) => {
+      for (let i=0;i<100;i++) { if(await nativePlayer(expression)) return; await pause(100); }
       assert.fail(message);
+    };
+    const waitFor = (expression, message) => selector.wait(expression, false, message);
+    const viewport = async params => {
+      await cdp('Emulation.setDeviceMetricsOverride', params);
+      // Parent geometry commits before the child receives its native resize.
+      await pause(100);
+      await evaluate('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
     };
     const keyboardActivate = async selector => {
       await evaluate(`document.querySelector(${JSON.stringify(selector)}).focus()`);
@@ -85,11 +92,18 @@ const server = http.createServer((req, res) => {
       await cdp('Input.dispatchKeyEvent', { type: 'char', text: '\r' });
       await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13 });
     };
-    const navigate = async (page, captureIntro = false) => {
-      await cdp('Page.navigate', { url: `${origin}/${page}.html` });
+    const navigate = async (page, captureIntro = false, withinHost = false) => {
+      if(withinHost && await host('!!window.SiteAudioShell?.isHost')) await host(`window.SiteAudioShell.navigate(${JSON.stringify(`${origin}/${page}.html`)})`);
+      else await cdp('Page.navigate', { url: `${origin}/${page}.html` });
       for (let i = 0; i < 100; i++) {
         await pause(100);
-        if (await evaluate(`document.readyState === 'complete' && location.pathname === '/${page}.html'`)) break;
+        if (await host(`document.readyState === 'complete' && location.pathname === '/${page}.html'`)) break;
+      }
+      await selector.enter('silent');
+      await selector.wait(`document.readyState === 'complete' && location.pathname === '/${page}.html'`,false,'Requested section initializes');
+      if(await evaluate("!!document.querySelector('#home-entry-silent')")){
+        await evaluate("document.querySelector('#home-entry-silent').click()");
+        await selector.wait("!document.querySelector('#home-entry')",false,'Standalone HOME entry releases content');
       }
       if (captureIntro) {
         await pause(300);
@@ -153,9 +167,9 @@ const server = http.createServer((req, res) => {
       assert.ok(samples.slice(intermediate + 1).some(sample => sample.panel >= .999 && sample.values.every(value => value >= .999)), `The observed fade must finish after its intermediate frames: ${diagnostic}`);
     };
     await cdp('Network.enable');
-    await cdp('Network.setBlockedURLs', { urls: ['*://*.youtube.com/*', '*://youtube.com/*', '*://*.youtube-nocookie.com/*', '*://youtube-nocookie.com/*'] });
+    await cdp('Network.setBlockedURLs', { urls: ['https://*', '*://*.youtube.com/*', '*://youtube.com/*', '*://*.youtube-nocookie.com/*', '*://youtube-nocookie.com/*'] });
     await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
-    await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+    await viewport({ width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
     await navigate('sobre-mi', true);
     await screenshot('sobre-mi-desktop');
     assert.equal(await evaluate(`document.querySelector('#sm-current-thought')?.textContent`), 'desvelandome como siempre', 'Show the exact personal thought supplied by Muted');
@@ -341,18 +355,18 @@ const server = http.createServer((req, res) => {
     };
     await assertSpookyDecorationLayout(1440);
     for (const width of [1024, 1100, 1148, 1150, 1280, 1440, 1490, 1500, 1560, 1764, 1920]) {
-      await cdp('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: false });
+      await viewport({ width, height: 1000, deviceScaleFactor: 1, mobile: false });
       await screenshot(`sobre-mi-perches-${width}`);
       await assertSpookyDecorationLayout(width);
       await assertPixelPetLayout(width);
     }
     await evaluate(`document.querySelector('.sm-collection-fold').open = true`);
     for (const width of [1024, 1280, 1440, 1764, 1920]) {
-      await cdp('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: false });
+      await viewport({ width, height: 1000, deviceScaleFactor: 1, mobile: false });
       await assertSpookyDecorationLayout(width);
     }
     await evaluate(`document.querySelector('.sm-collection-fold').open = false`);
-    await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+    await viewport({ width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
     await screenshot('sobre-mi-spooky-top');
     await evaluate(`document.querySelector('#sm-profile-bio').scrollIntoView({ block: 'center', behavior: 'instant' })`);
     await screenshot('sobre-mi-frame-profile');
@@ -508,7 +522,7 @@ const server = http.createServer((req, res) => {
     if (sidebarBaselineIndex >= 0) {
       const baselines = [];
       for (const width of [1024, 1280, 1440, 1764, 1920]) {
-        await cdp('Emulation.setDeviceMetricsOverride', { width, height: 1000, deviceScaleFactor: 1, mobile: false });
+        await viewport({ width, height: 1000, deviceScaleFactor: 1, mobile: false });
         baselines.push(await evaluate(`(() => {
           const box = selector => { const r = document.querySelector(selector).getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height }; };
           return { viewportWidth: ${width}, banners: [...document.querySelectorAll('.sm-sidebar-banners img')].map(img => { const r = img.getBoundingClientRect(); return { src: img.getAttribute('src'), x: r.x, width: r.width, height: r.height }; }), profile: box('.sm-welcome-card'), contact: box('#sm-contact'), siteNote: box('#sm-site-note') };
@@ -523,7 +537,7 @@ const server = http.createServer((req, res) => {
     const sidebarCompareIndex = process.argv.indexOf('--sidebar-compare');
     const sidebarBefore = sidebarCompareIndex >= 0 ? JSON.parse(fs.readFileSync(process.argv[sidebarCompareIndex + 1], 'utf8')) : [];
     for (const [width, height] of [[1764, 1000], [1920, 900], [1280, 800]]) {
-      await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
+      await viewport({ width, height, deviceScaleFactor: 1, mobile: false });
       await evaluate(`document.querySelector('#sm-main-content').scrollTo({ top: 0, behavior: 'instant' })`);
       const measureSidebar = () => evaluate(`(() => {
         const box = element => { const r = element.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, height: r.height, bottom: r.bottom }; };
@@ -565,7 +579,11 @@ const server = http.createServer((req, res) => {
       await keyboardActivate('.sm-contact-grid a[href="#sm-guestbook"]');
       await waitFor(`document.querySelector('#sm-main-content').scrollTop > 30`, 'The native sidebar fragment link must reveal its target in the right scroller');
       assert.deepEqual((await measureSidebar()).banners, initial.banners, 'Following a sidebar link must not displace the sidebar');
-      await evaluate(`history.replaceState(null, '', location.pathname); document.querySelector('#sm-main-content').scrollTo({ top: 0, behavior: 'instant' }); document.querySelector('#sm-main-content').focus()`);
+      if(await host('!!window.SiteAudioShell?.isHost')){
+        await host(`(() => {const url=new URL(window.SiteAudioShell.controller.snapshot().route.href);url.hash='';window.SiteAudioShell.controller.navigate(url.href,false);history.replaceState(null,'',url.href);})()`);
+        await selector.wait("location.hash === ''",false,'Fragment cleanup reaches the owned child without removing its capability');
+      }else await evaluate(`history.replaceState(null, '', location.pathname + location.search)`);
+      await evaluate(`document.querySelector('#sm-main-content').scrollTo({ top: 0, behavior: 'instant' }); document.querySelector('#sm-main-content').focus()`);
       assert.equal(await evaluate(`document.querySelector('#sm-main-content').tabIndex`), 0, 'The right reading area must be keyboard focusable');
       await cdp('Input.dispatchKeyEvent', { type: 'keyDown', key: 'PageDown', code: 'PageDown', windowsVirtualKeyCode: 34 });
       await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'PageDown', code: 'PageDown', windowsVirtualKeyCode: 34 });
@@ -576,14 +594,14 @@ const server = http.createServer((req, res) => {
       assert.deepEqual(bottom.banners, initial.banners, 'The sidebar must also remain fixed at the end of the reading area');
       await screenshot(`sobre-mi-sidebar-${width}x${height}`);
     }
-    await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
+    await viewport({ width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
     await evaluate(`document.querySelector('#sm-main-content').scrollTo({ top: 0, behavior: 'instant' })`);
     console.log('PASS: retired character removed; compact locked sidebar, unchanged banners, right-only native scrolling');
     if (process.argv.includes('--theme-only')) {
       assert.equal(await evaluate(`window.__introRevealSample`), '1', 'Keep the shared 700ms entrance');
       assert.deepEqual(await evaluate(`['#sm-notebook', '.sm-content-surface', '#site-header'].map(selector => { const style = getComputedStyle(document.querySelector(selector)); return [style.transitionProperty, style.transitionDuration]; })`), [['opacity', '0.5s'], ['opacity', '0.5s'], ['opacity', '0.5s']], 'Keep the shared smooth fade without requiring a specific rendered frame on a busy machine');
       for (const width of [1024, 1280, 1440, 1764, 1920]) {
-        await cdp('Emulation.setDeviceMetricsOverride', { width, height: width === 1764 ? 1021 : 900, deviceScaleFactor: 1, mobile: false });
+        await viewport({ width, height: width === 1764 ? 1021 : 900, deviceScaleFactor: 1, mobile: false });
         await assertBioVideoGeometry(width);
         await assertGuestbookGifGeometry(width);
         await assertPersonalExtrasGeometry(width);
@@ -611,41 +629,55 @@ const server = http.createServer((req, res) => {
     assert.equal(await evaluate(`!!document.querySelector('#now-playing-bar .sm-winamp-titlebar')`), true, 'About should have the requested Winamp player skin');
     assert.equal(await evaluate(`document.querySelector('#np-play').tagName`), 'BUTTON', 'Keep transport controls keyboard accessible');
     assert.equal(await evaluate(`!!document.querySelector('#sm-np-stop')`), true, 'The Winamp stop control must be functional, not a painted button');
-    assert.equal(await evaluate(`document.querySelectorAll('audio#audio-player').length`), 1, 'Keep one shared audio element');
+    assert.equal(await evaluate(`document.querySelectorAll('audio#audio-player').length`), 1, 'Keep the existing player markup slot');
+    assert.equal(await nativePlayer('audio instanceof HTMLAudioElement'),true,'The shared owner must use one real native music element');
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('.sm-winamp-cover')).backgroundImage.includes('assets/images/sobre-mi/player-cover-source.jpg')`), true, 'Player artwork must have its own About asset');
     const playerIndex = await evaluate(`npIndex`);
     await keyboardActivate('#np-play');
-    await waitFor(`!document.querySelector('#audio-player').paused && localStorage.getItem('isPlaying') === 'true'`, 'Play must start the real shared audio');
-    await waitFor(`Number.isFinite(document.querySelector('#audio-player').duration) && document.querySelector('#audio-player').duration > 0`, 'The real playlist track must load metadata after Play');
+    await waitForPlayer(`!audio.paused && localStorage.getItem('isPlaying') === 'true'`, 'Play must start the real shared audio');
+    await waitForPlayer(`Number.isFinite(audio.duration) && audio.duration > 0`, 'The real playlist track must load metadata after Play');
+    await waitFor(`!window.SiteAudioClient?.isFrame || !window.SiteAudioClient.getPlayer().paused`, 'Child facade receives the native play result');
     assert.equal(await evaluate(`document.querySelector('#np-play').getAttribute('aria-label')`), 'Pausar');
     assert.equal(await evaluate(`document.querySelector('#now-playing-bar').classList.contains('sm-winamp-playing')`), true);
     await screenshot('sobre-mi-winamp-playing');
     await keyboardActivate('#np-play');
-    assert.equal(await evaluate(`document.querySelector('#audio-player').paused`), true, 'Play toggle must pause');
-    assert.equal(await evaluate(`localStorage.getItem('isPlaying')`), 'false');
+    await waitForPlayer('audio.paused','Native pause acknowledgement');
+    assert.equal(await nativePlayer('audio.paused'), true, 'Play toggle must pause');
+    assert.equal(await host(`localStorage.getItem('isPlaying')`), 'false');
     await evaluate(`document.querySelector('#np-volume').value = .3; document.querySelector('#np-volume').dispatchEvent(new Event('input', { bubbles: true }))`);
     await waitFor(`document.querySelector('#sm-np-volume-value').textContent === '30%'`, 'Volume display must reflect actual audio volume');
-    assert.equal(await evaluate(`document.querySelector('#audio-player').volume`), .3);
-    assert.equal(await evaluate(`Number(localStorage.getItem('npVolume'))`), .3);
+    assert.equal(await nativePlayer('audio.volume'), .3);
+    assert.equal(await host(`Number(localStorage.getItem('npVolume'))`), .3);
     await evaluate(`document.querySelector('#np-progress').value = 35; document.querySelector('#np-progress').dispatchEvent(new Event('input', { bubbles: true }))`);
-    await waitFor(`!document.querySelector('#audio-player').seeking`, 'Seek must complete');
-    assert.equal(await evaluate(`Math.abs(document.querySelector('#audio-player').currentTime / document.querySelector('#audio-player').duration - .35) < .02`), true, 'Seek range must move the actual audio');
+    await waitForPlayer(`!audio.seeking && Math.abs(audio.currentTime / audio.duration - .35) < .02`, 'Seek must complete at its requested position');
+    assert.equal(await nativePlayer(`Math.abs(audio.currentTime / audio.duration - .35) < .02`), true, 'Seek range must move the actual audio');
     await keyboardActivate('#np-next');
+    await waitFor(`npIndex === ${(playerIndex + 1) % 6}`, 'Next authoritative state reaches the child');
     assert.equal(await evaluate(`npIndex`), (playerIndex + 1) % 6);
-    assert.equal(await evaluate(`document.querySelector('#audio-player').paused`), true, 'Next must preserve paused state');
+    assert.equal(await nativePlayer('audio.paused'), true, 'Next must preserve paused state');
     await keyboardActivate('#np-prev');
+    await waitFor(`npIndex === ${playerIndex}`, 'Previous authoritative state reaches the child');
     assert.equal(await evaluate(`npIndex`), playerIndex);
-    await waitFor(`document.querySelector('#audio-player').readyState >= 1`, 'Previous track must load');
+    await waitForPlayer('audio.readyState >= 1', 'Previous track must load');
     await keyboardActivate('#np-play');
-    await waitFor(`!document.querySelector('#audio-player').paused && isPlaying`, 'Playback must restart');
+    await waitForPlayer('!audio.paused','Playback must restart in the native owner');
+    await waitFor('isPlaying','Playback state reaches the child');
     await keyboardActivate('#sm-np-stop');
-    assert.deepEqual(await evaluate(`(() => { const a = document.querySelector('#audio-player'); return [a.paused, a.currentTime, isPlaying, startFrom, document.querySelector('#np-progress').value, document.querySelector('#np-current-time').textContent, localStorage.getItem('isPlaying'), Number(localStorage.getItem('npTime')), npIndex, a.volume]; })()`), [true, 0, false, 0, '0', '0:00', 'false', 0, playerIndex, .3], 'Stop must reset playback and persistence without changing song or volume');
+    await waitForPlayer('audio.paused && audio.currentTime === 0','Native Stop completes');
+    await waitFor('!isPlaying && startFrom === 0','Child receives the Stop snapshot');
+    const stoppedMedia=await nativePlayer(`[audio.paused,audio.currentTime,localStorage.getItem('isPlaying'),Number(localStorage.getItem('npTime')),audio.volume]`);
+    const stoppedUI=await evaluate(`[isPlaying,startFrom,document.querySelector('#np-progress').value,document.querySelector('#np-current-time').textContent,npIndex]`);
+    assert.deepEqual([stoppedMedia[0],stoppedMedia[1],...stoppedUI.slice(0,4),stoppedMedia[2],stoppedMedia[3],stoppedUI[4],stoppedMedia[4]], [true, 0, false, 0, '0', '0:00', 'false', 0, playerIndex, .3], 'Stop must reset playback and persistence without changing song or volume');
     assert.equal(await evaluate(`document.querySelector('#np-play').getAttribute('aria-label')`), 'Reproducir');
-    await navigate('japan');
+    const hostedAudio=await host('!!window.SiteAudioShell?.isHost');
+    if(hostedAudio)await host('window.__aboutMusicBefore = window.SiteAudioShell.engine.getNativeMedia().music');
+    await navigate('japan',false,true);
     assert.equal(await evaluate(`!!document.querySelector('.sm-winamp-titlebar')`), false, 'Other sections must not receive the About skin');
     assert.equal(await evaluate(`document.querySelector('#now-playing-bar').getBoundingClientRect().height`), 63, 'The independently styled JAPAN player is 63 logical pixels');
-    assert.deepEqual(await evaluate(`[npIndex, document.querySelector('#audio-player').volume, document.querySelector('#audio-player').paused, document.querySelector('#audio-player').currentTime]`), [playerIndex, .3, true, 0], 'Player state must survive navigation to another section');
-    await navigate('sobre-mi');
+    const persistedMedia=await nativePlayer('[audio.volume,audio.paused,audio.currentTime]');
+    assert.deepEqual([await evaluate('npIndex'),...persistedMedia], [playerIndex, .3, true, 0], 'Player state must survive navigation to another section');
+    if(hostedAudio)assert.equal(await host('window.__aboutMusicBefore === window.SiteAudioShell.engine.getNativeMedia().music'),true,'Section navigation keeps the same native music element alive');
+    await navigate('sobre-mi',false,true);
     assert.equal(await evaluate(`document.querySelector('#sm-np-volume-value').textContent`), '30%');
     console.log('PASS: Winamp real play/pause/seek/volume/previous/next/Stop, keyboard controls and cross-section persistence');
     assert.deepEqual(await evaluate(`Array.from(new Set(Array.from(document.images).map(img => img.getAttribute('src')))).filter(src => !src.startsWith('assets/images/sobre-mi/') && !src.startsWith('assets/gifs/sobre-mi/'))`), [], 'Every About image/GIF must be stored in its own section folders');
@@ -750,7 +782,7 @@ const server = http.createServer((req, res) => {
     assert.equal(await evaluate(`document.querySelectorAll('.sm-cyber-tv-embed iframe').length`), 0, 'Collapsing the archive must unload hidden videos');
     await evaluate(`document.querySelector('#sm-vocal-archive').open = false; document.querySelector('#sm-main-content').scrollTop = 0`);
     for (const width of [1024, 1280, 1440, 1764, 1920]) {
-      await cdp('Emulation.setDeviceMetricsOverride', { width, height: width === 1764 ? 1021 : 900, deviceScaleFactor: 1, mobile: false });
+      await viewport({ width, height: width === 1764 ? 1021 : 900, deviceScaleFactor: 1, mobile: false });
       await assertSocialDockGeometry(width, width === 1764 ? 1021 : 900);
       await assertProfileCard(width, width === 1764 ? 1021 : 900);
       await assertBioVideoGeometry(width);
@@ -819,15 +851,17 @@ const server = http.createServer((req, res) => {
     console.log('PASS: reference 25/75, 84/16 and 18/82 geometry; 2x3 interests, 4x2 favorites; 1024–1920px layout');
     await navigate('sobre-mi');
     for (const height of [640, 520, 480]) {
-      await cdp('Emulation.setDeviceMetricsOverride', { width:1024, height, deviceScaleFactor:1, mobile:false });
+      await viewport({ width:1024, height, deviceScaleFactor:1, mobile:false });
       await assertSocialDockGeometry(1024, height);
       await screenshot('sobre-mi-social-height-' + height);
     }
-    await cdp('Emulation.setDeviceMetricsOverride', { width:1440, height:900, deviceScaleFactor:1, mobile:false });
+    await viewport({ width:1440, height:900, deviceScaleFactor:1, mobile:false });
     await navigate('japan');
     assert.equal(await evaluate(`document.querySelectorAll('#dock-social .dock-link img').length`), 0, 'Do not replace another section’s social dock');
     console.log('PASS: six animated social links, safe keyboard activation, original gutter and short-window fit');
     await cdp('Page.navigate', { url: pathToFileURL(path.join(root, 'sobre-mi.html')).href });
+    await selector.wait(`location.protocol === 'file:' && document.readyState === 'complete'`,true,'Local-file host loads');
+    await selector.enter('silent');
     await waitFor(`location.protocol === 'file:' && document.readyState === 'complete' && !!document.querySelector('#phase-1 .sm-yt-player-toggle')`, 'The local-file route must remain usable');
     await pause(1900);
     await keyboardActivate('#sm-vocal-archive > summary');

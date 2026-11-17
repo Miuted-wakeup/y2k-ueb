@@ -5,3 +5,5 @@ Thumbs.db
 # Project
 node_modules/
 .env
+# Generated static publication output
+dist/

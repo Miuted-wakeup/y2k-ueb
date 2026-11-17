@@ -3,6 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=1024" />
   <meta name="description" content="El rincón personal de Muted: música, Japón, canto y una web hecha a mano." />
   <title>y2k-blog | SOBRE MÍ ✦ El mundo de Muted</title>
@@ -16,6 +17,16 @@
 
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="sections.css" />
+  <!-- Persistent audio host: each direct section validates its own destination. -->
+  <link rel="stylesheet" href="site-audio-shell.css" />
+  <script src="site-audio-core.js"></script>
+  <script src="home-companion-speech.js"></script>
+  <script src="site-audio-engine.js"></script>
+  <script src="site-audio-client.js"></script>
+  <script src="site-audio-shell.js"></script>
+  <noscript><style>
+    body, #site-header, #site-nav, #main-wrapper, .panel, #site-footer, .sm-late-reveal { opacity: 1 !important; }
+  </style></noscript>
 </head>
 
 <body id="section-sobre-mi">
@@ -1359,6 +1370,16 @@
         aria-label="TikTok: un enlace sorpresa (abre otra pestaña)" title="TikTok · una sorpresa" target="_blank"
         rel="noopener noreferrer">
         <img src="assets/gifs/sobre-mi/social/tiktok.gif" width="128" height="128" alt="" />
+      </a>
+      <a href="https://boards.4chan.org/vr/" class="dock-link" id="dock-4chan"
+        aria-label="4chan /vr/: videojuegos retro (abre otra pestaña)" title="4chan · /vr/ · videojuegos retro"
+        target="_blank" rel="noopener noreferrer">
+        <img src="assets/gifs/sobre-mi/social/4chan.gif" width="128" height="128" alt="" />
+      </a>
+      <a href="https://discord.com/users/740647632153608213" class="dock-link" id="dock-discord"
+        aria-label="Discord de Muted (abre otra pestaña)" title="Discord" target="_blank"
+        rel="noopener noreferrer">
+        <img src="assets/gifs/sobre-mi/social/discord.gif" width="128" height="128" alt="" />
       </a>
     </nav>
     <div id="dock-divider"></div>

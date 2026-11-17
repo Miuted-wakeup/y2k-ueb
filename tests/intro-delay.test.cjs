@@ -8,8 +8,9 @@ const { test } = require('node:test');
 const source = fs.readFileSync(path.join(__dirname, '..', 'scripts.js'), 'utf8');
 const boundary = source.indexOf('\nconst diaryEntries =');
 assert.ok(boundary > 0, 'The entrance handler must have a clear module boundary');
-const entrance = source.slice(0, boundary);
-assert.ok(entrance.includes("window.addEventListener('load'"));
+const readiness = source.slice(source.indexOf('    const onReady ='), source.indexOf('    const getPlayer ='));
+const entrance = readiness + source.slice(source.indexOf("onReady('load',"), boundary);
+assert.ok(entrance.includes("onReady('load'"));
 
 for (const section of ['', 'section-japan', 'section-canto', 'section-music', 'section-tech', 'section-sobre-mi']) {
   for (const reduced of [false, true]) {
@@ -19,12 +20,14 @@ for (const section of ['', 'section-japan', 'section-canto', 'section-music', 's
       const panel = { style: { opacity: '0' } };
       const image = { style: {} };
       const body = { id: section, style: { opacity: '0' } };
+      const host = { addEventListener: (event, callback) => { assert.equal(event, 'load'); onLoad = callback; } };
       vm.runInNewContext(entrance, {
+        host,
         window: {
           addEventListener: (event, callback) => { assert.equal(event, 'load'); onLoad = callback; },
           matchMedia: () => ({ matches: reduced }),
         },
-        document: { body, querySelectorAll: selector => selector.includes('.panel img') ? [image] : [panel] },
+        document: { readyState: 'loading', body, querySelectorAll: selector => selector.includes('.panel img') ? [image] : [panel] },
         setTimeout: (callback, delay) => timers.push({ callback, delay }),
       });
       onLoad();

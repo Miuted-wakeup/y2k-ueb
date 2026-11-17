@@ -8,6 +8,7 @@ const os = require('node:os');
 const http = require('node:http');
 const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
+const { contextSelector } = require('./site-audio-browser-utils.cjs');
 
 const root = path.resolve(__dirname, '..');
 const pages = ['index', 'japan', 'music', 'canto', 'tech', 'sobre-mi', 'cosas'];
@@ -45,8 +46,10 @@ const server = http.createServer((req, res) => {
     const pending = new Map();
     const errors = [];
     let id = 0;
+    let selector;
     ws.onmessage = event => {
       const message = JSON.parse(event.data);
+      selector?.event(message);
       if (message.method === 'Runtime.exceptionThrown') errors.push(message.params.exceptionDetails.text);
       const request = pending.get(message.id);
       if (request) { pending.delete(message.id); message.error ? request.reject(message.error) : request.resolve(message.result); }
@@ -54,11 +57,8 @@ const server = http.createServer((req, res) => {
     const cdp = (method, params = {}) => new Promise((resolve, reject) => {
       pending.set(++id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params }));
     });
-    const evaluate = async expression => {
-      const result = await cdp('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
-      assert.ok(!result.exceptionDetails, JSON.stringify(result.exceptionDetails));
-      return result.result.value;
-    };
+    selector = contextSelector(cdp);
+    const evaluate = expression => selector.run(expression);
     await cdp('Page.enable');
     await cdp('Runtime.enable');
     await cdp('Network.enable');
@@ -76,7 +76,13 @@ const server = http.createServer((req, res) => {
       await cdp('Page.navigate', { url: `${origin}/${page}.html` });
       for (let i = 0; i < 100; i++) {
         await pause(50);
-        if (await evaluate(`document.readyState === 'complete' && location.pathname === '/${page}.html'`)) break;
+        if (await selector.run(`document.readyState === 'complete' && location.pathname === '/${page}.html'`, true)) break;
+      }
+      await selector.enter('silent');
+      await selector.wait(`document.readyState === 'complete' && location.pathname === '/${page}.html'`,false,'Requested section document loads');
+      if(await evaluate("!!document.querySelector('#home-entry-silent')")){
+        await evaluate("document.querySelector('#home-entry-silent').click()");
+        await selector.wait("!document.querySelector('#home-entry')",false,'Standalone HOME entry releases asset audit');
       }
       await pause(300);
       const snapshot = await evaluate(`(() => {

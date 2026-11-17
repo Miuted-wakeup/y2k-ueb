@@ -6,6 +6,7 @@ const path = require('node:path');
 const os = require('node:os');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
+const { contextSelector } = require('./site-audio-browser-utils.cjs');
 const root = path.resolve(__dirname, '..');
 const output = fs.mkdtempSync(path.join(os.tmpdir(), 'y2k-scale-'));
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -47,8 +48,10 @@ const server = http.createServer((req, res) => {
     await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = reject; });
     let id = 0;
     const pending = new Map(), errors = [], metrics = [];
+    let selector;
     ws.onmessage = event => {
       const message = JSON.parse(event.data);
+      selector?.event(message);
       if (message.method === 'Runtime.exceptionThrown') errors.push(message.params.exceptionDetails.text);
       const request = pending.get(message.id);
       if (request) { pending.delete(message.id); message.error ? request.reject(message.error) : request.resolve(message.result); }
@@ -56,11 +59,10 @@ const server = http.createServer((req, res) => {
     const cdp = (method, params = {}) => new Promise((resolve, reject) => {
       pending.set(++id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params }));
     });
-    const evaluate = async expression => {
-      const result = await cdp('Runtime.evaluate', { expression, returnByValue:true, awaitPromise:true });
-      assert.ok(!result.exceptionDetails, JSON.stringify(result.exceptionDetails));
-      return result.result.value;
-    };
+    selector = contextSelector(cdp);
+    const host = expression => selector.run(expression, true);
+    // The UI is in the section; media is the explicit parent-owned facade.
+    const evaluate = expression => selector.run(expression.replaceAll("document.querySelector('#audio-player')", "window.SiteAudioClient.getPlayer()"));
     const waitFor = async (expression,message) => {
       for (let i=0;i<100;i++) { if (await evaluate(expression)) return; await pause(100); }
       assert.fail(message);
@@ -73,7 +75,7 @@ const server = http.createServer((req, res) => {
     };
     const skinFingerprints = new Set();
     await cdp('Page.enable'); await cdp('Runtime.enable'); await cdp('Network.enable');
-    await cdp('Network.setBlockedURLs', { urls:['*://*.youtube.com/*', '*://youtube.com/*', '*://*.youtube-nocookie.com/*', '*://youtube-nocookie.com/*'] });
+    await cdp('Network.setBlockedURLs', { urls:['https://*','*://*.youtube.com/*', '*://youtube.com/*', '*://*.youtube-nocookie.com/*', '*://youtube-nocookie.com/*'] });
     const viewport = async (width, height) => {
       await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor:1, mobile:false });
       await pause(100);
@@ -84,13 +86,10 @@ const server = http.createServer((req, res) => {
         await cdp('Page.navigate', { url:`${origin}/${page}.html` });
         for (let i = 0; i < 150; i++) {
           await pause(50);
-          if (await evaluate(`document.readyState === 'complete' && location.pathname === '/${page}.html'`)) break;
+          if (await host(`document.readyState === 'complete' && location.pathname === '/${page}.html'`)) break;
         }
         await pause(1500);
-        if (page === 'index') {
-          await evaluate("document.querySelector('#home-entry-silent').click()");
-          await waitFor("!document.querySelector('#home-entry')", 'Explicit silent HOME entry before shared-control checks');
-        }
+        await selector.enter(width===1768 ? 'sound' : 'silent');
         const state = await evaluate(`(() => {
           const box = el => { const r = el.getBoundingClientRect(); return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}; };
           const reachable = el => { const r = el.getBoundingClientRect(); const hit = document.elementFromPoint(r.x+r.width/2,r.y+r.height/2); return el === hit || el.contains(hit); };
@@ -148,10 +147,11 @@ const server = http.createServer((req, res) => {
             await evaluate(`const range=document.querySelector('#np-progress');range.value=40;range.dispatchEvent(new Event('input',{bubbles:true}));`);
             await waitFor(`Math.abs(document.querySelector('#audio-player').currentTime/document.querySelector('#audio-player').duration-.4)<.02`,'Seeking must still control the original audio element');
             await evaluate(`const v=document.querySelector('#np-volume');v.value=.3;v.dispatchEvent(new Event('input',{bubbles:true}));`);
+            await waitFor(`window.SiteAudioClient.getPlayer().volume===.3`, 'Volume ACK reaches facade');
             assert.deepEqual(await evaluate(`[document.querySelector('#audio-player').volume,document.querySelector('#np-volume-value').textContent,localStorage.getItem('npVolume')]`),[.3,'30%','0.3']);
             const [index,length]=await evaluate('[npIndex,playlist.length]');
-            await enter('#np-next'); assert.equal(await evaluate('npIndex'),(index+1)%length,'Next must use the shared playlist');
-            await enter('#np-prev'); assert.equal(await evaluate('npIndex'),index,'Previous must return to the same track');
+            await enter('#np-next'); await waitFor(`npIndex===${(index+1)%length}`, 'Next native ACK'); assert.equal(await evaluate('npIndex'),(index+1)%length,'Next must use the shared playlist');
+            await enter('#np-prev'); await waitFor(`npIndex===${index}`, 'Previous native ACK'); assert.equal(await evaluate('npIndex'),index,'Previous must return to the same track');
             await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
             assert.equal(await evaluate(`getComputedStyle(document.querySelector('#np-equalizer .eq-bar')).animationName`),'none','Reduced motion must keep the meter still');
             await cdp('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
@@ -174,8 +174,10 @@ const server = http.createServer((req, res) => {
           assert.ok(state.banners.every(b=>b.bottom<=state.sidebar.bottom+1), `About: keep both unchanged banners visible at ${width}x${height}`);
           const before = await evaluate(`({sidebar:document.querySelector('#sm-sidebar').getBoundingClientRect().top,player:document.querySelector('#now-playing-bar').getBoundingClientRect().top,scroll:document.querySelector('#sm-main-content').scrollTop})`);
           const point = await evaluate(`(() => {const r=document.querySelector('#sm-main-content').getBoundingClientRect();return{x:r.x+r.width*.6,y:r.y+r.height*.6};})()`);
+          await cdp('Input.dispatchMouseEvent', {type:'mouseMoved',...point});
+          await pause(100); // Let the compositor route native input into the newly exposed child.
           await cdp('Input.dispatchMouseEvent', {type:'mouseWheel',...point,deltaY:500,deltaX:0});
-          await pause(300);
+          await waitFor(`document.querySelector('#sm-main-content').scrollTop>${before.scroll}`, 'Native wheel scroll commits in the section frame');
           const after = await evaluate(`({sidebar:document.querySelector('#sm-sidebar').getBoundingClientRect().top,player:document.querySelector('#now-playing-bar').getBoundingClientRect().top,scroll:document.querySelector('#sm-main-content').scrollTop})`);
           assert.ok(after.scroll>before.scroll, 'The right content must respond to native wheel scrolling');
           near(after.sidebar,before.sidebar,'Sidebar stays anchored'); near(after.player,before.player,'Player stays anchored');
@@ -191,6 +193,7 @@ const server = http.createServer((req, res) => {
     assert.equal(skinFingerprints.size,6,'Each section must have a different chassis/layout, not just another label');
     // Resize the same live document: scaling must not restart audio or change its selection.
     await evaluate(`window.__scaleAudio=document.querySelector('#audio-player');window.__scaleIndex=npIndex;window.__scaleAudio.currentTime=12;`);
+    await waitFor(`Math.abs(window.__scaleAudio.currentTime-12)<1`, 'Seek ACK before resize');
     await viewport(1768,1016);
     assert.equal(await evaluate(`window.__scaleAudio===document.querySelector('#audio-player') && npIndex===window.__scaleIndex && Math.abs(window.__scaleAudio.currentTime-12)<1`),true);
     // The mouse trail's CSS position must be in logical, not already-scaled, coordinates.

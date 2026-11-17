@@ -6,6 +6,7 @@ const os = require('node:os');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
+const { contextSelector } = require('./site-audio-browser-utils.cjs');
 const root = path.resolve(__dirname, '..');
 const output = fs.mkdtempSync(path.join(os.tmpdir(), 'y2k-loading-removed-'));
 const chrome = process.env.CHROME_PATH || ['C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe'].find(fs.existsSync);
@@ -30,14 +31,17 @@ const server = http.createServer((req,res) => {
     ws = new WebSocket(target.webSocketDebuggerUrl);
     await new Promise((resolve,reject) => {ws.onopen=resolve;ws.onerror=reject;});
     let serial=0; const pending=new Map(), requests=[], errors=[];
+    let selector;
     ws.onmessage = event => {
       const m=JSON.parse(event.data), call=pending.get(m.id);
+      selector?.event(m);
       if(m.method==='Network.requestWillBeSent') requests.push(m.params.request.url);
       if(m.method==='Runtime.exceptionThrown') errors.push(m.params.exceptionDetails.text);
       if(call){pending.delete(m.id);m.error?call.reject(m.error):call.resolve(m.result);}
     };
     const cdp=(method,params={}) => new Promise((resolve,reject) => {pending.set(++serial,{resolve,reject});ws.send(JSON.stringify({id:serial,method,params}));});
-    const evaluate=async expression => {const r=await cdp('Runtime.evaluate',{expression,returnByValue:true});assert.ok(!r.exceptionDetails,JSON.stringify(r.exceptionDetails));return r.result.value;};
+    selector=contextSelector(cdp);
+    const evaluate=expression=>selector.run(expression);
     await cdp('Page.enable');await cdp('Runtime.enable');await cdp('Network.enable');
     await cdp('Network.setBlockedURLs',{urls:['https://*']});
     await cdp('Emulation.setDeviceMetricsOverride',{width:1768,height:1016,deviceScaleFactor:1,mobile:false});
@@ -47,8 +51,10 @@ const server = http.createServer((req,res) => {
     for(const url of urls){
       await cdp('Page.navigate',{url});
       let ready=false;
-      for(let i=0;i<160;i++){await pause(50);if(await evaluate("document.readyState==='complete'&&location.href==="+JSON.stringify(url))){ready=true;break;}}
+      for(let i=0;i<160;i++){await pause(50);if(await selector.run("document.readyState==='complete'&&location.href==="+JSON.stringify(url),true)){ready=true;break;}}
       assert.ok(ready,'Page completes: '+url);
+      await selector.enter('silent');
+      await selector.wait("document.readyState==='complete'&&!!document.getElementById('np-play')",false,'Section controls initialize');
       if (await evaluate("!!document.querySelector('#home-entry-silent')")) {
         await evaluate("document.querySelector('#home-entry-silent').click()");
         for(let i=0;i<40;i++){if(await evaluate("!document.querySelector('#home-entry')"))break;await pause(40);}
@@ -57,6 +63,7 @@ const server = http.createServer((req,res) => {
       await pause(1600);
       const state=await evaluate(`(() => {const p=document.getElementById('np-play'),r=p.getBoundingClientRect();return {seen:window.__loadingSeen,overlay:!!document.getElementById('section-loading-overlay'),opacity:getComputedStyle(document.body).opacity,reachable:p.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))};})()`);
       assert.deepEqual(state,{seen:false,overlay:false,opacity:'1',reachable:true},url);
+      assert.deepEqual(await selector.run("({seen:window.__loadingSeen,overlay:!!document.getElementById('section-loading-overlay')})",true),{seen:false,overlay:false},'No withdrawn overlay in the persistent host either');
       console.log('PASS no LOADING '+url);
     }
     assert.deepEqual(requests.filter(url=>/\/section-loading\.(js|css|png)(?:[?#]|$)/.test(url)),[],'No withdrawn resources requested');
