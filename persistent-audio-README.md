@@ -83,13 +83,14 @@ See [static publishing](vercel-static-README.md) for Vercel configuration.
 No deployment, remote account access, commit or push is part of this change.
 Never publish private repository notes/tests/provenance/archived concepts.
 
-## HOME ambience
+## Shared ambience across all sections
 
-Place recordings in `assets/music/ambient/home/`, then explicitly register their
-site-relative filenames in `SiteAudioCore.AMBIENCE.home.tracks`. HOME currently
-uses `crystal-settings.mp3` (the supplied YouTube track, downloaded through the
-user's own tool and extracted locally with FFmpeg). One track loops. There is no
-folder scan, guessed filename or fallback song. See `assets/music/ambient/README.md`.
+Place recordings anywhere under `assets/music/ambient/`, then explicitly register
+their site-relative filenames in `SiteAudioCore.AMBIENCE.default.tracks`. All
+seven sections share `crystal-settings.mp3` (the supplied YouTube track, downloaded
+through the user's own tool and extracted locally with FFmpeg). Its historical
+`home/` file location does not restrict playback to HOME. One track loops. There
+is no folder scan, guessed filename or fallback song. See `assets/music/ambient/README.md`.
 
 The persistent parent owns a separate, lazy native Audio element. During the
 trusted ENTRAR event it may prime a configured source at zero output; it never
@@ -98,7 +99,7 @@ for later playback, including file-based development without fetch/decoded-audio
 CORS requirements. Browser refusal, missing files and load timeouts affect only
 ambience, not native voice/main-player permission.
 
-After the intro is complete, HOME ambience fades up to `0.10 * master volume`.
+After the intro is complete, shared ambience fades up to `0.10 * master volume`.
 Shurelia uses peak voice gain `0.20` only in HOME (other voices retain `0.12`).
 Her actual glyph sounds temporarily duck ambience to 30% of its normal level,
 then it recovers gently after her speech. `requirePlaying: false` remains in
@@ -106,14 +107,16 @@ force: voice is independent of whether the main player's song is playing or
 paused, while respecting master mute/zero and explicit silent entry.
 
 Starting the main player or JAPAN favorite pauses ambience immediately, rather
-than mixing songs. Pausing/stopping foreground playback lets eligible HOME
+than mixing songs. Pausing/stopping foreground playback lets eligible shared
 ambience resume at its prior position. Single tracks loop; multiple registered
 tracks start randomly and consume a shuffled bag without repeating a source until
 the round is exhausted. A new round never starts with the just-finished track;
-pause and navigation keep the current selection and bag. Other routes have no ambient configuration
-and remain silent. Changing routes, hiding the page, native context suspension,
-BFCache entry and disposal stop ineligible ambience; no hidden extra AudioContext
-or saved permission boolean is created.
+pause and navigation keep the current selection and bag. Routes using the default
+pool share the same media, position and bag, so moving between them does not pause
+or restart ambience. An explicitly configured section rule can override that pool;
+an empty override intentionally disables ambience there. Hiding the page, native
+context suspension, BFCache entry and disposal stop ineligible ambience; no hidden
+extra AudioContext or saved permission boolean is created.
 
 This change does not edit section HTML/CSS, skins, TECH/workspace/guest files or
 other aesthetics. Levels are starting values, not normalized loudness claims;

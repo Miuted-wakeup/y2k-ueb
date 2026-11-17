@@ -31,13 +31,15 @@
       rules.set(section, { tracks, volume: finite(rule.volume) && rule.volume >= 0 && rule.volume <= 1 ? rule.volume : .10 });
     }
     let media = null, section = null, entered = false, pageActive = true, destroyed = false;
-    let loadedSection = null, source = '', pendingSeek = null, generation = 0, starting = false, priming = false;
+    let loadedPool = null, source = '', pendingSeek = null, generation = 0, starting = false, priming = false;
     let failure = null, fadeTimer = null, duckTimer = null, loadTimer = null, ducked = false, targetVolume = 0;
     const clearTimer = id => { if (id !== null) win.clearTimeout(id); };
     function listen(target, name, fn) {
       target?.addEventListener?.(name, fn); cleanups.push(() => target?.removeEventListener?.(name, fn));
     }
-    const currentRule = () => rules.get(section);
+    // Routes without an explicit override share one default pool and timeline.
+    const poolKey = routeSection => rules.has(routeSection) ? routeSection : 'default';
+    const currentRule = () => rules.get(poolKey(section));
     const visible = () => pageActive && !win.document?.hidden;
     const eligible = () => !destroyed && entered && visible() && options.allowed()
       && !options.foreground() && options.master() > 0 && !!currentRule()?.tracks.length;
@@ -45,10 +47,10 @@
       const value = options.random();
       return Math.floor((finite(value) ? Math.max(0, Math.min(.999999999, value)) : .5) * length);
     }
-    function nextTrack(nextSection) {
-      const count = rules.get(nextSection)?.tracks.length || 0;
+    function nextTrack(pool) {
+      const count = rules.get(pool)?.tracks.length || 0;
       if (!count) return null;
-      let bag = bags.get(nextSection);
+      let bag = bags.get(pool);
       if (!bag?.length) {
         bag = Array.from({ length: count }, (_, index) => index);
         for (let i = count - 1; i > 0; i--) {
@@ -56,12 +58,12 @@
         }
         // Each URL plays once per round; the next round cannot immediately
         // repeat its predecessor either. Pause/navigation never draw again.
-        if (count > 1 && bag[0] === indices.get(nextSection)) {
+        if (count > 1 && bag[0] === indices.get(pool)) {
           const other = 1 + randomIndex(count - 1); [bag[0], bag[other]] = [bag[other], bag[0]];
         }
-        bags.set(nextSection, bag);
+        bags.set(pool, bag);
       }
-      const index = bag.shift(); indices.set(nextSection, index); return index;
+      const index = bag.shift(); indices.set(pool, index); return index;
     }
     function pause(reset = false) {
       if (!media) return;
@@ -76,9 +78,9 @@
       try { media.currentTime = pendingSeek; pendingSeek = null; } catch (_) { /* Apply again after metadata. */ }
     }
     function prepare(nextSection) {
-      const rule = rules.get(nextSection);
+      const pool = poolKey(nextSection), rule = rules.get(pool);
       if (!rule?.tracks.length) return false;
-      const index = indices.has(nextSection) ? indices.get(nextSection) : nextTrack(nextSection);
+      const index = indices.has(pool) ? indices.get(pool) : nextTrack(pool);
       const nextSource = rule.tracks[index];
       if (!media) {
         media = options.makeMedia();
@@ -88,18 +90,18 @@
         listen(media, 'error', () => { if (!destroyed) { pause(); failure = 'MediaError'; } });
         listen(media, 'ended', () => {
           if (destroyed || !media.ended) return;
-          const previousSection = loadedSection, previousRule = rules.get(previousSection);
+          const previousPool = loadedPool, previousRule = rules.get(previousPool);
           pause(true);
           if (!previousRule?.tracks.length) return;
-          nextTrack(previousSection);
-          source = ''; prepare(previousSection); sync();
+          nextTrack(previousPool);
+          source = ''; prepare(previousPool); sync();
         });
       }
       if (nextSource !== source) {
-        pause(); source = nextSource; loadedSection = nextSection; failure = null;
+        pause(); source = nextSource; failure = null;
         pendingSeek = positions.get(source) || 0; media.src = source; seek();
       }
-      loadedSection = nextSection;
+      loadedPool = pool;
       media.loop = rule.tracks.length === 1;
       return true;
     }
@@ -158,7 +160,8 @@
     function setRoute(nextSection, ready) {
       if (destroyed) return;
       if (section !== nextSection) {
-        pause(); section = nextSection; failure = null;
+        if (poolKey(section) !== poolKey(nextSection)) { pause(); failure = null; }
+        section = nextSection;
         clearTimer(duckTimer); duckTimer = null; ducked = false;
       }
       entered = ready === true;
@@ -181,8 +184,8 @@
     listen(win, 'pagehide', () => { pageActive = false; pause(); });
     listen(win, 'pageshow', () => { pageActive = true; }); // Controller revalidates before resuming.
     return Object.freeze({ setRoute, prime, sync, pause, duck,
-      snapshot: () => ({ section, configured: !!currentRule()?.tracks.length, count: currentRule()?.tracks.length || 0,
-        index: indices.get(section) || 0, playing: !!media && !media.paused && media.volume > 0,
+      snapshot: () => ({ section, pool: poolKey(section), configured: !!currentRule()?.tracks.length, count: currentRule()?.tracks.length || 0,
+        index: indices.get(poolKey(section)) || 0, playing: !!media && !media.paused && media.volume > 0,
         volume: media?.volume || 0, error: failure }),
       getMedia: () => media,
       destroy() {

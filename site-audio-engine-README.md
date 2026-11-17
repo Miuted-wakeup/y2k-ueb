@@ -140,38 +140,44 @@ node --check home-companion-speech.js
 Unit tests cover native outcomes and ownership with fakes. They do not replace
 the shell's fresh-profile file/HTTP permission, navigation and waveform checks.
 
-## Optional HOME ambient layer
+## Shared ambient layer
 
 Pass `ambience: SiteAudioCore.AMBIENCE` when creating the engine, then call the
 parent-only `engine.setAmbience(section, entered)` as the shell route/entry state
 changes. No child command or protocol field is added. An empty `tracks` list
-means no soundtrack. Files belong in `assets/music/ambient/home/`; HOME now
-registers `crystal-settings.mp3`, downloaded through the user's tool. Additional
-files must be registered by exact relative path, not discovered automatically.
+means no soundtrack. `AMBIENCE.default` supplies all seven sections with one
+shared media instance, track selection, playback position and shuffle bag. It
+registers `assets/music/ambient/home/crystal-settings.mp3`, downloaded through the
+user's tool; the historical folder name does not limit playback scope. Additional
+files under `assets/music/ambient/` must be registered by exact relative path,
+not discovered automatically. Explicit section rules can override the default;
+an empty section override intentionally disables ambience for that section.
 
 Only same-origin/file URLs under `assets/music/ambient/` with recognized audio
 extensions are accepted, up to 32 tracks per rule. Configured `volume` is a
-multiplier of master volume. The initial HOME multiplier is 0.10. Ambient native
+multiplier of master volume. The default multiplier is 0.10. Ambient native
 media is lazy and separate from main `isPlaying`/track/seek persistence. It is
 primed silently from the real activation event when a source exists, but this
 promise never gates native activation. Media errors/autoplay refusal remain
 ambient-only, with an eight-second start watchdog and no automatic retry loop.
 
 Foreground main/favorite playback wins over ambience, including pending/requested
-playback; ambience pauses immediately and eligible HOME can resume afterward.
+playback; ambience pauses immediately and eligible shared ambience can resume afterward.
 It also obeys entered/native-active, mute/zero, visibility, page lifecycle and
-route rules. Native media events advance a per-section Fisher-Yates shuffle bag; the first
+route rules. Native media events advance a per-pool Fisher-Yates shuffle bag; the first
 track is random, every unique source plays once per round, and new rounds avoid
 immediately repeating their predecessor. Duplicate URLs are removed. Pause and
-route changes preserve the current selection/bag; a single track loops. Short output ramps avoid abrupt starts; Shurelia glyphs duck
-ambient output to 30% for 260ms (extended by later glyphs), then fade back.
+route changes preserve the current selection/bag. Switching routes within the
+same default pool does not pause or restart playback; a single track loops.
+Short output ramps avoid abrupt starts. HOME Shurelia glyphs duck ambient output
+to 30% for 260ms (extended by later glyphs), then fade back.
 
 HOME's `shurelia` voice is created with optional speech `gain: 0.20`; all other
 instances retain the helper default 0.12. `requirePlaying: false` is preserved,
 so starting the main song never disables her voice. The helper's optional gain
 accepts finite numbers from 0 to 0.35, with invalid/absent values falling back.
 
-`engine.getAmbienceState()` exposes parent-only diagnostic state; native media
+`engine.getAmbienceState()` exposes parent-only route/pool diagnostic state; native media
 inspection now includes optional `ambience`. This adds no visual component and
 requires no edits to section HTML/CSS or player skins. Actual track balance and
 browser autoplay behavior are unverified: the configured MP3 was created by the

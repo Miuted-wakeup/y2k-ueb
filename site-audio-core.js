@@ -25,7 +25,7 @@
   ].map(Object.freeze));
   // Explicit ambient allowlist. Empty tracks intentionally produce no ambience.
   const AMBIENCE = Object.freeze({
-    home: Object.freeze({ volume: 0.10, tracks: Object.freeze(['assets/music/ambient/home/crystal-settings.mp3']) })
+    default: Object.freeze({ volume: 0.10, tracks: Object.freeze(['assets/music/ambient/home/crystal-settings.mp3']) })
   });
   const kinds = new Set(['hello', 'state', 'command', 'ack', 'navigate', 'replace', 'page-ready', 'page-leaving', 'request-activation']);
   const validToken = token => typeof token === 'string' && /^[a-f0-9]{32}$/i.test(token);
