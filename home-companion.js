@@ -20,7 +20,7 @@
     ? require('./home-companion-messages.js') : host.HOME_COMPANION_MESSAGES;
   const REACTIONS = typeof module !== 'undefined' && module.exports
     ? require('./home-companion-reactions.js') : host.HOME_COMPANION_REACTIONS;
-  const fallback = { text: 'Hola, viajera. Puedes quedarte un rato.', mood: 'warm' };
+  const fallback = { text: 'Hola, viajero. Puedes quedarte un rato.', mood: 'warm' };
   function normalizeMessageLink(input) {
     if (!input || typeof input.url !== 'string' || input.url.length > 2048) return null;
     try {
@@ -216,8 +216,8 @@
       <div class="he-shell">
         <div class="he-titlebar"><span>★ MUTED'S DIGITAL SANCTUARY</span><span aria-hidden="true">─ □ ×</span></div>
         <header class="he-heading"><p class="he-kicker">PERSONAL WEB / Y2K MODE</p><h1 id="home-entry-title">★ mi espacio ★</h1><p>わたしのせかい · un pequeño rincón de internet</p></header>
-        <div class="he-stage"><div class="he-copy"><p class="he-label">BIENVENIDA A CASA</p><h2>Fuera del algoritmo,<br>dentro de mi mundo.</h2>
-          <p id="home-entry-description">Entra, ponte cómoda y deja que Shurelia te dé la bienvenida. El sonido del personaje es opcional; la música no se iniciará.</p>
+        <div class="he-stage"><div class="he-copy"><p class="he-label">BIENVENIDO A CASA</p><h2>Fuera del algoritmo,<br>dentro de mi mundo.</h2>
+          <p id="home-entry-description">Entra, ponte cómodo y deja que Shurelia te dé la bienvenida. El sonido del personaje es opcional; la música no se iniciará.</p>
           <button id="home-entry-start" type="button">ENTRAR <span>▶ activar sonido</span></button>
           <button id="home-entry-silent" type="button">Entrar sin sonido</button>
           <p id="home-entry-status" role="status" aria-live="polite">Tú eliges cómo entrar.</p></div>
@@ -248,7 +248,7 @@
         primary.disabled = phase === 'unlocking' || phase === 'revealing';
         silent.disabled = phase === 'revealing';
         status.textContent = phase === 'unlocking' ? 'Permitiendo el sonido… Puedes entrar sin él.' : phase === 'failed'
-          ? 'El sonido no se pudo activar. Reintenta o entra sin sonido.' : phase === 'revealing' ? 'Bienvenida a mi espacio.' : 'Tú eliges cómo entrar.';
+          ? 'El sonido no se pudo activar. Reintenta o entra sin sonido.' : phase === 'revealing' ? 'Bienvenido a mi espacio.' : 'Tú eliges cómo entrar.';
         if (phase === 'failed') { primary.textContent = 'REINTENTAR SONIDO'; primary.focus({ preventScroll: true }); }
         if (phase === 'destroyed') remove();
       },

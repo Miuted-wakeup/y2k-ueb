@@ -82,7 +82,7 @@ const diaryEntries = [
   "quiero que este sitio dure para siempre.",
   "estar en línea a las 2am tiene su propia magia.",
   "感謝してる、今日という日に。",
-  "algunos días son solo para existir tranquila.",
+  "algunos días son solo para existir tranquilo.",
   "escuché the mismo álbum tres veces seguidas sin culpa.",
   "el pasado del internet era más honesto.",
   "hoy me sentí exactamente como una canción de city pop.",
