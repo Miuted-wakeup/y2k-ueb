@@ -1,0 +1,53 @@
+/* WITHDRAWN after user feedback. Not linked or enabled by HOME; retained as reference.
+   The supplied preview stays untouched; its PIXTA marks are not removed. */
+body.home-manga-header #site-header {
+  padding: 6px 0;
+  background: #0d0d0d;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+body.home-manga-header #header-inner {
+  align-items: flex-start;
+  gap: 5px;
+}
+
+/* One proportion-preserved module, not a full-width hero. The rest is unassigned.
+   360 x 159.2 is exactly 80% of the original 450 x 199 image. */
+body.home-manga-header #header-logo {
+  flex: 0 0 auto;
+  width: 360px;
+  height: 159.2px;
+  padding: 22px 25px 33px 128px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background: #111 url('assets/images/home/welcome-manga.webp') center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  text-align: center;
+}
+
+body.home-manga-header #site-title {
+  display: block;
+  max-width: 100%;
+  color: #281b21;
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: 0;
+  text-shadow: none;
+  overflow-wrap: anywhere;
+}
+
+body.home-manga-header #site-tagline {
+  display: block;
+  max-width: 100%;
+  margin-top: 0;
+  color: #3c3033;
+  font-size: 9.5px;
+  line-height: 1.45;
+  text-shadow: none;
+  overflow-wrap: anywhere;
+}
+
+/* Keep the existing ticker as its own strip below the small welcome module. */
+body.home-manga-header #header-marquee { align-self: stretch; }
