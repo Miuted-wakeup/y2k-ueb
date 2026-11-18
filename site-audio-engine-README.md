@@ -14,17 +14,19 @@ const engine = SiteAudioEngine.createEngine({
   window,
   SpeechAPI: HomeCompanionSpeech,
   playlist: SiteAudioCore.PLAYLIST,
+  ambience: SiteAudioCore.AMBIENCE,
   baseURL: location.href,
 });
 const unsubscribe = engine.subscribe(state => publishValidatedState(state));
 const allowed = await engine.probe();
 ```
 
-The exact factory options are `window`, `SpeechAPI`, `playlist`, `baseURL`,
+The exact factory options are `window`, `SpeechAPI`, `playlist`, `ambience`, `baseURL`,
 `AudioCtor`, `AudioContextCtor`, `storage`, `now`, and `random`. Native constructors,
-storage and clocks can be injected for tests. The engine has no JS polling or
-audio timers: native media events, AudioContext scheduling and `onended` own
-those lifetimes. It does not attach document or route listeners.
+storage and clocks can be injected. Native media events, AudioContext scheduling
+and `onended` own playback lifetimes. The optional ambient layer adds bounded
+output-ramp, speech-duck and start-watchdog timers, plus visibility/page lifecycle
+listeners; it does not poll routes.
 
 ## Activation is native state, not a storage flag
 
@@ -110,7 +112,8 @@ no native references. `subscribe(fn)` emits strictly increasing revisions and
 returns an unsubscribe function.
 
 Parent-only native QA can call `getNativeContext()` and
-`getNativeMedia(): {music,favorite}`. Never put these results into bridge messages.
+`getNativeMedia(): {music,favorite,ambience}`. Ambience may be null until configured.
+Never put these results into bridge messages.
 `destroy(): Promise` stops media/notes, removes listeners and closes the one owned
 context once. Late promises cannot reactivate a destroyed engine.
 
@@ -147,14 +150,21 @@ parent-only `engine.setAmbience(section, entered)` as the shell route/entry stat
 changes. No child command or protocol field is added. An empty `tracks` list
 means no soundtrack. `AMBIENCE.default` supplies all seven sections with one
 shared media instance, track selection, playback position and shuffle bag. It
-registers `assets/music/ambient/home/crystal-settings.mp3`, downloaded through the
-user's tool; the historical folder name does not limit playback scope. Additional
+registers the original `assets/music/ambient/home/crystal-settings.mp3` and eight
+recordings under `assets/music/ambient/global/`, downloaded through the user's
+tool; the historical folder name does not limit playback scope. Additional
 files under `assets/music/ambient/` must be registered by exact relative path,
 not discovered automatically. Explicit section rules can override the default;
 an empty section override intentionally disables ambience for that section.
 
 Only same-origin/file URLs under `assets/music/ambient/` with recognized audio
-extensions are accepted, up to 32 tracks per rule. Configured `volume` is a
+extensions are accepted, up to 32 entries per rule. Track entries support legacy
+path strings or `{src,title,cover}` objects (`cover` is optional). URLs are deduplicated; the first entry's
+title is kept. Titles remove control characters, trim whitespace and cap at 180
+characters, with a filename fallback. Covers are normalized same-origin/file
+URLs under `assets/images/ambient/`, at most 2048 characters, with PNG/JPEG/WebP/
+AVIF/GIF extensions and no credentials. Invalid or absent covers become null;
+the audio track itself remains eligible. Configured `volume` is a
 multiplier of master volume. The default multiplier is 0.10. Ambient native
 media is lazy and separate from main `isPlaying`/track/seek persistence. It is
 primed silently from the real activation event when a source exists, but this
@@ -177,9 +187,27 @@ instances retain the helper default 0.12. `requirePlaying: false` is preserved,
 so starting the main song never disables her voice. The helper's optional gain
 accepts finite numbers from 0 to 0.35, with invalid/absent values falling back.
 
-`engine.getAmbienceState()` exposes parent-only route/pool diagnostic state; native media
-inspection now includes optional `ambience`. This adds no visual component and
-requires no edits to section HTML/CSS or player skins. Actual track balance and
-browser autoplay behavior are unverified: the configured MP3 was created by the
-requested download/conversion, but no tests/runtime checks/builds were requested
-or run. No listening or loudness analysis was performed.
+`engine.getAmbienceState()` exposes parent-only route/pool diagnostic state and
+the current title/cover; native inspection includes optional `ambience`.
+
+`engine.subscribeAmbience(fn)` returns an unsubscribe function. It emits a frozen
+`{id,section,pool,src,title,cover}` once after native `play()` succeeds and ambient output
+first becomes positive and unmuted while eligible. IDs increase for each actual
+start/resume. It emits no native objects or bridge messages, and does not replay
+an earlier event to a new subscriber. Preloads, muted entry primes, ordinary
+same-pool navigation and later volume/duck ramps do not emit another start.
+Pause cancels an outstanding announcement; destruction clears subscribers.
+
+The shared shell subscribes before controller startup and shows one polite,
+noninteractive top-left status card for 4.2 seconds. A decorative 44px cover sits
+beside the title when the configured local image loads; errors or missing images
+retain title-only presentation. Image loading neither gates playback nor restarts
+the notice timeout. It themes the visible card
+to the current route without a new announcement or timeout reset. It hides before
+entry, on visibility loss and page exit; persisted pagehide preserves the
+subscription for BFCache while ordinary pagehide disposes it. Only shared shell
+CSS/JS is changed, not section HTML/CSS or player skins.
+
+Actual track balance and browser autoplay behavior remain unverified: the MP3s
+were created by the requested download/conversion, but no tests/runtime checks,
+builds, listening or loudness analysis were requested or run for this addition.

@@ -1,4 +1,4 @@
-// Local workbench navigation and a manual filmstrip. No autoplay, clones or network calls.
+// Blog navigation, an optional laboratory and a manual filmstrip. No autoplay or network calls.
 (function (win) {
   'use strict';
   if (win.SiteAudioShell?.isHost) return;
@@ -14,12 +14,24 @@
       cleanup.push(() => element.removeEventListener(name, handler, options));
     };
     const motion = () => win.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    const content = doc.getElementById('center-feed');
     workspace.querySelectorAll('[data-tech-section]').forEach(button => {
       listen(button, 'click', () => {
         const target = doc.getElementById(button.dataset.techSection);
         if (!target) return;
-        target.scrollIntoView({ block: 'start', behavior: motion() });
-        const focus = target.id === 'panel-tech-terminal' ? doc.getElementById('terminal-cli-input') : target;
+        // An explicit jump to a tool reveals its closed laboratory first.
+        for (let disclosure = target.closest('details'); disclosure; disclosure = disclosure.parentElement?.closest('details')) {
+          disclosure.open = true;
+        }
+        if (content?.contains(target)) {
+          // Scroll the blog column only, never its fixed author rail or masthead.
+          const zoom = Number(win.getComputedStyle(doc.documentElement).zoom) || 1;
+          const inset = parseFloat(win.getComputedStyle(content).scrollPaddingTop) || 0;
+          const top = content.scrollTop + (target.getBoundingClientRect().top - content.getBoundingClientRect().top) / zoom - inset;
+          content.scrollTo({ top: Math.max(0, top), behavior: motion() });
+        }
+        const focus = target.id === 'panel-tech-terminal' ? doc.getElementById('terminal-cli-input')
+          : target.matches('details') ? target.querySelector('summary') : target;
         focus?.focus({ preventScroll: true });
       });
     });
@@ -38,7 +50,7 @@
       });
       function update() {
         frame = 0;
-        if (!cards.length) return;
+        if (!cards.length || !track.getClientRects().length) return;
         const bounds = track.getBoundingClientRect();
         const left = bounds.left;
         active = cards.reduce((best, card, index) =>
@@ -70,6 +82,8 @@
       listen(next, 'click', () => move(1));
       listen(track, 'scroll', queueUpdate, { passive: true });
       listen(win, 'resize', queueUpdate);
+      const laboratory = track.closest('details');
+      if (laboratory) listen(laboratory, 'toggle', queueUpdate);
       if (win.ResizeObserver) {
         const observer = new win.ResizeObserver(queueUpdate);
         observer.observe(track);

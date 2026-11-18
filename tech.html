@@ -18,8 +18,11 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="sections.css" />
   <link rel="stylesheet" href="player-skins.css" />
+  <link rel="stylesheet" href="tech-player-cd.css" />
   <link rel="stylesheet" href="tech-terminal-guest.css" />
   <link rel="stylesheet" href="tech-workspace.css" />
+  <link rel="stylesheet" href="tech-backgrounds.css" />
+  <link rel="stylesheet" href="tech-paint.css" />
   <!-- Persistent audio host: each direct section validates its own destination. -->
   <link rel="stylesheet" href="site-audio-shell.css" />
   <script src="site-audio-core.js"></script>
@@ -80,145 +83,26 @@
       </div>
     </div>
 
-    <!-- AERO WORKSTATION: one scrollable desktop, several distinct work surfaces. -->
+    <!-- AERO BLOG: the author and entries lead; optional tools stay in the laboratory. -->
     <div id="layout" class="tech-shell">
-      <!-- One shared page scroll surface; no independent blog sidebars. -->
-      <main id="center-feed" class="tech-workspace" aria-label="Escritorio personal de tecnología">
+      <!-- Author and links remain anchored; only the central blog column scrolls. -->
+      <div class="tech-workspace">
         <div class="tech-desk-heading">
           <div>
-            <h1>El laboratorio de Muted</h1>
-            <p>C:\Users\muted\Tech\ · hardware, interfaces y pequeños programas del wired</p>
+            <h1>Tech · apuntes del wired</h1>
+            <p>Aprendizajes, pensamientos y experiencias con la tecnología.</p>
           </div>
-          <nav class="tech-local-nav" aria-label="Recorrer el escritorio">
-            <button type="button" data-tech-section="panel-tech-terminal" aria-controls="panel-tech-terminal">01 · consola.exe</button>
-            <button type="button" data-tech-section="tech-gadgets" aria-controls="tech-gadgets">02 · cacharros</button>
-            <button type="button" data-tech-section="tech-rig" aria-controls="tech-rig">03 · mi PC</button>
-            <button type="button" data-tech-section="tech-readme" aria-controls="tech-readme">04 · léeme.txt</button>
-          </nav>
+          <div class="tech-desk-actions">
+            <nav class="tech-local-nav" aria-label="Recorrer el blog de Tech">
+              <button type="button" data-tech-section="tech-blog-feed" aria-controls="tech-blog-feed">01 · entradas</button>
+              <button type="button" data-tech-section="tech-laboratory" aria-controls="tech-laboratory">02 · laboratorio</button>
+            </nav>
+            <button type="button" class="tech-background-button" id="tech-wallpaper-toggle" aria-controls="tech-wallpaper-settings" aria-expanded="false">▧ Personalizar fondo</button>
+          </div>
         </div>
 
-        <!-- Main workbench: a wide console beside a compact tray of native gadgets. -->
-        <div class="tech-workbench">
-          <div class="panel" id="panel-tech-terminal">
-            <div class="panel-titlebar">
-              <span class="panel-title">✦ POWERSHELL · NAVI</span>
-              <div class="panel-controls">
-                <span class="panel-btn">─</span>
-                <span class="panel-btn">✕</span>
-              </div>
-            </div>
-            <div class="panel-body" style="padding:6px;">
-              <div class="tech-terminal" role="group" aria-label="Réplica de la consola de muted">
-                <div class="terminal-main">
-                  <div class="terminal-session" id="terminal-cli-session">
-                    <div class="terminal-header">Windows PowerShell 1.0</div>
-                    <div class="terminal-output" id="terminal-cli-output" role="log" aria-live="polite" aria-relevant="additions text"></div>
-                    <div class="terminal-input-wrap">
-                      <label class="terminal-prompt" for="terminal-cli-input">PS C:\Users\muted&gt;</label>
-                      <input type="text" class="terminal-input" id="terminal-cli-input" aria-label="Comando de NAVI; escribe help para ver los comandos" maxlength="500" autocomplete="off" spellcheck="false" autocapitalize="off">
-                    </div>
-                  </div>
-                  <div class="terminal-shortcuts" aria-label="Comandos rápidos">
-                    <button type="button" class="term-btn" data-cmd="help">help</button>
-                    <button type="button" class="term-btn" data-cmd="ascii">ascii</button>
-                    <button type="button" class="term-btn" data-cmd="shurelia">shurelia</button>
-                    <button type="button" class="term-btn" data-cmd="talk">talk</button>
-                    <button type="button" class="term-btn" data-cmd="matrix">matrix</button>
-                    <button type="button" class="term-btn" data-cmd="theme amber">amber</button>
-                    <button type="button" class="term-btn" data-cmd="clear">clear</button>
-                  </div>
-                </div>
-                <!-- A fictional 2007 rig in the user's original terminal layout; not live telemetry. -->
-                <aside class="terminal-navi" aria-label="NAVI: recreación de un equipo retro de 2007">
-                  <figure class="navi-portrait">
-                    <img src="assets/gifs/tech/lain-glitch-framed.gif" width="181" height="212" alt="Lain entre interferencias de una pantalla CRT">
-                    <figcaption>present day</figcaption>
-                  </figure>
-                  <section class="navi-status" aria-labelledby="navi-status-heading">
-                    <h3 id="navi-status-heading">// navi status</h3>
-                    <dl class="navi-readings">
-                      <div><dt>cpu</dt><dd>Core 2 Duo E6600 @ 2.40GHz</dd></div>
-                      <div><dt>gpu</dt><dd>NVIDIA GeForce 8800 GTX</dd></div>
-                      <div><dt>vram</dt><dd>768 MiB GDDR3</dd></div>
-                      <div><dt>mem</dt><dd class="navi-meter-reading"><span class="navi-meter" aria-label="Memoria: 54%">[ <span class="navi-meter-track"><span class="navi-meter-fill navi-meter-memory"></span></span> ]</span><span>2.16 GiB / 4.00 GiB</span></dd></div>
-                      <div><dt>disk</dt><dd class="navi-meter-reading"><span class="navi-meter" aria-label="Disco: 32%">[ <span class="navi-meter-track"><span class="navi-meter-fill navi-meter-disk"></span></span> ]</span><span>74.62 GiB / 232.88 GiB</span></dd></div>
-                      <div><dt>net</dt><dd>↓ 228 B/s&nbsp;&nbsp; ↑ 221 B/s</dd></div>
-                    </dl>
-                  </section>
-                  <section class="navi-system" aria-labelledby="navi-system-heading">
-                    <h3 id="navi-system-heading">NAVI</h3>
-                    <dl class="navi-readings">
-                      <div><dt>uptime</dt><dd>6 hours, 17 mins</dd></div>
-                      <div><dt>system</dt><dd>Windows Vista Ultimate x64</dd></div>
-                      <div><dt>grid</dt><dd>1680x1050 @ 60Hz</dd></div>
-                    </dl>
-                    <p class="navi-protocol">protocol 7 // wired</p>
-                    <p class="terminal-prompt">PS C:\Users\muted&gt;</p>
-                  </section>
-                </aside>
-              </div>
-            </div>
-          </div>
-          <section class="tech-toolshelf" aria-label="Bandeja de utilidades">
-            <div class="tech-instruments">
-              <div id="tech-clock" class="panel">
-                <div class="panel-titlebar">
-                  <span class="panel-title">✦ CLOCK</span>
-                  <div class="panel-controls">
-                    <span class="panel-btn">─</span>
-                    <span class="panel-btn">✕</span>
-                  </div>
-                </div>
-                <div class="panel-body vista-clock-box">
-                  <div class="vista-clock-circle">
-                    <div class="vista-hand hour" id="vista-hour-hand"></div>
-                    <div class="vista-hand minute" id="vista-minute-hand"></div>
-                    <div class="vista-hand second" id="vista-second-hand"></div>
-                    <div class="vista-clock-center"></div>
-                  </div>
-                  <span style="font-family:var(--font-digital);font-size:16px;color:#005F8A;margin-top:6px;" id="clock-time">00:00:00</span>
-                </div>
-              </div>
-              <div id="tech-weather" class="panel">
-                <div class="panel-titlebar">
-                  <span class="panel-title">✦ WEATHER / 東京</span>
-                  <div class="panel-controls">
-                    <span class="panel-btn">─</span>
-                    <span class="panel-btn">✕</span>
-                  </div>
-                </div>
-                <div class="panel-body" style="padding:6px;">
-                  <div class="vista-weather-box">
-                    <div class="weather-icon">☀️</div>
-                    <div class="weather-info">
-                      <span class="weather-temp">24°C</span>
-                      <span class="weather-city">Akihabara, Tokyo 🇯🇵</span>
-                      <span style="font-size:9px;color:var(--text-dim);font-family:var(--font-jp);">Soleado · Viento 8km/h</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div id="tech-audio" class="panel">
-                <div class="panel-titlebar">
-                  <span class="panel-title">✦ AUDIO ENGINE</span>
-                  <div class="panel-controls">
-                    <span class="panel-btn">─</span>
-                    <span class="panel-btn">✕</span>
-                  </div>
-                </div>
-                <div class="panel-body" style="text-align:center;padding:8px;">
-                  <div style="display:flex;justify-content:center;gap:4px;height:24px;align-items:flex-end;">
-                    <span class="eq-bar" style="height:18px;"></span>
-                    <span class="eq-bar" style="height:24px;"></span>
-                    <span class="eq-bar" style="height:12px;"></span>
-                    <span class="eq-bar" style="height:20px;"></span>
-                    <span class="eq-bar" style="height:16px;"></span>
-                    <span class="eq-bar" style="height:22px;"></span>
-                  </div>
-                  <span class="tech-audio-label" style="color:var(--text-dim);margin-top:4px;display:block;">44.1kHz · 24-BIT HI-FI</span>
-                </div>
-              </div>
-            </div>
+        <div class="tech-blog-layout">
+          <aside class="tech-blog-sidebar" aria-label="Perfil y enlaces de Muted">
             <div class="panel" id="panel-msn">
               <div class="panel-titlebar">
                 <span class="panel-title">✦ MSN MESSENGER 8.5</span>
@@ -234,7 +118,7 @@
                     <span class="msn-status-dot"></span>
                   </div>
                   <div class="msn-meta">
-                    <span class="msn-name">☆ MUTED (online) ☆</span>
+                    <span class="msn-name">☆ MUTED ☆</span>
                     <span class="msn-status-text">( ´ ∀ ` ) · en línea</span>
                     <span style="font-size:8px;color:var(--text-dim);font-family:var(--font-pixel);">Muted · MSN</span>
                   </div>
@@ -275,230 +159,383 @@
                 </a>
               </div>
             </div>
+          </aside>
+          <main id="center-feed" class="tech-blog-content" tabindex="0" aria-label="Contenido desplazable del blog de tecnología de Muted">
+            <section id="tech-wallpaper-settings" class="panel tech-wallpaper-settings" aria-labelledby="tech-wallpaper-heading" hidden>
+              <div class="panel-titlebar">
+                <h2 id="tech-wallpaper-heading" class="panel-title">✦ PROPIEDADES DE PANTALLA · FONDO</h2>
+                <button type="button" id="tech-wallpaper-close" class="tech-wallpaper-close" aria-label="Cerrar selector de fondos">✕</button>
+              </div>
+              <div class="panel-body">
+                <p class="tech-wallpaper-intro">Elige un fondo para este escritorio. Solo cambia tu vista de Tech; no afecta a las demás secciones.</p>
+                <div class="tech-wallpaper-grid" id="tech-wallpaper-grid" role="group" aria-label="Fondos de Tech"></div>
+                <div class="tech-wallpaper-footer">
+                  <button type="button" class="tech-background-button" id="tech-wallpaper-reset">Restaurar original</button>
+                  <p id="tech-wallpaper-status" role="status" aria-live="polite">Fondo actual: Original de Tech.</p>
+                </div>
+              </div>
+            </section>
+          <section id="tech-blog-feed" class="tech-blog-feed" tabindex="-1" aria-label="Entradas y apuntes de Tech">
+            <!-- Prepend real dated entries here, newest first. Existing undated material keeps no invented publication dates. -->
+            <article tabindex="-1" id="tech-essay" class="panel tech-entry post">
+              <div class="panel-titlebar">
+                <span class="panel-title">★ ESSAY — La calidez humana del Skeuomorphism</span>
+                <div class="panel-controls">
+                  <span class="panel-btn">─</span>
+                  <span class="panel-btn">✕</span>
+                </div>
+              </div>
+              <div class="panel-body post-long">
+                <span class="post-tag" style="background:#00A8E8;color:#FFF;">DISEÑO DE INTERFACES</span>
+                <h2 class="post-title" style="color:#005F8A;margin:6px 0 10px;">Por qué el Flat Design le robó el alma al software.</h2>
+                <p>
+                  En la era de Windows Vista, Mac OS X Tiger e iOS 6, cada control en pantalla tenía volumen, brillo y textura. Un botón no era un rectángulo gris plano con texto: era una cápsula de vidrio que proyectaba una sombra suave sobre el fondo. Los iconos parecían objetos que podías sostener en tus manos.
+                </p>
+                <p>
+                  El diseño plano actual optimizó la carga y facilitó el trabajo a las corporaciones, pero a costa de volver cada pantalla estéril e indistinguible. El Frutiger Aero representaba un futuro cálido y lleno de posibilidades, no un formulario corporativo en blanco y negro.
+                </p>
+              </div>
+            </article>
+            <article tabindex="-1" id="tech-readme" class="panel tech-entry aero-hero-banner">
+              <div class="panel-titlebar">
+                <span class="panel-title">🫧 次世代の透明な世界 · THE AERO ODYSSEY</span>
+                <div class="panel-controls">
+                  <span class="panel-btn">─</span>
+                  <span class="panel-btn">✕</span>
+                </div>
+              </div>
+              <div class="panel-body aero-hero-content">
+                <div class="aero-hero-title">
+                  <span>FRUTIGER AERO SANCTUARY</span>
+                  <span style="font-size:10px;color:#27AE60;font-family:var(--font-pixel);">EST. 2006</span>
+                </div>
+                <div class="aero-hero-sub">
+                  El optimismo futurista que perdimos: colinas verdes, agua cristalina, orbes y vidrio translúcido.
+                </div>
+                <p class="aero-hero-desc">
+                  A mediados de los 2000, la tecnología no pretendía ser un bloque negro y minimalista de titanio. Soñábamos con interfaces translúcidas que reflejaran el cielo, botones con textura de gelatina que daban ganas de tocar, peces tropicales nadando dentro de orbes de cristal y una convivencia pacífica entre la naturaleza y la alta tecnología.
+                </p>
+              </div>
+            </article>
+            <article id="tech-manifesto" class="panel tech-entry">
+              <div class="panel-titlebar">
+                <span class="panel-title">✦ FRUTIGER AERO MANIFESTO (3 PILARES)</span>
+                <div class="panel-controls">
+                  <span class="panel-btn">─</span>
+                  <span class="panel-btn">✕</span>
+                </div>
+              </div>
+              <div class="panel-body" style="padding:10px;">
+                <div class="tech-pillar-list">
+                  <div style="background:rgba(255,255,255,0.75);border:1px solid #95D3EE;border-radius:4px;padding:8px;">
+                    <span style="font-family:var(--font-pixel);font-size:7px;color:#005F8A;display:block;margin-bottom:4px;">01. TRANSPARENCIA</span>
+                    <p style="font-size:10.5px;color:var(--text);font-family:var(--font-jp);line-height:1.4;">Vidrio esmerilado, reflejos de luz y refracción óptica que daban profundidad tridimensional.</p>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.75);border:1px solid #95D3EE;border-radius:4px;padding:8px;">
+                    <span style="font-family:var(--font-pixel);font-size:7px;color:#27AE60;display:block;margin-bottom:4px;">02. NATURALEZA Y AGUA</span>
+                    <p style="font-size:10.5px;color:var(--text);font-family:var(--font-jp);line-height:1.4;">Cielos despejados, hojas verdes con rocío y ondas acuáticas integradas al entorno digital.</p>
+                  </div>
+                  <div style="background:rgba(255,255,255,0.75);border:1px solid #95D3EE;border-radius:4px;padding:8px;">
+                    <span style="font-family:var(--font-pixel);font-size:7px;color:#2F80ED;display:block;margin-bottom:4px;">03. OPTIMISMO UTÓPICO</span>
+                    <p style="font-size:10.5px;color:var(--text);font-family:var(--font-jp);line-height:1.4;">La creencia sincera de que el futuro y la tecnología nos llevarían a un mundo más luminoso y limpio.</p>
+                  </div>
+                </div>
+              </div>
+            </article>
           </section>
+
+        <details id="tech-laboratory" class="tech-laboratory">
+          <summary class="tech-laboratory-summary">
+            <span>Laboratorio de Tech</span>
+            <small>Consola, Paint y cacharros · abrir cuando quieras explorar</small>
+          </summary>
+          <div class="tech-laboratory-content">
+            <!-- Main workbench: a wide console beside a compact tray of native gadgets. -->
+            <div class="tech-workbench">
+              <div class="panel" id="panel-tech-terminal">
+                <div class="panel-titlebar">
+                  <span class="panel-title">✦ POWERSHELL · NAVI</span>
+                  <div class="panel-controls">
+                    <span class="panel-btn">─</span>
+                    <span class="panel-btn">✕</span>
+                  </div>
+                </div>
+                <div class="panel-body" style="padding:6px;">
+                  <div class="tech-terminal" role="group" aria-label="Réplica de la consola de muted">
+                    <div class="terminal-main">
+                      <div class="terminal-session" id="terminal-cli-session">
+                        <div class="terminal-header">Windows PowerShell 1.0</div>
+                        <div class="terminal-output" id="terminal-cli-output" role="log" aria-live="polite" aria-relevant="additions text"></div>
+                        <div class="terminal-input-wrap">
+                          <label class="terminal-prompt" for="terminal-cli-input">PS C:\Users\muted&gt;</label>
+                          <input type="text" class="terminal-input" id="terminal-cli-input" aria-label="Comando de NAVI; escribe help para ver los comandos" maxlength="500" autocomplete="off" spellcheck="false" autocapitalize="off">
+                        </div>
+                      </div>
+                      <div class="terminal-shortcuts" aria-label="Comandos rápidos">
+                        <button type="button" class="term-btn" data-cmd="help">help</button>
+                        <button type="button" class="term-btn" data-cmd="paint">paint</button>
+                        <button type="button" class="term-btn" data-cmd="fondo">fondo</button>
+                        <button type="button" class="term-btn" data-cmd="ascii">ascii</button>
+                        <button type="button" class="term-btn" data-cmd="shurelia">shurelia</button>
+                        <button type="button" class="term-btn" data-cmd="talk">talk</button>
+                        <button type="button" class="term-btn" data-cmd="matrix">matrix</button>
+                        <button type="button" class="term-btn" data-cmd="theme amber">amber</button>
+                        <button type="button" class="term-btn" data-cmd="clear">clear</button>
+                      </div>
+                    </div>
+                    <!-- A fictional 2007 rig in the user's original terminal layout; not live telemetry. -->
+                    <aside class="terminal-navi" aria-label="NAVI: recreación de un equipo retro de 2007">
+                      <figure class="navi-portrait">
+                        <img src="assets/gifs/tech/lain-glitch-framed.gif" width="181" height="212" alt="Lain entre interferencias de una pantalla CRT">
+                        <figcaption>present day</figcaption>
+                      </figure>
+                      <section class="navi-status" aria-labelledby="navi-status-heading">
+                        <h3 id="navi-status-heading" title="Actividad ficticia de NAVI; no son lecturas del ordenador del visitante.">// navi status · simulado</h3>
+                        <dl class="navi-readings">
+                          <div><dt>cpu</dt><dd>Core 2 Duo E6600 @ 2.40GHz<span data-navi-metric="cpu"> · 28.0%</span></dd></div>
+                          <div><dt>gpu</dt><dd>NVIDIA GeForce 8800 GTX<span data-navi-metric="gpu"> · 9.0%</span></dd></div>
+                          <div><dt>vram</dt><dd data-navi-metric="vram">152 MiB / 768 MiB GDDR3</dd></div>
+                          <div><dt>mem</dt><dd class="navi-meter-reading"><span class="navi-meter" data-navi-meter="memory" aria-label="Memoria: 54%">[ <span class="navi-meter-track"><span class="navi-meter-fill navi-meter-memory"></span></span> ]</span><span data-navi-metric="memory">2.16 GiB / 4.00 GiB</span></dd></div>
+                          <div><dt>disk</dt><dd class="navi-meter-reading"><span class="navi-meter" data-navi-meter="disk" aria-label="Disco: 32%">[ <span class="navi-meter-track"><span class="navi-meter-fill navi-meter-disk"></span></span> ]</span><span data-navi-metric="disk">74.62 GiB / 232.88 GiB</span></dd></div>
+                          <div><dt>net</dt><dd>↓ <span data-navi-metric="download">228 B/s</span>&nbsp;&nbsp; ↑ <span data-navi-metric="upload">221 B/s</span></dd></div>
+                        </dl>
+                      </section>
+                      <section class="navi-system" aria-labelledby="navi-system-heading">
+                        <h3 id="navi-system-heading">NAVI</h3>
+                        <dl class="navi-readings">
+                          <div><dt>uptime</dt><dd data-navi-metric="uptime">6h 17m 0s</dd></div>
+                          <div><dt>system</dt><dd>Windows Vista Ultimate x64</dd></div>
+                          <div><dt>grid</dt><dd>1680x1050 @ 60Hz</dd></div>
+                        </dl>
+                        <p class="navi-protocol">protocol 7 // wired</p>
+                        <p class="terminal-prompt">PS C:\Users\muted&gt;</p>
+                      </section>
+                    </aside>
+                  </div>
+                </div>
+              </div>
+              <section class="tech-toolshelf" aria-label="Bandeja de utilidades">
+                <div class="tech-instruments">
+                  <div id="tech-clock" class="panel">
+                    <div class="panel-titlebar">
+                      <span class="panel-title">✦ CLOCK</span>
+                      <div class="panel-controls">
+                        <span class="panel-btn">─</span>
+                        <span class="panel-btn">✕</span>
+                      </div>
+                    </div>
+                    <div class="panel-body vista-clock-box">
+                      <div class="vista-clock-circle">
+                        <div class="vista-hand hour" id="vista-hour-hand"></div>
+                        <div class="vista-hand minute" id="vista-minute-hand"></div>
+                        <div class="vista-hand second" id="vista-second-hand"></div>
+                        <div class="vista-clock-center"></div>
+                      </div>
+                      <span style="font-family:var(--font-digital);font-size:16px;color:#005F8A;margin-top:6px;" id="clock-time">00:00:00</span>
+                    </div>
+                  </div>
+                  <div id="tech-weather" class="panel">
+                    <div class="panel-titlebar">
+                      <span class="panel-title">✦ WEATHER / 東京</span>
+                      <div class="panel-controls">
+                        <span class="panel-btn">─</span>
+                        <span class="panel-btn">✕</span>
+                      </div>
+                    </div>
+                    <div class="panel-body" style="padding:6px;">
+                      <div class="vista-weather-box">
+                        <div class="weather-icon">☀️</div>
+                        <div class="weather-info">
+                          <span class="weather-temp">24°C</span>
+                          <span class="weather-city">Akihabara, Tokyo 🇯🇵</span>
+                          <span style="font-size:9px;color:var(--text-dim);font-family:var(--font-jp);">Soleado · Viento 8km/h</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="tech-audio" class="panel">
+                    <div class="panel-titlebar">
+                      <span class="panel-title">✦ AUDIO ENGINE</span>
+                      <div class="panel-controls">
+                        <span class="panel-btn">─</span>
+                        <span class="panel-btn">✕</span>
+                      </div>
+                    </div>
+                    <div class="panel-body" style="text-align:center;padding:8px;">
+                      <div style="display:flex;justify-content:center;gap:4px;height:24px;align-items:flex-end;">
+                        <span class="eq-bar" style="height:18px;"></span>
+                        <span class="eq-bar" style="height:24px;"></span>
+                        <span class="eq-bar" style="height:12px;"></span>
+                        <span class="eq-bar" style="height:20px;"></span>
+                        <span class="eq-bar" style="height:16px;"></span>
+                        <span class="eq-bar" style="height:22px;"></span>
+                      </div>
+                      <span class="tech-audio-label" style="color:var(--text-dim);margin-top:4px;display:block;">44.1kHz · 24-BIT HI-FI</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <!-- Applications expand in their own row, never over the console or player. -->
+            <section id="tech-paint-workspace" class="tech-paint-workspace" hidden aria-label="Área de aplicaciones: Paint"></section>
+
+            <div class="tech-workspace-band"><h2>01 / El estante de los cacharros</h2><span>懐かしいテクノロジー · desliza para curiosear</span></div>
+            <div tabindex="-1" id="tech-gadgets" class="panel">
+              <div class="panel-titlebar">
+                <span class="panel-title">✦ GADGET MUSEUM · 懐かしいテクノロジー (2000s HARDWARE)</span>
+                <div class="panel-controls">
+                  <span class="panel-btn">─</span>
+                  <span class="panel-btn">✕</span>
+                </div>
+              </div>
+              <div class="panel-body" style="padding:8px;">
+                <div class="tech-carousel-toolbar">
+                  <span>2005–2006 · una pequeña colección de hardware</span>
+                  <div class="tech-carousel-controls" hidden>
+                    <button type="button" class="tech-carousel-button" data-carousel-step="-1" aria-label="Gadgets anteriores" aria-controls="tech-gadget-track">◀</button>
+                    <output class="tech-carousel-position" aria-live="polite" aria-atomic="true">01–03 / 04</output>
+                    <button type="button" class="tech-carousel-button" data-carousel-step="1" aria-label="Gadgets siguientes" aria-controls="tech-gadget-track">▶</button>
+                  </div>
+                </div>
+                <div class="gadget-grid tech-carousel-track" id="tech-gadget-track" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Museo de gadgets; flechas izquierda y derecha para recorrerlo">
+                  <!-- iPod -->
+                  <div class="gadget-card">
+                    <div class="gadget-img-wrap">
+                      <img src="assets/images/tech/ipod.jpg" class="gadget-img" alt="iPod Classic">
+                    </div>
+                    <span class="gadget-name">iPod Classic 5G</span>
+                    <span class="gadget-year">2005 · Apple</span>
+                    <span class="gadget-desc">Click Wheel impecable y DAC Wolfson cálido.</span>
+                  </div>
+
+                  <!-- Nintendo DS Lite -->
+                  <div class="gadget-card">
+                    <div class="gadget-img-wrap">
+                      <img src="assets/images/tech/nds.jpg" class="gadget-img" alt="Nintendo DS Lite">
+                    </div>
+                    <span class="gadget-name">Nintendo DS Lite</span>
+                    <span class="gadget-year">2006 · Nintendo</span>
+                    <span class="gadget-desc">Doble pantalla táctil y diseño blanco polar glossy.</span>
+                  </div>
+
+                  <!-- PSP -->
+                  <div class="gadget-card">
+                    <div class="gadget-img-wrap">
+                      <img src="assets/images/tech/psp.jpg" class="gadget-img" alt="Sony PSP 1000">
+                    </div>
+                    <span class="gadget-name">Sony PSP 1000</span>
+                    <span class="gadget-year">2005 · Sony</span>
+                    <span class="gadget-desc">XMB wave menú, pantalla panorámica y discos UMD.</span>
+                  </div>
+
+                  <!-- Keitai -->
+                  <div class="gadget-card">
+                    <div class="gadget-img-wrap">
+                      <img src="assets/images/tech/keitai.jpg" class="gadget-img" alt="Japanese Keitai Phone">
+                    </div>
+                    <span class="gadget-name">DoCoMo Keitai</span>
+                    <span class="gadget-year">2005 · Japan</span>
+                    <span class="gadget-desc">Flip phone con charms, pantallas OLED y correo i-mode.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tech-workspace-band"><h2>02 / Dentro de la caja</h2><span>componentes, pegatinas y orgullo de 2007</span></div>
+            <section class="tech-system-drawer" aria-label="Configuración y pegatinas del equipo">
+              <div tabindex="-1" id="tech-rig" class="panel">
+                <div class="panel-titlebar">
+                  <span class="panel-title">✦ HARDWARE SPECS (2007)</span>
+                  <div class="panel-controls">
+                    <span class="panel-btn">─</span>
+                    <span class="panel-btn">✕</span>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="aero-spec-row">
+                    <span class="aero-spec-label">CPU:</span>
+                    <span class="aero-spec-val">Intel Core 2 Duo E6600</span>
+                  </div>
+                  <div class="aero-spec-row">
+                    <span class="aero-spec-label">GPU:</span>
+                    <span class="aero-spec-val">NVIDIA 8800 GTX 768MB</span>
+                  </div>
+                  <div class="aero-spec-row">
+                    <span class="aero-spec-label">RAM:</span>
+                    <span class="aero-spec-val">4.00 GB DDR2 800MHz</span>
+                  </div>
+                  <div class="aero-spec-row">
+                    <span class="aero-spec-label">HDD:</span>
+                    <span class="aero-spec-val">250 GB SATA · 7200 RPM</span>
+                  </div>
+                  <div class="aero-spec-row">
+                    <span class="aero-spec-label">AUDIO:</span>
+                    <span class="aero-spec-val">Sound Blaster X-Fi</span>
+                  </div>
+                  <div class="aero-spec-row">
+                    <span class="aero-spec-label">MONITOR:</span>
+                    <span class="aero-spec-val">SyncMaster 226BW 2ms</span>
+                  </div>
+                  <div class="aero-spec-row">
+                    <span class="aero-spec-label">OS:</span>
+                    <span class="aero-spec-val">Windows Vista Ultimate</span>
+                  </div>
+
+                  <!-- Gauges -->
+                  <div class="aero-gauge-wrap">
+                    <div class="aero-gauge-label">
+                      <span>CPU LOAD</span>
+                      <span>28%</span>
+                    </div>
+                    <div class="aero-gauge-bar">
+                      <div class="aero-gauge-fill" style="width:28%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="aero-gauge-wrap">
+                    <div class="aero-gauge-label">
+                      <span>RAM USAGE</span>
+                      <span>54%</span>
+                    </div>
+                    <div class="aero-gauge-bar">
+                      <div class="aero-gauge-fill blue" style="width:54%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="tech-badges" class="panel">
+                <div class="panel-titlebar">
+                  <span class="panel-title">✦ WEB 2.0 BADGES</span>
+                  <div class="panel-controls">
+                    <span class="panel-btn">─</span>
+                    <span class="panel-btn">✕</span>
+                  </div>
+                </div>
+                <div class="panel-body" style="padding:6px;">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+                    <span class="badge-88x31">DESIGNED FOR VISTA</span>
+                    <span class="badge-88x31 pink">INTEL CORE 2 DUO</span>
+                    <span class="badge-88x31">FLASH PLAYER 9</span>
+                    <span class="badge-88x31 pink">RSS 2.0 FEED</span>
+                    <span class="badge-88x31">VALID XHTML 1.0</span>
+                    <span class="badge-88x31 pink">SKEUOMORPHISM</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+        </details>
+          </main>
         </div>
-
-        <div class="tech-workspace-band"><h2>01 / El estante de los cacharros</h2><span>懐かしいテクノロジー · desliza para curiosear</span></div>
-        <div tabindex="-1" id="tech-gadgets" class="panel">
-          <div class="panel-titlebar">
-            <span class="panel-title">✦ GADGET MUSEUM · 懐かしいテクノロジー (2000s HARDWARE)</span>
-            <div class="panel-controls">
-              <span class="panel-btn">─</span>
-              <span class="panel-btn">✕</span>
-            </div>
-          </div>
-          <div class="panel-body" style="padding:8px;">
-            <div class="tech-carousel-toolbar">
-              <span>2005–2006 · una pequeña colección de hardware</span>
-              <div class="tech-carousel-controls" hidden>
-                <button type="button" class="tech-carousel-button" data-carousel-step="-1" aria-label="Gadgets anteriores" aria-controls="tech-gadget-track">◀</button>
-                <output class="tech-carousel-position" aria-live="polite" aria-atomic="true">01–03 / 04</output>
-                <button type="button" class="tech-carousel-button" data-carousel-step="1" aria-label="Gadgets siguientes" aria-controls="tech-gadget-track">▶</button>
-              </div>
-            </div>
-            <div class="gadget-grid tech-carousel-track" id="tech-gadget-track" tabindex="0" role="region" aria-roledescription="carrusel" aria-label="Museo de gadgets; flechas izquierda y derecha para recorrerlo">
-              <!-- iPod -->
-              <div class="gadget-card">
-                <div class="gadget-img-wrap">
-                  <img src="assets/images/tech/ipod.jpg" class="gadget-img" alt="iPod Classic">
-                </div>
-                <span class="gadget-name">iPod Classic 5G</span>
-                <span class="gadget-year">2005 · Apple</span>
-                <span class="gadget-desc">Click Wheel impecable y DAC Wolfson cálido.</span>
-              </div>
-
-              <!-- Nintendo DS Lite -->
-              <div class="gadget-card">
-                <div class="gadget-img-wrap">
-                  <img src="assets/images/tech/nds.jpg" class="gadget-img" alt="Nintendo DS Lite">
-                </div>
-                <span class="gadget-name">Nintendo DS Lite</span>
-                <span class="gadget-year">2006 · Nintendo</span>
-                <span class="gadget-desc">Doble pantalla táctil y diseño blanco polar glossy.</span>
-              </div>
-
-              <!-- PSP -->
-              <div class="gadget-card">
-                <div class="gadget-img-wrap">
-                  <img src="assets/images/tech/psp.jpg" class="gadget-img" alt="Sony PSP 1000">
-                </div>
-                <span class="gadget-name">Sony PSP 1000</span>
-                <span class="gadget-year">2005 · Sony</span>
-                <span class="gadget-desc">XMB wave menú, pantalla panorámica y discos UMD.</span>
-              </div>
-
-              <!-- Keitai -->
-              <div class="gadget-card">
-                <div class="gadget-img-wrap">
-                  <img src="assets/images/tech/keitai.jpg" class="gadget-img" alt="Japanese Keitai Phone">
-                </div>
-                <span class="gadget-name">DoCoMo Keitai</span>
-                <span class="gadget-year">2005 · Japan</span>
-                <span class="gadget-desc">Flip phone con charms, pantallas OLED y correo i-mode.</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="tech-workspace-band"><h2>02 / Dentro de la caja</h2><span>componentes, pegatinas y orgullo de 2007</span></div>
-        <section class="tech-system-drawer" aria-label="Configuración y pegatinas del equipo">
-          <div tabindex="-1" id="tech-rig" class="panel">
-            <div class="panel-titlebar">
-              <span class="panel-title">✦ HARDWARE SPECS (2007)</span>
-              <div class="panel-controls">
-                <span class="panel-btn">─</span>
-                <span class="panel-btn">✕</span>
-              </div>
-            </div>
-            <div class="panel-body">
-              <div class="aero-spec-row">
-                <span class="aero-spec-label">CPU:</span>
-                <span class="aero-spec-val">Intel Core 2 Duo E6600</span>
-              </div>
-              <div class="aero-spec-row">
-                <span class="aero-spec-label">GPU:</span>
-                <span class="aero-spec-val">NVIDIA 8800 GTX 768MB</span>
-              </div>
-              <div class="aero-spec-row">
-                <span class="aero-spec-label">RAM:</span>
-                <span class="aero-spec-val">4.00 GB DDR2 800MHz</span>
-              </div>
-              <div class="aero-spec-row">
-                <span class="aero-spec-label">HDD:</span>
-                <span class="aero-spec-val">250 GB SATA · 7200 RPM</span>
-              </div>
-              <div class="aero-spec-row">
-                <span class="aero-spec-label">AUDIO:</span>
-                <span class="aero-spec-val">Sound Blaster X-Fi</span>
-              </div>
-              <div class="aero-spec-row">
-                <span class="aero-spec-label">MONITOR:</span>
-                <span class="aero-spec-val">SyncMaster 226BW 2ms</span>
-              </div>
-              <div class="aero-spec-row">
-                <span class="aero-spec-label">OS:</span>
-                <span class="aero-spec-val">Windows Vista Ultimate</span>
-              </div>
-
-              <!-- Gauges -->
-              <div class="aero-gauge-wrap">
-                <div class="aero-gauge-label">
-                  <span>CPU LOAD</span>
-                  <span>28%</span>
-                </div>
-                <div class="aero-gauge-bar">
-                  <div class="aero-gauge-fill" style="width:28%;"></div>
-                </div>
-              </div>
-
-              <div class="aero-gauge-wrap">
-                <div class="aero-gauge-label">
-                  <span>RAM USAGE</span>
-                  <span>54%</span>
-                </div>
-                <div class="aero-gauge-bar">
-                  <div class="aero-gauge-fill blue" style="width:54%;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="tech-badges" class="panel">
-            <div class="panel-titlebar">
-              <span class="panel-title">✦ WEB 2.0 BADGES</span>
-              <div class="panel-controls">
-                <span class="panel-btn">─</span>
-                <span class="panel-btn">✕</span>
-              </div>
-            </div>
-            <div class="panel-body" style="padding:6px;">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
-                <span class="badge-88x31">DESIGNED FOR VISTA</span>
-                <span class="badge-88x31 pink">INTEL CORE 2 DUO</span>
-                <span class="badge-88x31">FLASH PLAYER 9</span>
-                <span class="badge-88x31 pink">RSS 2.0 FEED</span>
-                <span class="badge-88x31">VALID XHTML 1.0</span>
-                <span class="badge-88x31 pink">SKEUOMORPHISM</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div class="tech-workspace-band"><h2>03 / Notas junto al monitor</h2><span>opiniones de una web hecha a mano</span></div>
-        <section class="tech-notebook" aria-label="Notas sobre diseño y Frutiger Aero">
-          <div tabindex="-1" id="tech-readme" class="panel aero-hero-banner">
-            <div class="panel-titlebar">
-              <span class="panel-title">🫧 次世代の透明な世界 · THE AERO ODYSSEY</span>
-              <div class="panel-controls">
-                <span class="panel-btn">─</span>
-                <span class="panel-btn">✕</span>
-              </div>
-            </div>
-            <div class="panel-body aero-hero-content">
-              <div class="aero-hero-title">
-                <span>FRUTIGER AERO SANCTUARY</span>
-                <span style="font-size:10px;color:#27AE60;font-family:var(--font-pixel);">EST. 2006</span>
-              </div>
-              <div class="aero-hero-sub">
-                El optimismo futurista que perdimos: colinas verdes, agua cristalina, orbes y vidrio translúcido.
-              </div>
-              <p class="aero-hero-desc">
-                A mediados de los 2000, la tecnología no pretendía ser un bloque negro y minimalista de titanio. Soñábamos con interfaces translúcidas que reflejaran el cielo, botones con textura de gelatina que daban ganas de tocar, peces tropicales nadando dentro de orbes de cristal y una convivencia pacífica entre la naturaleza y la alta tecnología.
-              </p>
-            </div>
-          </div>
-          <div tabindex="-1" id="tech-essay" class="panel post">
-            <div class="panel-titlebar">
-              <span class="panel-title">★ ESSAY — La calidez humana del Skeuomorphism</span>
-              <div class="panel-controls">
-                <span class="panel-btn">─</span>
-                <span class="panel-btn">✕</span>
-              </div>
-            </div>
-            <div class="panel-body post-long">
-              <span class="post-tag" style="background:#00A8E8;color:#FFF;">DISEÑO DE INTERFACES</span>
-              <h2 class="post-title" style="color:#005F8A;margin:6px 0 10px;">Por qué el Flat Design le robó el alma al software.</h2>
-              <p>
-                En la era de Windows Vista, Mac OS X Tiger e iOS 6, cada control en pantalla tenía volumen, brillo y textura. Un botón no era un rectángulo gris plano con texto: era una cápsula de vidrio que proyectaba una sombra suave sobre el fondo. Los iconos parecían objetos que podías sostener en tus manos.
-              </p>
-              <p>
-                El diseño plano actual optimizó la carga y facilitó el trabajo a las corporaciones, pero a costa de volver cada pantalla estéril e indistinguible. El Frutiger Aero representaba un futuro cálido y lleno de posibilidades, no un formulario corporativo en blanco y negro.
-              </p>
-            </div>
-          </div>
-          <div id="tech-manifesto" class="panel">
-            <div class="panel-titlebar">
-              <span class="panel-title">✦ FRUTIGER AERO MANIFESTO (3 PILARES)</span>
-              <div class="panel-controls">
-                <span class="panel-btn">─</span>
-                <span class="panel-btn">✕</span>
-              </div>
-            </div>
-            <div class="panel-body" style="padding:10px;">
-              <div class="tech-pillar-list">
-                <div style="background:rgba(255,255,255,0.75);border:1px solid #95D3EE;border-radius:4px;padding:8px;">
-                  <span style="font-family:var(--font-pixel);font-size:7px;color:#005F8A;display:block;margin-bottom:4px;">01. TRANSPARENCIA</span>
-                  <p style="font-size:10.5px;color:var(--text);font-family:var(--font-jp);line-height:1.4;">Vidrio esmerilado, reflejos de luz y refracción óptica que daban profundidad tridimensional.</p>
-                </div>
-                <div style="background:rgba(255,255,255,0.75);border:1px solid #95D3EE;border-radius:4px;padding:8px;">
-                  <span style="font-family:var(--font-pixel);font-size:7px;color:#27AE60;display:block;margin-bottom:4px;">02. NATURALEZA Y AGUA</span>
-                  <p style="font-size:10.5px;color:var(--text);font-family:var(--font-jp);line-height:1.4;">Cielos despejados, hojas verdes con rocío y ondas acuáticas integradas al entorno digital.</p>
-                </div>
-                <div style="background:rgba(255,255,255,0.75);border:1px solid #95D3EE;border-radius:4px;padding:8px;">
-                  <span style="font-family:var(--font-pixel);font-size:7px;color:#2F80ED;display:block;margin-bottom:4px;">03. OPTIMISMO UTÓPICO</span>
-                  <p style="font-size:10.5px;color:var(--text);font-family:var(--font-jp);line-height:1.4;">La creencia sincera de que el futuro y la tecnología nos llevarían a un mundo más luminoso y limpio.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
+      </div>
 
     </div>
   </div>
 
   <!-- NOW PLAYING BAR PERSISTENTE -->
   <div id="now-playing-bar" data-player-skin="tech" role="region" aria-label="Reproductor de TECH">
-    <img id="np-kirby" src="assets/gifs/tech/kirby-hang.gif" alt="kirby">
     <div class="np-device" aria-hidden="true">
       <span class="np-device-art"><i></i><i></i></span>
       <span class="np-device-name">AERO MEDIA</span>
@@ -594,9 +631,14 @@
   <script src="home-companion-messages.js"></script>
   <script src="home-companion.js"></script>
   <script src="tech-terminal-guest.js"></script>
+  <script src="tech-wallpapers.js"></script>
+  <script src="tech-backgrounds.js"></script>
+  <script src="tech-paint.js"></script>
+  <script src="tech-terminal-metrics.js"></script>
   <script src="tech-terminal.js"></script>
   <script src="scripts.js"></script>
   <script src="player-skins.js"></script>
+  <script src="tech-player-cd.js"></script>
   <script src="tech-workspace.js"></script>
 </body>
 

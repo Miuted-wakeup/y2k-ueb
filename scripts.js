@@ -271,7 +271,11 @@ const playlist = [
   { title: "hatachi no koi", artist: "sped up", src: "assets/music/hatachi.mp3" },
   { title: "Fly, Kirby!", artist: "Kirby's Return to Dream Land", src: "assets/music/kirby.mp3" },
   { title: "TouhouMAD - Nitori Get Down!", artist: "小野崎人", src: "assets/music/nitori.mp3" },
-  { title: "aishite aishite aishite", artist: "kikuo", src: "assets/music/aishite.mp3" }
+  { title: "aishite aishite aishite", artist: "kikuo", src: "assets/music/aishite.mp3" },
+  { title: "Remember Summer Days", artist: "Anri", src: "assets/music/yt-3agc6do-624.mp3" },
+  { title: "Heroes (NightCore)", artist: "Canal: luna love", src: "assets/music/yt-hxrwlmloaeo.mp3" },
+  { title: "Color Your Night", artist: "Lotus Juice, Azumi Takahashi & ATLUS Sound Team", src: "assets/music/yt-j9sn1nfgqq8.mp3" },
+  { title: "Looping the Rooms feat. Hatsune Miku", artist: "Canal: rusino / ルシノ", src: "assets/music/yt-icbdykfxpms.mp3" }
 ];
 
 let npIndex = client ? client.state().music.index : parseInt(localStorage.getItem('npIndex') || Math.floor(Math.random() * playlist.length));

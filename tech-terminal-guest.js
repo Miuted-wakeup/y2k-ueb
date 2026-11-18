@@ -175,6 +175,10 @@
         listen(reduced, 'change', event => director?.setReducedMotion(event.matches));
         listen(win, 'resize', syncVisibility);
         listen(doc, 'scroll', syncVisibility, true);
+        // Collapsing the optional laboratory hides this visit without a scroll event.
+        for (let disclosure = visitor.closest('details'); disclosure; disclosure = disclosure.parentElement?.closest('details')) {
+          listen(disclosure, 'toggle', syncVisibility);
+        }
         listen(doc, 'visibilitychange', () => {
           if (now() >= expiresAt) { close(false); return; }
           director?.setPageVisible(!doc.hidden);

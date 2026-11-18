@@ -1,0 +1,73 @@
+/* Shared size aligns the corner disc with the controls' inset, not a cutout in the bar. */
+#section-tech {
+  --tech-cd-size: clamp(180px, 22vw, 260px);
+}
+#section-tech > .tech-cd-window {
+  display: block;
+  visibility: hidden;
+  position: fixed;
+  left: calc(var(--tech-cd-size) * -0.5);
+  bottom: calc(var(--tech-cd-size) * -0.25);
+  width: var(--tech-cd-size);
+  height: var(--tech-cd-size);
+  /* Overlay the complete player background (9997), without intercepting its controls. */
+  z-index: 9998;
+  pointer-events: none;
+  user-select: none;
+}
+#section-tech > .tech-cd-window.is-ready { visibility: visible; }
+#section-tech > .tech-cd-window * { pointer-events: none; }
+#section-tech.tech-cd-mounted #now-playing-bar[data-player-skin='tech'] {
+  left: 0;
+  /* Preserve the former content position: outer inset + padding + the removed 2px border. */
+  padding-left: calc(var(--tech-cd-size) * 0.5 + 26px);
+  grid-template-areas: 'info controls seek status volume';
+  grid-template-columns: minmax(150px, 1fr) 144px minmax(180px, 1.3fr) 82px 110px;
+}
+#section-tech.tech-cd-mounted #now-playing-bar[data-player-skin='tech'] .np-device { display: none; }
+#section-tech .tech-cd-slide {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: translateX(0);
+}
+#section-tech .tech-cd-slide.is-stowed {
+  transform: translateX(calc(-100% - 48px));
+}
+#section-tech .tech-cd-disc {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: 49.76% 49.76%;
+  filter: drop-shadow(3px 5px 7px #28516966);
+}
+/* Playback-controlled JS interpolates these transforms; no media query silently cancels it. */
+#section-tech > .tech-cd-window.is-playing .tech-cd-disc { will-change: transform; }
+#section-tech .tech-cd-print {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 30deg, #d7e4e9, #f5fbfd, #9cb3c1, #edf7fb, #bbd0dc, #d7e4e9);
+  /* Source-space ellipse fits the supplied imperfect ring; the entire metal hub stays clear. */
+  --tech-cd-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1254 1254'%3E%3Cpath fill='white' fill-rule='evenodd' d='M1187 624 a563 551 0 1 0 -1126 0 a563 551 0 1 0 1126 0 Z M782 638 a157 155 0 1 0 -314 0 a157 155 0 1 0 314 0 Z'/%3E%3C/svg%3E");
+  -webkit-mask: var(--tech-cd-mask) center / 100% 100% no-repeat;
+  mask: var(--tech-cd-mask) center / 100% 100% no-repeat;
+}
+#section-tech .tech-cd-cover,
+#section-tech .tech-cd-ring { display: block; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#section-tech .tech-cd-cover { object-fit: cover; }
+#section-tech .tech-cd-cover[hidden] { display: none; }
+#section-tech .tech-cd-ring { object-fit: contain; }
+@media (max-width: 900px) {
+  #section-tech.tech-cd-mounted #now-playing-bar[data-player-skin='tech'] {
+    grid-template-columns: minmax(0, 1fr) 132px minmax(0, 1.3fr) 72px 82px;
+    gap: 8px;
+  }
+}
+@media (max-width: 640px) {
+  #section-tech { --tech-cd-size: 160px; }
+}
+@media (max-height: 420px) {
+  #section-tech { --tech-cd-size: 140px; }
+}

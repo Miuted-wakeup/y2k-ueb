@@ -17,22 +17,42 @@
   // Native Audio also works during file:// development without fetch/CORS decoding.
   function createAmbience(options) {
     const win = options.window, rules = new Map(), indices = new Map(), bags = new Map(), positions = new Map(), cleanups = [];
+    const listeners = new Set();
     const root = new URL('assets/music/ambient/', options.baseURL);
+    const coverRoot = new URL('assets/images/ambient/', options.baseURL);
+    function coverURL(src) {
+      try {
+        if (typeof src !== 'string' || src.length > 2048) return null;
+        const url = new URL(src, options.baseURL);
+        return url.protocol === coverRoot.protocol && url.origin === coverRoot.origin && url.pathname.startsWith(coverRoot.pathname)
+          && !url.username && !url.password && /\.(png|jpe?g|webp|avif|gif)$/i.test(url.pathname) ? url.href : null;
+      } catch (_) { return null; }
+    }
+    const cleanTitle = title => typeof title === 'string' ? title.replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, 180) : '';
+    function filenameTitle(src) {
+      try { return cleanTitle(decodeURIComponent(new URL(src).pathname.split('/').pop()).replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ')) || 'Ambiente'; }
+      catch (_) { return 'Ambiente'; }
+    }
     for (const [section, rule] of Object.entries(options.config || {})) {
       if (!/^[a-z][a-z-]{0,31}$/.test(section) || !Array.isArray(rule?.tracks)) continue;
-      const tracks = [...new Set(rule.tracks.slice(0, 32).flatMap(src => {
+      const tracks = [], titles = new Map(), covers = new Map();
+      for (const track of rule.tracks.slice(0, 32)) {
         try {
-          if (typeof src !== 'string' || src.length > 2048) return [];
+          const src = typeof track === 'string' ? track : track?.src;
+          if (typeof src !== 'string' || src.length > 2048) continue;
           const url = new URL(src, options.baseURL);
-          return url.protocol === root.protocol && url.origin === root.origin && url.pathname.startsWith(root.pathname)
-            && !url.username && !url.password && /\.(mp3|ogg|oga|wav|m4a|aac|flac|opus)$/i.test(url.pathname) ? [url.href] : [];
-        } catch (_) { return []; }
-      }))];
-      rules.set(section, { tracks, volume: finite(rule.volume) && rule.volume >= 0 && rule.volume <= 1 ? rule.volume : .10 });
+          if (url.protocol !== root.protocol || url.origin !== root.origin || !url.pathname.startsWith(root.pathname)
+            || url.username || url.password || !/\.(mp3|ogg|oga|wav|m4a|aac|flac|opus)$/i.test(url.pathname) || titles.has(url.href)) continue;
+          tracks.push(url.href); titles.set(url.href, cleanTitle(track?.title) || filenameTitle(url.href));
+          covers.set(url.href, coverURL(track?.cover));
+        } catch (_) { /* Ignore malformed or non-local entries. */ }
+      }
+      rules.set(section, { tracks, titles, covers, volume: finite(rule.volume) && rule.volume >= 0 && rule.volume <= 1 ? rule.volume : .10 });
     }
     let media = null, section = null, entered = false, pageActive = true, destroyed = false;
     let loadedPool = null, source = '', pendingSeek = null, generation = 0, starting = false, priming = false;
     let failure = null, fadeTimer = null, duckTimer = null, loadTimer = null, ducked = false, targetVolume = 0;
+    let announcementPending = false, startId = 0;
     const clearTimer = id => { if (id !== null) win.clearTimeout(id); };
     function listen(target, name, fn) {
       target?.addEventListener?.(name, fn); cleanups.push(() => target?.removeEventListener?.(name, fn));
@@ -43,6 +63,14 @@
     const visible = () => pageActive && !win.document?.hidden;
     const eligible = () => !destroyed && entered && visible() && options.allowed()
       && !options.foreground() && options.master() > 0 && !!currentRule()?.tracks.length;
+    const trackTitle = () => rules.get(loadedPool)?.titles.get(source) || filenameTitle(source);
+    const trackCover = () => rules.get(loadedPool)?.covers.get(source) || null;
+    function announceStart() {
+      if (!announcementPending || !media || media.paused || media.muted || media.volume <= 0 || !eligible()) return;
+      announcementPending = false;
+      const track = Object.freeze({ id: ++startId, section, pool: loadedPool, src: source, title: trackTitle(), cover: trackCover() });
+      for (const callback of [...listeners]) { try { callback(track); } catch (_) {} }
+    }
     function randomIndex(length) {
       const value = options.random();
       return Math.floor((finite(value) ? Math.max(0, Math.min(.999999999, value)) : .5) * length);
@@ -66,6 +94,7 @@
       const index = bag.shift(); indices.set(pool, index); return index;
     }
     function pause(reset = false) {
+      announcementPending = false;
       if (!media) return;
       if (source) positions.set(source, reset ? 0 : Number.isFinite(media.currentTime) ? media.currentTime : 0);
       generation++; starting = false; priming = false;
@@ -114,6 +143,9 @@
         if (destroyed || !media || media.paused) return;
         const progress = Math.min(1, (Date.now() - begin) / duration);
         media.volume = Math.max(0, Math.min(1, initial + (target - initial) * progress));
+        // Report the first positive output only, never the muted entry prime,
+        // source preload, ordinary navigation, or a later speech/volume fade.
+        announceStart();
         if (progress < 1) fadeTimer = win.setTimeout(tick, 30);
       };
       tick();
@@ -137,6 +169,7 @@
         starting = false; priming = false;
         // Priming is never audible under the entry movie or another section.
         if (prime && !eligible()) { pause(true); return; }
+        announcementPending = true;
         sync();
       }, reason => {
         if (destroyed || turn !== generation) return;
@@ -184,13 +217,14 @@
     listen(win, 'pagehide', () => { pageActive = false; pause(); });
     listen(win, 'pageshow', () => { pageActive = true; }); // Controller revalidates before resuming.
     return Object.freeze({ setRoute, prime, sync, pause, duck,
+      subscribe(fn) { if (typeof fn !== 'function') throw new TypeError('Ambient subscriber required'); listeners.add(fn); return () => listeners.delete(fn); },
       snapshot: () => ({ section, pool: poolKey(section), configured: !!currentRule()?.tracks.length, count: currentRule()?.tracks.length || 0,
         index: indices.get(poolKey(section)) || 0, playing: !!media && !media.paused && media.volume > 0,
-        volume: media?.volume || 0, error: failure }),
+        title: source ? trackTitle() : null, cover: source ? trackCover() : null, volume: media?.volume || 0, error: failure }),
       getMedia: () => media,
       destroy() {
         if (destroyed) return;
-        destroyed = true; pause(); clearTimer(duckTimer); cleanups.forEach(fn => fn());
+        destroyed = true; pause(); clearTimer(duckTimer); cleanups.forEach(fn => fn()); listeners.clear();
         media?.removeAttribute?.('src');
       }
     });
@@ -559,6 +593,7 @@
     return Object.freeze({ snapshot, probe, unlock, continueSilent, execute, releaseLease, destroy,
       setAmbience(section, entered) { activeSection = section; ambience.setRoute(section, entered); },
       getAmbienceState: ambience.snapshot,
+      subscribeAmbience: ambience.subscribe,
       subscribe(fn) { if (typeof fn !== 'function') throw new TypeError('Subscriber required'); subscribers.add(fn); return () => subscribers.delete(fn); },
       getNativeContext: nativeContext, getNativeMedia: () => ({ music, favorite, ambience: ambience.getMedia() }) });
   }

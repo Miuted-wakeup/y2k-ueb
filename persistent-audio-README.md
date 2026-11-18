@@ -87,9 +87,10 @@ Never publish private repository notes/tests/provenance/archived concepts.
 
 Place recordings anywhere under `assets/music/ambient/`, then explicitly register
 their site-relative filenames in `SiteAudioCore.AMBIENCE.default.tracks`. All
-seven sections share `crystal-settings.mp3` (the supplied YouTube track, downloaded
-through the user's own tool and extracted locally with FFmpeg). Its historical
-`home/` file location does not restrict playback to HOME. One track loops. There
+seven sections share nine recordings: `crystal-settings.mp3` and eight tracks in
+`assets/music/ambient/global/` (supplied YouTube tracks, downloaded through the
+user's own tool and extracted locally with FFmpeg). The original track's historical
+`home/` file location does not restrict playback to HOME. A single-track pool loops. There
 is no folder scan, guessed filename or fallback song. See `assets/music/ambient/README.md`.
 
 The persistent parent owns a separate, lazy native Audio element. During the
@@ -118,10 +119,22 @@ an empty override intentionally disables ambience there. Hiding the page, native
 context suspension, BFCache entry and disposal stop ineligible ambience; no hidden
 extra AudioContext or saved permission boolean is created.
 
-This change does not edit section HTML/CSS, skins, TECH/workspace/guest files or
-other aesthetics. Levels are starting values, not normalized loudness claims;
-recordings with different mastering need a later adjustment. The configured
-recording was downloaded and converted successfully, but no listening tests,
+When an ambient recording starts or resumes audibly, a small card shows its title
+and a 44px cover beside it (local source-video stills, stored under
+`assets/images/ambient/`; optional `cover` metadata in the shared registry)
+at the physical viewport's top-left (14px inset) for 4.2 seconds. Its colors follow
+the current section; a route change only updates the visible card's palette,
+without restarting the timer or announcing a new track. It ignores preloads,
+silent entry priming and speech-volume ramps, and hides under entry or when the
+document is hidden/leaving. It is a polite status region with plain text, no
+buttons, focus changes or pointer capture. Failed/missing images keep the title
+without a broken-image icon and never delay audio or extend the card's timer.
+All card presentation lives in the
+shared shell; section HTML/CSS, skins and TECH/workspace/guest files are untouched.
+
+Levels are starting values, not normalized loudness claims;
+recordings with different mastering may need a later adjustment. All configured
+recordings were downloaded and converted successfully, but no listening tests,
 automated checks, browser/runtime verification or site build were requested/run.
 `dist` remains unbuilt.
 

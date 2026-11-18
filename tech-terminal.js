@@ -1,4 +1,4 @@
-// Tech-only local commands. No shell execution, eval, network calls or new audio context.
+// Local commands with an optional, explicitly opened external Paint app. No shell, eval or new audio context.
 (function (host) {
   'use strict';
 
@@ -33,6 +33,8 @@ a little life in the wired.`
   });
   const COMMANDS = Object.freeze({
     help: ['help [comando]', 'Muestra esta guía o los detalles de un comando.'],
+    paint: ['paint [abrir|minimizar|restaurar|cerrar]', 'Abre el Paint clásico en su propia zona del escritorio, fuera de la consola. Carga JSPaint externo y necesita Internet. Cerrar/minimizar conserva el dibujo mientras sigues en Tech; guárdalo antes de salir.'],
+    fondo: ['fondo [lista|original|id]', 'Sin argumentos abre los fondos de Tech. lista muestra sus identificadores; original restaura el fondo inicial. Tu elección se guarda solo en este navegador.'],
     ascii: ['ascii [cat|pc|kirby|flower]', 'Dibuja en la consola. Sin argumento aparece un gato.'],
     shurelia: ['shurelia [30..180]', 'Abre la biblioteca de Shurelia en el panel derecho durante 90 segundos, o el tiempo que indiques. Repetir renueva la visita.'],
     talk: ['talk', 'Pide otro diálogo a Shurelia. También puedes tocar su retrato; durante una frase, el primer toque la completa.'],
@@ -66,7 +68,7 @@ a little life in the wired.`
     if (name) return Object.hasOwn(COMMANDS, name) ? COMMANDS[name].join('\n') : `No hay ayuda para '${name}'. Escribe help.`;
     return 'NAVI // pequeños programas para quedarse un rato\n\n'
       + Object.values(COMMANDS).map(([usage, description]) => `${usage}\n  ${description}`).join('\n\n')
-      + '\n\nTodo ocurre en esta página. El PC es una ficha retro, no un monitor de tu ordenador.\nEscape apaga Matrix y despide a la visita; las flechas recorren tus comandos.';
+      + '\n\nLos comandos son locales; Paint carga JSPaint externo únicamente cuando lo abres.\nEl PC es una ficha retro, no un monitor de tu ordenador.\nEscape apaga Matrix y despide a la visita; las flechas recorren tus comandos.';
   }
 
   function mount(root, win = host) {
@@ -77,6 +79,7 @@ a little life in the wired.`
     const session = root.querySelector('#terminal-cli-session');
     const main = root.querySelector('.terminal-main');
     if (!input || !output || !session || !main) return null;
+    const metrics = win.TechTerminalMetrics?.mount(root, win);
     const guest = win.TechTerminalGuest?.create(win);
     const history = [];
     const pending = new Set();
@@ -143,6 +146,8 @@ a little life in the wired.`
       if (args[0] === '--help') response = help(name);
       else switch (name) {
         case 'help': response = help(args[0] === 'cls' ? 'clear' : args[0]); break;
+        case 'paint': response = win.TechPaint?.command(args, win) || 'Paint no está disponible en este momento. Puedes seguir usando la consola.'; break;
+        case 'fondo': response = win.TechBackgrounds?.command(args, win) || 'El selector de fondos no está disponible en este momento.'; break;
         case 'ascii':
           response = Object.hasOwn(ART, args[0] || 'cat') ? ART[args[0] || 'cat'] : 'Elige: ascii cat, ascii pc, ascii kirby o ascii flower.';
           break;
@@ -208,7 +213,9 @@ a little life in the wired.`
     });
     root.querySelectorAll('.term-btn').forEach(button => listen(button, 'click', () => {
       run(button.dataset.cmd);
-      input.focus({ preventScroll: true });
+      // App commands can intentionally move focus outside the console.
+      const active = win.document.activeElement;
+      if (!active || active === win.document.body || root.contains(active)) input.focus({ preventScroll: true });
     }));
     listen(session, 'click', event => {
       if (event.target === session || event.target === output && !win.getSelection()?.toString()) input.focus({ preventScroll: true });
@@ -222,6 +229,7 @@ a little life in the wired.`
         if (destroyed) return;
         destroyed = true;
         clear();
+        metrics?.destroy();
         guest?.destroy();
         listeners.splice(0).forEach(remove => remove());
         mounts.delete(root);

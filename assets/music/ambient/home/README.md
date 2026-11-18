@@ -18,7 +18,8 @@ player's songs. See `../README.md` for mixing and random-order rules.
   `libmp3lame`, VBR quality 2, 48 kHz stereo, approximately 2:04.82.
 - The intermediary source video remains outside the site's public assets.
 
-This is the only configured shared track, so it loops across all sections.
+This original track now shares the global pool with eight recordings in `../global/`.
+It no longer loops alone: all nine use the same random, nonrepeating rounds.
 Moving between sections using the default pool preserves playback, position and
 shuffle state without pausing or restarting it. Additional tracks use a random,
 nonrepeating round rather than sequential order. The default ambient level remains

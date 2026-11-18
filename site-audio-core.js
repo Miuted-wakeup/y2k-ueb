@@ -21,11 +21,25 @@
     { title: 'hatachi no koi', artist: 'sped up', src: 'assets/music/hatachi.mp3' },
     { title: 'Fly, Kirby!', artist: "Kirby's Return to Dream Land", src: 'assets/music/kirby.mp3' },
     { title: 'TouhouMAD - Nitori Get Down!', artist: '小野崎人', src: 'assets/music/nitori.mp3' },
-    { title: 'aishite aishite aishite', artist: 'kikuo', src: 'assets/music/aishite.mp3' }
+    { title: 'aishite aishite aishite', artist: 'kikuo', src: 'assets/music/aishite.mp3' },
+    { title: 'Remember Summer Days', artist: 'Anri', src: 'assets/music/yt-3agc6do-624.mp3' },
+    { title: 'Heroes (NightCore)', artist: 'Canal: luna love', src: 'assets/music/yt-hxrwlmloaeo.mp3' },
+    { title: 'Color Your Night', artist: 'Lotus Juice, Azumi Takahashi & ATLUS Sound Team', src: 'assets/music/yt-j9sn1nfgqq8.mp3' },
+    { title: 'Looping the Rooms feat. Hatsune Miku', artist: 'Canal: rusino / ルシノ', src: 'assets/music/yt-icbdykfxpms.mp3' }
   ].map(Object.freeze));
   // Explicit ambient allowlist. Empty tracks intentionally produce no ambience.
   const AMBIENCE = Object.freeze({
-    default: Object.freeze({ volume: 0.10, tracks: Object.freeze(['assets/music/ambient/home/crystal-settings.mp3']) })
+    default: Object.freeze({ volume: 0.10, tracks: Object.freeze([
+      { src: 'assets/music/ambient/home/crystal-settings.mp3', title: 'crystal settings', cover: 'assets/images/ambient/youtube-P_7kL2GYXOU.png' },
+      { src: 'assets/music/ambient/global/youtube-_u58MXgRjGQ.mp3', title: 'Sunshower', cover: 'assets/images/ambient/youtube-_u58MXgRjGQ.png' },
+      { src: 'assets/music/ambient/global/youtube-tXfFJ2zyeYU.mp3', title: 'distant ocean', cover: 'assets/images/ambient/youtube-tXfFJ2zyeYU.png' },
+      { src: 'assets/music/ambient/global/youtube-FBT6pVibU5k.mp3', title: 'Schedule I OST - adventures in grassland', cover: 'assets/images/ambient/youtube-FBT6pVibU5k.png' },
+      { src: 'assets/music/ambient/global/youtube-T-_hOj-eUds.mp3', title: 'Atlas', cover: 'assets/images/ambient/youtube-T-_hOj-eUds.png' },
+      { src: 'assets/music/ambient/global/youtube-2aaNu_uTrn4.mp3', title: 'logged in for hours', cover: 'assets/images/ambient/youtube-2aaNu_uTrn4.png' },
+      { src: 'assets/music/ambient/global/youtube-Gm0K-CL8yoc.mp3', title: 'floating signal', cover: 'assets/images/ambient/youtube-Gm0K-CL8yoc.png' },
+      { src: 'assets/music/ambient/global/youtube-GOQEOkPsdcM.mp3', title: 'HOME - Tides', cover: 'assets/images/ambient/youtube-GOQEOkPsdcM.png' },
+      { src: 'assets/music/ambient/global/youtube--V_sltvF08Y.mp3', title: 'Network Winds', cover: 'assets/images/ambient/youtube--V_sltvF08Y.png' }
+    ].map(Object.freeze)) })
   });
   const kinds = new Set(['hello', 'state', 'command', 'ack', 'navigate', 'replace', 'page-ready', 'page-leaving', 'request-activation']);
   const validToken = token => typeof token === 'string' && /^[a-f0-9]{32}$/i.test(token);

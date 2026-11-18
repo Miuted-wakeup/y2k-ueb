@@ -1,16 +1,33 @@
-/* Tech is a dense personal workbench, not the shared three-column blog. */
-#section-tech #layout.tech-shell { display: block; }
-#section-tech #center-feed.tech-workspace {
+/* Tech is a blog first: a fixed author rail beside one central scroll surface. */
+#section-tech #layout.tech-shell { display: flex; }
+#section-tech .tech-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+#section-tech #center-feed.tech-blog-content {
+  min-width: 0;
+  min-height: 0;
   height: 100%;
   padding: 0 6px 14px 0;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
   scroll-padding-top: 6px;
+  scrollbar-gutter: stable;
+}
+#section-tech #center-feed.tech-blog-content:focus-visible {
+  outline: 1px dotted #005f8a;
+  outline-offset: -2px;
 }
 #section-tech .tech-workspace .panel { margin: 0; min-width: 0; }
 .tech-desk-heading {
   display: flex;
+  flex-shrink: 0;
   justify-content: space-between;
   align-items: end;
   gap: 12px;
@@ -22,6 +39,53 @@
 }
 .tech-desk-heading h1 { font: 17px/1.2 var(--font-chrome); }
 .tech-desk-heading p { margin-top: 3px; font: 11px/1.3 var(--font-digital); }
+.tech-blog-layout {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: minmax(205px, 23%) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+  overflow: hidden;
+}
+.tech-blog-sidebar,
+.tech-blog-feed { display: grid; gap: 11px; min-width: 0; align-content: start; }
+.tech-blog-feed { scroll-margin-top: 6px; }
+.tech-blog-sidebar {
+  min-height: 0;
+  overflow: hidden;
+}
+#section-tech .tech-blog-sidebar .msn-card-body { padding: 9px; gap: 7px; }
+.tech-blog-sidebar .msn-name { font-size: 8px; }
+.tech-blog-sidebar .msn-avatar-wrap { flex-shrink: 0; width: 52px; height: 52px; }
+.tech-blog-sidebar .msn-meta { min-width: 0; }
+.tech-blog-sidebar .msn-music-status { flex-wrap: wrap; gap: 3px 6px; }
+.tech-blog-sidebar .aero-bookmark-link { padding: 6px; font-size: 11px; }
+.tech-blog-sidebar .aero-bookmark-link:last-child { margin-bottom: 0; }
+#section-tech .tech-blog-feed .tech-entry { min-width: 0; }
+#section-tech .tech-blog-feed .panel-title { white-space: normal; overflow-wrap: anywhere; line-height: 1.4; }
+#section-tech .tech-blog-feed .post-long { padding: 13px 16px; font: 13px/1.8 var(--font-jp); }
+.tech-blog-feed .post-long p { margin: 0 0 12px; }
+.tech-blog-feed .post-long p:last-child { margin-bottom: 0; }
+#section-tech .tech-blog-feed .post-title { font-size: 17px; line-height: 1.5; }
+.tech-laboratory { min-width: 0; margin-top: 16px; }
+.tech-laboratory-summary {
+  padding: 9px 11px;
+  border: 1px solid;
+  border-color: #fff #6ca8bf #6ca8bf #fff;
+  border-radius: 3px;
+  background: linear-gradient(#f4fcff, #cceaf6 48%, #b1dce9 51%, #e1f6fa);
+  color: #005678;
+  box-shadow: 1px 1px 0 #72a5b9;
+  cursor: pointer;
+}
+.tech-laboratory-summary::marker { color: #197a8c; }
+.tech-laboratory-summary span { font: 11px/1.5 var(--font-chrome); }
+.tech-laboratory-summary small { display: inline-block; margin-left: 10px; font: 12px/1.4 var(--font-digital); }
+.tech-laboratory-summary:focus-visible { outline: 2px dotted #005f8a; outline-offset: 2px; }
+.tech-laboratory[open] > .tech-laboratory-summary { margin-bottom: 10px; box-shadow: inset 0 -2px #56b989, 1px 1px #72a5b9; }
+.tech-laboratory-content { min-width: 0; }
 .tech-local-nav { display: flex; flex-wrap: wrap; gap: 4px; }
 .tech-local-nav button,
 .tech-carousel-button {
@@ -75,13 +139,6 @@
 #section-tech #tech-audio .panel-body { padding: 5px; }
 #tech-audio .eq-bar { max-height: 19px; }
 #tech-audio .tech-audio-label { font-family: var(--font-digital); font-size: 10px; }
-#section-tech .tech-toolshelf .msn-card-body { padding: 7px; gap: 5px; }
-.tech-toolshelf .msn-name { font-size: 7.5px; }
-.tech-toolshelf .msn-avatar-wrap { flex-shrink: 0; width: 46px; height: 46px; }
-.tech-toolshelf .msn-music-status { flex-wrap: wrap; gap: 2px 5px; }
-.tech-toolshelf .msn-meta { min-width: 0; }
-.tech-toolshelf .aero-bookmark-link { padding: 5px 6px; font-size: 10px; }
-.tech-toolshelf .aero-bookmark-link:last-child { margin-bottom: 0; }
 .tech-workspace-band {
   display: flex;
   justify-content: space-between;
@@ -153,15 +210,8 @@
 #tech-rig .aero-spec-val { text-align: right; }
 #tech-rig .aero-gauge-wrap { flex: 1 1 calc(50% - 16px); margin-top: 0; }
 #tech-badges .badge-88x31 { width: 100%; min-width: 0; }
-.tech-notebook {
-  display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(270px, 1fr);
-  gap: 10px;
-  align-items: start;
-}
-#tech-readme { grid-column: 1 / -1; }
-#tech-readme .aero-hero-content { padding: 10px 14px; gap: 6px; }
-#tech-readme .aero-hero-title { font-size: 16px; }
+#tech-readme .aero-hero-content { padding: 12px 16px; gap: 8px; }
+#tech-readme .aero-hero-title { font-size: 16px; flex-wrap: wrap; gap: 8px; }
 #tech-readme .aero-hero-desc { max-width: 105ch; }
 #tech-essay .post-title { line-height: 1.5; }
 #tech-manifesto .tech-pillar-list { display: grid; grid-template-columns: 1fr; gap: 7px; }
@@ -226,10 +276,29 @@
 #section-tech #dock-coming { color: #216580; }
 
 @media (max-width: 1250px) {
+  .tech-blog-layout { grid-template-columns: 205px minmax(0, 1fr); gap: 11px; }
   .tech-workbench { grid-template-columns: minmax(0, 1fr) 280px; }
   .tech-desk-heading { align-items: start; }
   .tech-local-nav { max-width: 260px; justify-content: end; }
   .tech-carousel-track .gadget-card { flex-basis: 43%; }
+}
+@media (max-width: 760px) {
+  .tech-blog-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .tech-blog-sidebar { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .tech-workbench { grid-template-columns: minmax(0, 1fr); }
+  #section-tech #panel-tech-terminal, .tech-toolshelf { grid-column: 1; }
+  .tech-system-drawer { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .tech-blog-sidebar { grid-template-columns: minmax(0, 1fr); }
+  .tech-laboratory-summary small { display: block; margin: 4px 0 0; }
+}
+@media (max-height: 760px) {
+  .tech-blog-sidebar { gap: 8px; }
+  #section-tech .tech-blog-sidebar .msn-card-body { padding: 6px; gap: 4px; }
+  .tech-blog-sidebar .msn-avatar-wrap { width: 42px; height: 42px; }
+  .tech-blog-sidebar .aero-bookmark-link { padding: 4px; margin-bottom: 4px; font-size: 10px; }
+  #section-tech #tech-bookmarks .panel-body { padding: 4px !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tech-carousel-track .gadget-card { transition: none; }

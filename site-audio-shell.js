@@ -225,7 +225,69 @@
   function mountBrowserHost(win, shell) {
     const doc = win.document, Core = defaultCore;
     let controller, dialog = null, previousFocus = null, revealCover = null, introSerial = 0;
+    let ambientToast = null, ambientToastTitle = null, ambientToastCover = null, ambientToastTimer = null;
+    let unsubscribeAmbience = null, lastAmbienceId = null;
     const setText = (id, text) => { const node = doc.getElementById(id); if (node) node.textContent = text; };
+    function hideAmbientToast() {
+      if (ambientToastTimer !== null) win.clearTimeout(ambientToastTimer);
+      ambientToastTimer = null;
+      if (ambientToast) ambientToast.hidden = true;
+    }
+    function themeAmbientToast(section) {
+      if (ambientToast) ambientToast.dataset.section = Core.SECTIONS.some(item => item.section === section) ? section : 'home';
+    }
+    function showAmbientToast(track) {
+      const state = controller?.snapshot();
+      if (!state?.entered || doc.hidden || !ambientToast || !Number.isFinite(track?.id) ||
+          track.id === lastAmbienceId || typeof track.title !== 'string' || !track.title.trim()) return;
+      lastAmbienceId = track.id;
+      hideAmbientToast();
+      themeAmbientToast(state.route.section);
+      ambientToast.hidden = false;
+      ambientToastTitle.textContent = track.title;
+      ambientToastCover.hidden = true;
+      ambientToastCover.onload = ambientToastCover.onerror = null;
+      ambientToastCover.removeAttribute('src');
+      if (typeof track.cover === 'string' && track.cover) {
+        const cover = track.cover;
+        ambientToastCover.onload = () => {
+          if (ambientToastCover?.getAttribute('src') === cover) ambientToastCover.hidden = false;
+        };
+        ambientToastCover.onerror = () => { if (ambientToastCover) ambientToastCover.hidden = true; };
+        ambientToastCover.src = cover;
+      }
+      ambientToastTimer = win.setTimeout(hideAmbientToast, 4200);
+    }
+    function ambientVisibilityChanged() { if (doc.hidden) hideAmbientToast(); }
+    function ambientPageHidden(event) {
+      hideAmbientToast();
+      if (!event.persisted) disposeAmbientToast();
+    }
+    function disposeAmbientToast() {
+      hideAmbientToast();
+      unsubscribeAmbience?.(); unsubscribeAmbience = null;
+      doc.removeEventListener('visibilitychange', ambientVisibilityChanged);
+      win.removeEventListener('pagehide', ambientPageHidden);
+      if (ambientToastCover) { ambientToastCover.onload = ambientToastCover.onerror = null; ambientToastCover.removeAttribute('src'); }
+      ambientToast?.remove(); ambientToast = ambientToastTitle = ambientToastCover = null;
+    }
+    function mountAmbientToast(engine) {
+      if (typeof engine.subscribeAmbience !== 'function') return;
+      ambientToast = doc.createElement('div'); ambientToast.id = 'site-ambient-toast'; ambientToast.hidden = true;
+      ambientToast.setAttribute('role', 'status'); ambientToast.setAttribute('aria-live', 'polite');
+      ambientToast.setAttribute('aria-atomic', 'true');
+      const label = doc.createElement('span'); label.className = 'sa-ambient-label'; label.textContent = '♫ AMBIENTE';
+      const content = doc.createElement('div'); content.className = 'sa-ambient-content';
+      ambientToastCover = doc.createElement('img'); ambientToastCover.className = 'sa-ambient-cover';
+      ambientToastCover.alt = ''; ambientToastCover.width = 44; ambientToastCover.height = 44; ambientToastCover.hidden = true;
+      ambientToastCover.decoding = 'async';
+      ambientToastTitle = doc.createElement('strong'); ambientToastTitle.className = 'sa-ambient-title';
+      content.append(ambientToastCover, ambientToastTitle);
+      ambientToast.append(label, content); doc.documentElement.appendChild(ambientToast);
+      doc.addEventListener('visibilitychange', ambientVisibilityChanged);
+      win.addEventListener('pagehide', ambientPageHidden);
+      unsubscribeAmbience = engine.subscribeAmbience(showAmbientToast);
+    }
     function closeGate(restoreFocus = true) {
       if (dialog) {
         const old = dialog; dialog = null;
@@ -294,6 +356,8 @@
       const sectionFrame = controller?.getFrame();
       const entry = Core.SECTIONS.find(item => item.section === state.route.section);
       doc.title = entry.label + ' · mi espacio';
+      themeAmbientToast(state.route.section);
+      if (!state.entered || state.phase !== 'complete') hideAmbientToast();
       if (state.phase === 'revealing') { openCurtains(); return; }
       clearReveal();
       if (state.phase === 'complete') {
@@ -352,15 +416,16 @@
           frame.src = src; doc.body.appendChild(frame); return frame;
         }, onPhase: phaseUI,
         onError(reason) {
-          clearReveal(); closeGate(); const box = doc.createElement('p'); box.className = 'site-audio-error';
+          disposeAmbientToast(); clearReveal(); closeGate(); const box = doc.createElement('p'); box.className = 'site-audio-error';
           box.textContent = 'No se pudo abrir la sección. Recarga la página para reintentar. ' + (reason?.message || ''); doc.body.appendChild(box);
         },
         onUnexpectedLeave() { /* Never stream new state to an unauthenticated destination. */ }
       });
       shell.engine = engine; shell.controller = controller; shell.snapshot = () => controller.snapshot();
-      shell.navigate = href => controller.navigate(href); controller.start();
+      shell.navigate = href => controller.navigate(href);
+      mountAmbientToast(engine); controller.start();
     } catch (reason) {
-      clearReveal(); closeGate(); shell.isHost = false;
+      disposeAmbientToast(); clearReveal(); closeGate(); shell.isHost = false;
       doc.body.style.setProperty('opacity', '1', 'important');
       doc.querySelectorAll('.panel,#site-header,#site-nav,#main-wrapper').forEach(node => node.style.setProperty('opacity', '1', 'important'));
       const note = doc.createElement('p'); note.textContent = 'Audio compartido no disponible. Recarga para reintentar.'; note.setAttribute('role', 'alert'); doc.body.prepend(note);
