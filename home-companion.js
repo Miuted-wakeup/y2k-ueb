@@ -314,6 +314,7 @@
       cleanups.push(() => target?.removeEventListener(type, callback, options));
     };
     root.classList.add('hc-script-ready');
+    const portraitRenderer = art?.createPortraitRenderer?.(interactButton, { window: win });
     const reactionButtons = [...(doc.querySelectorAll?.('.hc-reactive-button') || [])];
     const paint = count => glyphs.forEach((glyph, i) => { glyph.style.visibility = i < count ? 'visible' : 'hidden'; });
     const director = createDirector({ reducedMotion: reduced.matches, ready: false,
@@ -336,6 +337,7 @@
       onFrame(frame) {
         portrait.style.backgroundPosition = -(frame % 4) * 64 + 'px ' + -Math.floor(frame / 4) * 56 + 'px';
         portrait.dataset.frame = frame;
+        portraitRenderer?.setFrame(frame);
       },
       onState(s) {
         root.dataset.mood = s.mood; root.dataset.speaking = s.typing && s.visible;
@@ -388,6 +390,7 @@
       if (disposed) return;
       disposed = true; soundAllowed = false;
       entry?.destroy(); destroy(); speech?.destroy();
+      portraitRenderer?.destroy();
       cleanups.forEach(cleanup => cleanup());
       if (fontImage) fontImage.onload = fontImage.onerror = null;
     };

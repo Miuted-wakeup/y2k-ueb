@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="tech-player-cd.css" />
   <link rel="stylesheet" href="tech-terminal-guest.css" />
   <link rel="stylesheet" href="tech-workspace.css" />
+  <link rel="stylesheet" href="tech-header.css" />
   <link rel="stylesheet" href="tech-backgrounds.css" />
   <link rel="stylesheet" href="tech-paint.css" />
   <!-- Persistent audio host: each direct section validates its own destination. -->
@@ -44,10 +45,25 @@
         <span id="site-title">★ mi espacio ★</span>
         <span id="site-tagline">わたしのせかい ✦ mi pequeño rincón de internet</span>
       </div>
-      <div id="header-marquee">
-        <marquee behavior="scroll" direction="left" scrollamount="3">
-          🫧 FRUTIGER AERO · 次世代の透明な世界 ✦ Windows Vista 64-bit Aero ✦ Skeuomorphic bliss ✦ 100Mbps Fiber ✦ Optimismo digital 2005-2007 ✦ 水と光の未来 ✦ Intel Core 2 Duo ✦ iPod click wheel 🫧
-        </marquee>
+      <div id="header-marquee" class="tech-header-ticker">
+        <div id="tech-header-phrases" class="tech-header-viewport" tabindex="0" role="marquee" aria-live="off" aria-label="Frases del rincón. El texto se detiene mientras esta franja tiene el foco.">
+          <div class="tech-header-track">
+            <div class="tech-header-copy">
+              <span class="tech-header-phrase">Bienvenido. Ponte cómodo y sube un poco el volumen.</span>
+              <span class="tech-header-phrase">¿Me pasas tu MSN?</span>
+              <span class="tech-header-phrase">Seguro que se arregla reiniciando.</span>
+              <span class="tech-header-phrase">Antes de apagar el PC, una canción más.</span>
+              <span class="tech-header-phrase">Una carpeta nueva para ordenar las carpetas nuevas.</span>
+              <span class="tech-header-phrase">¿Y si cambiamos el fondo de pantalla otra vez?</span>
+              <span class="tech-header-phrase">Un zumbido para saber si sigues ahí.</span>
+              <span class="tech-header-phrase">Siempre hay sitio para otro MP3.</span>
+              <span class="tech-header-phrase">Guardar como... por si acaso.</span>
+              <span class="tech-header-phrase">Qué largo se hace el último tramo de una descarga.</span>
+              <span class="tech-header-phrase">Ese CD merece una última canción.</span>
+              <span class="tech-header-phrase">La lista de favoritos nunca termina de ordenarse.</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -112,20 +128,31 @@
                 </div>
               </div>
               <div class="panel-body msn-card-body">
+                <span class="tech-profile-corner" aria-hidden="true">
+                  <img src="assets/gifs/tech/profile/toro-and-kuro.gif" alt="" width="144" height="80">
+                </span>
                 <div class="msn-user-row">
-                  <div class="msn-avatar-wrap">
-                    <img src="assets/images/tech/avatar.jpg" class="msn-avatar-img" alt="avatar msn">
-                    <span class="msn-status-dot"></span>
+                  <div class="tech-profile-portrait">
+                    <div class="msn-avatar-wrap">
+                      <img src="assets/images/tech/avatar.jpg" class="msn-avatar-img" alt="Avatar de Muted">
+                      <span class="msn-status-dot"></span>
+                    </div>
+                    <span class="tech-profile-monitor" aria-hidden="true">
+                      <img src="assets/gifs/tech/lain-glitch-framed.gif" alt="" width="181" height="212">
+                    </span>
                   </div>
                   <div class="msn-meta">
                     <span class="msn-name">☆ MUTED ☆</span>
                     <span class="msn-status-text">( ´ ∀ ` ) · en línea</span>
-                    <span style="font-size:8px;color:var(--text-dim);font-family:var(--font-pixel);">Muted · MSN</span>
+                    <span class="tech-profile-handle">Muted · MSN</span>
                   </div>
                 </div>
                 <div class="msn-music-status">
                   <span>♫ Escuchando:</span>
                   <strong>Daft Punk — Digital Love</strong>
+                  <span class="tech-profile-sitter" aria-hidden="true">
+                    <img src="assets/images/tech/profile/no-filter.webp" alt="" width="420" height="420">
+                  </span>
                 </div>
                 <button type="button" class="msn-nudge-btn" id="msn-nudge-btn">
                   <span>⚡ Enviar Zumbido (Nudge)</span>
@@ -639,6 +666,7 @@
   <script src="scripts.js"></script>
   <script src="player-skins.js"></script>
   <script src="tech-player-cd.js"></script>
+  <script src="tech-header-carousel.js"></script>
   <script src="tech-workspace.js"></script>
 </body>
 

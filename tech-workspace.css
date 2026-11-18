@@ -63,6 +63,79 @@
 .tech-blog-sidebar .msn-music-status { flex-wrap: wrap; gap: 3px 6px; }
 .tech-blog-sidebar .aero-bookmark-link { padding: 6px; font-size: 11px; }
 .tech-blog-sidebar .aero-bookmark-link:last-child { margin-bottom: 0; }
+/* A vertical author portrait, with a tiny Wired monitor rather than another widget row. */
+#section-tech #panel-msn {
+  --tech-profile-avatar: clamp(64px, calc(var(--site-viewport-height) * .1), 88px);
+  --tech-profile-sitter-size: 72px;
+}
+#section-tech #panel-msn .msn-card-body { position: relative; }
+#section-tech #panel-msn .tech-profile-corner {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 64px;
+  z-index: 1;
+  pointer-events: none;
+}
+#section-tech #panel-msn .msn-music-status { position: relative; }
+#section-tech #panel-msn .tech-profile-sitter {
+  position: absolute;
+  right: -4px;
+  /* The original has 44/420 transparent pixels below the feet; let them cross the perch. */
+  bottom: calc(100% - var(--tech-profile-sitter-size) * .104762 - 2px);
+  width: var(--tech-profile-sitter-size);
+  z-index: 1;
+  pointer-events: none;
+}
+#section-tech #panel-msn :is(.tech-profile-corner, .tech-profile-sitter) img {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  user-select: none;
+}
+#section-tech #panel-msn .msn-user-row {
+  flex-direction: column;
+  gap: 9px;
+  padding: 3px 0 2px;
+  text-align: center;
+}
+#section-tech #panel-msn .tech-profile-portrait {
+  position: relative;
+  width: var(--tech-profile-avatar);
+  height: var(--tech-profile-avatar);
+}
+#section-tech #panel-msn .msn-avatar-wrap {
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  border-radius: 8px;
+  box-shadow: 0 3px 9px #008cb633, 0 0 0 1px #fff;
+}
+#section-tech #panel-msn .msn-meta { align-items: center; gap: 2px; }
+#section-tech #panel-msn .msn-name { font-size: 9px; line-height: 1.4; }
+#section-tech #panel-msn .tech-profile-handle { color: #397087; font: 11px/1.2 var(--font-digital); }
+#section-tech #panel-msn .tech-profile-monitor {
+  position: absolute;
+  right: -44px;
+  bottom: 0;
+  display: block;
+  width: 40px;
+  padding: 2px;
+  border: 1px solid;
+  border-color: #f3fcff #527e8e #527e8e #f3fcff;
+  border-radius: 2px;
+  background: #123842;
+  box-shadow: 1px 2px 2px #14526c55;
+  pointer-events: none;
+}
+#section-tech #panel-msn .tech-profile-monitor img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
 #section-tech .tech-blog-feed .tech-entry { min-width: 0; }
 #section-tech .tech-blog-feed .panel-title { white-space: normal; overflow-wrap: anywhere; line-height: 1.4; }
 #section-tech .tech-blog-feed .post-long { padding: 13px 16px; font: 13px/1.8 var(--font-jp); }
@@ -299,7 +372,74 @@
   .tech-blog-sidebar .msn-avatar-wrap { width: 42px; height: 42px; }
   .tech-blog-sidebar .aero-bookmark-link { padding: 4px; margin-bottom: 4px; font-size: 10px; }
   #section-tech #tech-bookmarks .panel-body { padding: 4px !important; }
+  #section-tech #panel-msn { --tech-profile-avatar: 64px; --tech-profile-sitter-size: 60px; }
+  #section-tech #panel-msn .msn-user-row { gap: 5px; padding-block: 1px; }
+  #section-tech #panel-msn .tech-profile-monitor { width: 34px; right: -38px; }
+  #section-tech #panel-msn .tech-profile-corner { width: 56px; top: 4px; left: 4px; }
+}
+@media (max-height: 580px) {
+  #section-tech #panel-msn { --tech-profile-avatar: 56px; --tech-profile-sitter-size: 52px; }
+  #section-tech #panel-msn .tech-profile-monitor { display: none; }
+  #section-tech #panel-msn .tech-profile-corner { width: 48px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tech-carousel-track .gadget-card { transition: none; }
+}
+
+/* Reserve the disc's real vertical footprint, then fit the rail to what remains.
+   Size containment belongs only to the stretched desktop grid item, never the
+   auto-height author row used by the narrow layout. */
+@supports (container-type: size) {
+  @media (min-width: 761px) {
+    #section-tech .tech-blog-sidebar {
+      container-name: tech-author;
+      container-type: size;
+      gap: 8px;
+    }
+    #section-tech.tech-cd-mounted .tech-blog-sidebar {
+      /* The wrapper already ends 8px above the player; retain that gap above the CD. */
+      padding-bottom: max(0px, calc(var(--tech-cd-size) * .75 - var(--np-player-height, 63px)));
+    }
+  }
+
+  @container tech-author (max-height: 420px) {
+    #section-tech #panel-msn { --tech-profile-avatar: 64px; --tech-profile-sitter-size: 60px; }
+    #section-tech #panel-msn .msn-card-body { padding: 6px; gap: 4px; }
+    #section-tech #panel-msn .msn-user-row { gap: 5px; padding-block: 0; }
+    #section-tech #panel-msn .tech-profile-handle { font-size: 10px; line-height: 1.1; }
+    #section-tech #panel-msn .tech-profile-monitor { width: 32px; right: -36px; }
+    #section-tech #panel-msn .tech-profile-corner { width: 52px; top: 4px; left: 4px; }
+    #section-tech #panel-msn > .panel-titlebar,
+    #section-tech #tech-bookmarks > .panel-titlebar { padding: 3px 6px; }
+    #section-tech #tech-bookmarks .panel-body { padding: 4px !important; }
+    #section-tech #tech-bookmarks .aero-bookmark-link {
+      padding: 4px;
+      margin-bottom: 3px;
+      font-size: 10.5px;
+      line-height: 1.3;
+    }
+    #section-tech #tech-bookmarks .aero-bookmark-link:last-child { margin-bottom: 0; }
+  }
+
+  @container tech-author (max-height: 360px) {
+    #section-tech #panel-msn { --tech-profile-avatar: 60px; --tech-profile-sitter-size: 52px; }
+    #section-tech #panel-msn .msn-card-body { padding: 4px; gap: 3px; }
+    #section-tech #panel-msn .msn-user-row { gap: 3px; }
+    #section-tech #panel-msn .msn-meta { gap: 1px; line-height: 1.2; }
+    #section-tech #panel-msn .msn-name { font-size: 8.5px; line-height: 1.2; }
+    #section-tech #panel-msn .tech-profile-monitor { width: 28px; right: -32px; }
+    #section-tech #panel-msn .tech-profile-corner { width: 44px; top: 3px; left: 3px; }
+    #section-tech #panel-msn .msn-nudge-btn { padding: 3px 6px; }
+    #section-tech #panel-msn .msn-music-status { padding: 2px 5px; font-size: 9px; line-height: 1.3; }
+    #section-tech #panel-msn > .panel-titlebar,
+    #section-tech #tech-bookmarks > .panel-titlebar { padding: 2px 6px; }
+    #section-tech #tech-bookmarks .panel-body { padding: 3px !important; }
+    #section-tech #tech-bookmarks .aero-bookmark-link {
+      padding: 3px 4px;
+      margin-bottom: 2px;
+      font-size: 10px;
+      line-height: 1.25;
+    }
+    #section-tech #tech-bookmarks .aero-bookmark-link:last-child { margin-bottom: 0; }
+  }
 }

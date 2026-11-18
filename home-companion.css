@@ -49,6 +49,11 @@ button.hc-portrait:disabled { pointer-events: none; cursor: default; }
 .hc-body, .hc-face { display: block; position: absolute; background: url('assets/images/home/shurelia-atlas.png') no-repeat; image-rendering: pixelated; }
 .hc-body { inset: 0; background-position: 0 -184px; }
 .hc-face { left: 82px; top: 76px; width: 64px; height: 56px; background-position: 0 0; }
+.hc-portrait-canvas { display: block; position: absolute; inset: 0; width: 256px; height: 328px; image-rendering: pixelated; pointer-events: none; }
+.hc-portrait-canvas[hidden] { display: none; }
+/* Keep the original layers as a fallback until a complete native-size frame exists. */
+.hc-portrait.hc-composed > .hc-body,
+.hc-portrait.hc-composed > .hc-face { visibility: hidden; }
 .hc-dialogue {
   position: absolute;
   right: calc(50% + 54px);

@@ -16,6 +16,19 @@ Its transparent facial aperture is `(82,260,64,56)` in source coordinates:
 overlay one 64×56 face at `(left:82, top:76)` relative to that body.
 Scale the assembled body and face together; retain the image's transparency.
 
+HOME now tries a single-surface composition: draw that body and the selected
+original face at their native coordinates onto one 256×328 canvas, with
+`imageSmoothingEnabled=false`, then scale only the assembled surface. The canvas
+keeps `image-rendering:pixelated`; the existing 72% portrait scale and 130% site
+zoom are unchanged. This avoids scaling the edge of the face aperture as a
+separate layer. It does not redraw or modify any source image.
+
+The original `.hc-body` and `.hc-face` spans remain as the no-JavaScript,
+unavailable-canvas or image/drawing-error fallback. They are hidden only after
+the first successful canvas paint. This is a user-authorized trial for a likely
+fractional-layer seam, not a browser-verified fix: no tests, browser/runtime
+checks or builds were run for this change.
+
 The nine face tiles begin at `(0,0)`, `(64,0)`, `(128,0)`, `(192,0)`,
 `(0,56)`, `(64,56)`, `(128,56)`, `(192,56)` and `(0,112)`.
 The second, smaller portrait set remains intact in the atlas but is not needed
@@ -26,6 +39,13 @@ for this composition. Do not display the entire sheet as one character.
 `home-companion-art.js` exposes `HomeCompanionArt` in a classic browser script
 and the same API through CommonJS for local tests:
 
+- `createPortraitRenderer(container, { window, src? })`: optional portrait helper;
+  `src` defaults to the unchanged local Shurelia atlas. Returns
+  `{ setFrame(frame), destroy() }`, or `null` when the required drawing support
+  is unavailable. `setFrame` accepts original face indexes0–8 and retains the
+  latest selection while the image loads; it composes the body and selected
+  tile in one native-resolution paint. `destroy` releases the image callbacks
+  and canvas and restores the existing sprite fallback.
 - `normalizeText(text)`: uppercase/base-letter visual text; Spanish accents
   become their base letters. Curly/guillemet quotes, long dashes, underscores and ellipses use their closest
   available glyphs. Spanish `¿`/`¡` retain their identity and use the original
@@ -67,6 +87,14 @@ compact widgets now fit without independent scrolling at normal desktop heights;
 very low windows retain an explicitly labelled reachable fallback. The original
 main clearance already supplies an 8px gap. Left and center scrolling are unchanged.
 No other section loads these scripts/styles. The old `character.png` is retained.
+
+HOME's frame callback still updates the fallback sprite position and face data,
+and also forwards that same frame to the optional portrait renderer. Rendering
+does not change expression selection, dialogue/audio timing, entry or the
+portrait's scene/scroll footprint. Director disposal also destroys the renderer;
+remount creates a fresh instance. The existing persisted-page lifecycle still
+decides whether to retain or remount the active instance. TECH's separately owned visitor is not
+changed by this HOME integration.
 
 - Dialogue remains automatic after HOME's separate welcome entry, and the portrait
   itself is now a native button: click, Enter or Space requests dialogue. While
